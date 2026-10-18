@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validation — Astrea</title>
+<meta name="description" content="Fourteen day-ahead calls in Denmark set against what cleared: MASE 0.61 and 0.54, with the error traced to a single measurable driver.">
+<meta property="og:title" content="Validation — Astrea">
+<meta property="og:description" content="Fourteen day-ahead calls in Denmark set against what cleared: MASE 0.61 and 0.54, with the error traced to a single measurable driver.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navlinks">Menu</button>
+    <nav class="nav-links" id="navlinks">
+      <a class="nav-link" href="/platform">Platform</a>
+      <a class="nav-link" href="/validation">Validation</a>
+      <a class="nav-link" href="/company">Company</a>
+      <div class="dd">
+        <button class="dd-btn" id="ddBtn" aria-expanded="false" aria-haspopup="true" aria-controls="ddmenu">Demo <span class="dd-caret" aria-hidden="true"></span></button>
+        <div class="dd-menu" id="ddmenu">
+          <a class="dd-item" href="/demo"><strong>Trader demo</strong><span>Day-ahead forecast against the cleared price, DK1 and DK2</span></a>
+          <a class="dd-item" href="/validation#record"><strong>Forecast record</strong><span>Fourteen graded calls, with driver attribution</span></a>
+        </div>
+      </div>
+      <a class="nav-cta" href="/company#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="sec sec-navy">
+  <div class="wrap stack" style="gap:18px">
+    <p class="eyebrow">Validation</p>
+    <h1 class="h-xl" style="max-width:20ch">Fourteen day-ahead calls in Denmark, set against what cleared.</h1>
+    <p class="lead">Both Danish bidding zones, 23 September to 6 October 2026. Each forecast was issued one day before its delivery day. Delivery days from 29 September are out of sample.</p>
+  </div>
+</section>
+
+<section class="sec" id="record">
+  <div class="wrap stack" style="gap:30px">
+    <div class="grid g3">
+      <div class="card">
+        <p class="stat">0.61 / 0.54</p>
+        <p class="stat-label">MASE at D+1, DK1 / DK2</p>
+        <p>39% and 46% below the seasonal-naive benchmark on the walk-forward test.</p>
+      </div>
+      <div class="card">
+        <p class="stat">&euro;27.8 / &euro;29.5</p>
+        <p class="stat-label">Mean error, 14 days</p>
+        <p>In &euro;/MWh on the daily-mean day-ahead price. A harder fortnight than the walk-forward average.</p>
+      </div>
+      <div class="card">
+        <p class="stat">9 of 13</p>
+        <p class="stat-label">Direction called</p>
+        <p>Day-over-day price moves called in the right direction, in both zones.</p>
+      </div>
+    </div>
+    <div class="card card-accent">
+      <p class="card-label">What the benchmark is</p>
+      <p style="font-size:17px">Seasonal-naive means the realized daily mean of the same weekday one week earlier &mdash; the standard reference in price forecasting, and what a desk without a model falls back on. MASE below 1.0 beats it.</p>
+    </div>
+    <p style="text-align:center"><a class="btn btn-dark" href="/demo">Explore the record day by day &rarr;</a></p>
+  </div>
+</section>
+
+<section class="sec sec-alt">
+  <div class="wrap stack" style="gap:30px">
+    <div class="stack" style="gap:14px">
+      <p class="eyebrow">The diagnosis</p>
+      <h2 class="h-lg">The error has one name: the German price move.</h2>
+      <p class="lead">Denmark clears in the same coupled auction as Germany. When the German price jumps and the model is holding yesterday's level, the miss is the size of the jump.</p>
+    </div>
+    <div class="card card-navy">
+      <p class="card-label" style="color:var(--gold-bright)">What the relationship says</p>
+      <p style="font-size:19px;line-height:1.5">Forecast error tracks the unanticipated German price move almost one for one: slope 1.0, with an R&sup2; of 0.91 in DK1 and 0.94 in DK2.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card" style="border-left:5px solid var(--rust)">
+        <h3>When Germany rises, we under-call</h3>
+        <p>Three days, average miss &euro;54. The interconnector carries the German price into both zones even when local wind is strong.</p>
+      </div>
+      <div class="card card-accent">
+        <h3>When wind surges, we over-call</h3>
+        <p>Three days, average miss &euro;34. Denmark decouples below Germany and the model keeps the imported level.</p>
+      </div>
+      <div class="card">
+        <h3>When Germany holds, we are right</h3>
+        <p>2 October: the German price moved &euro;5 and our error was under &euro;8 in both zones.</p>
+      </div>
+    </div>
+    <p class="note">Based on the seven delivery days in this window where the German anchor is recorded in the model's own driver attribution. A small sample, to be re-measured over a longer window before it is quoted as a constant.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap stack" style="gap:26px">
+    <div class="stack" style="gap:14px">
+      <p class="eyebrow">What comes next</p>
+      <h2 class="h-lg">The remaining work is one forecast.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <p class="card-label">The constraint, stated plainly</p>
+        <p style="font-size:17px">Tomorrow's German price is not available to us. It clears in the same coupled auction, at the same moment, as the Danish price we are trying to predict. Closing the gap means forecasting the German outcome from data published before gate closure.</p>
+      </div>
+      <div class="card">
+        <p class="card-label">What is available before gate closure</p>
+        <p style="font-size:17px">German wind, solar and load forecasts from the TSOs, published well before noon. Forward and futures quotes for next-day delivery. Interconnector capacity and planned outages. None of it requires reconstructing the market-coupling algorithm.</p>
+      </div>
+    </div>
+    <div class="card card-gold">
+      <p class="card-label" style="color:var(--gold)">Why this is worth publishing</p>
+      <p style="font-size:18px">A forecast whose error is overwhelmingly attributable to one measurable driver is in better shape than one that is merely closer on average. It tells a customer which days to trust it on &mdash; the days the German anchor is holding still &mdash; and it tells us exactly what to build next.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <div style="max-width:360px">
+        <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
+        <p style="margin-top:14px;line-height:1.6">Forecasting and dispatch intelligence for utilities and battery owners. Built inside an operating energy company.</p>
+      </div>
+      <nav class="foot-nav">
+        <a href="/platform">Platform</a>
+        <a href="/validation">Validation</a>
+        <a href="/demo">Trader demo</a>
+        <a href="/company">Company</a>
+        <a href="/company#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="foot-bot">
+      <span>&copy; 2026 Astrea. A Nuvve Holding Corp company (NASDAQ: NVVE).</span>
+      <span>San Diego, California</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/nav.js" defer></script>
+
+</body>
+</html>
