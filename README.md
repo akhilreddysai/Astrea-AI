@@ -29,26 +29,34 @@ securities counsel first.
 
 ## Deploy
 
-### What went wrong on the current deployment
+### Two things went wrong, in order
 
-As of 19 October, `astrea-ruddy.vercel.app` was serving only the four
-root-level HTML files. Everything else was missing:
+**First (19 October): the files were not there.** The deployment served only
+the four root HTML files — `assets/`, `demo/` and `vercel.json` never reached
+Vercel. That is what happens when pages are dragged into the dashboard
+individually or added to git one by one. Deploy the **whole folder**, not the
+pages. This is fixed; the current deployment has everything.
 
-| URL | Status |
-|---|---|
-| `/` | 200 — the page loads |
-| `/validation` | 200 |
-| `/assets/css/styles.css` | **404** — this is why the site is unstyled |
-| `/assets/js/nav.js` | **404** |
-| `/demo` | **404** — the whole folder is absent |
+**Second (20 October): browsers cached the 404.** While the site was broken,
+`/assets/css/styles.css` returned a 404 — and the `/assets/(.*)` rule in
+`vercel.json` stamped `max-age=31536000, immutable` on that 404 response. Any
+browser that loaded the site during the broken window stored "this file does
+not exist" for a year. The server was fixed; those browsers kept showing an
+unstyled page.
 
-`/validation.html` also returned 200 instead of redirecting to `/validation`,
-which means `vercel.json` is not on the deployment either.
+Both are now handled:
 
-So nothing is wrong with the HTML or the CSS: the `assets/` folder, the `demo/`
-folder and `vercel.json` never reached Vercel. That is what happens when the
-HTML files are dragged into the dashboard individually, or added to git one by
-one. Deploy the **whole folder**, not the pages.
+- Every CSS, JS and icon link carries `?v=2`. A different URL is a different
+  cache entry, so a poisoned cache is bypassed for everyone, not just people
+  who know to hard-reload.
+- `vercel.json` no longer sends a one-year immutable cache on assets. It sends
+  `max-age=600, stale-while-revalidate=604800`: fast for repeat visits, but
+  self-healing within ten minutes instead of a year.
+
+**Bump the `?v=` number whenever you change the CSS or a JS file.** Filenames
+here are not content-hashed, so the query string is what tells a returning
+browser the file is new. It appears once in the shared head and script block —
+search the five HTML files for `?v=2`.
 
 ### The reliable way
 
