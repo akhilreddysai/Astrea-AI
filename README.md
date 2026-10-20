@@ -11,7 +11,7 @@ done.
 | `/` | `index.html` | The problem, the reasoning/computation split, how the forecast works in time, the two engines |
 | `/platform` | `platform.html` | Pipeline, the agent layer, governance and audit trail |
 | `/validation` | `validation.html` | The Danish day-ahead record, the German-coupling diagnosis, what comes next |
-| `/company` | `company.html` | Leadership, the Nuvve relationship, contact |
+| `/company` | `company.html` | Leadership, the two JV parents, contact |
 | `/demo` | `demo/index.html` | Trader demo — interactive DK1/DK2 chart, day table, driver panel |
 
 The demo is reachable from the **Demo** dropdown in the main nav on every page,
@@ -29,22 +29,74 @@ securities counsel first.
 
 ## Deploy
 
+### What went wrong on the current deployment
+
+As of 19 October, `astrea-ruddy.vercel.app` was serving only the four
+root-level HTML files. Everything else was missing:
+
+| URL | Status |
+|---|---|
+| `/` | 200 — the page loads |
+| `/validation` | 200 |
+| `/assets/css/styles.css` | **404** — this is why the site is unstyled |
+| `/assets/js/nav.js` | **404** |
+| `/demo` | **404** — the whole folder is absent |
+
+`/validation.html` also returned 200 instead of redirecting to `/validation`,
+which means `vercel.json` is not on the deployment either.
+
+So nothing is wrong with the HTML or the CSS: the `assets/` folder, the `demo/`
+folder and `vercel.json` never reached Vercel. That is what happens when the
+HTML files are dragged into the dashboard individually, or added to git one by
+one. Deploy the **whole folder**, not the pages.
+
+### The reliable way
+
 ```bash
 cd astrea-site
+npx vercel --prod
+```
+
+The CLI uploads the directory as it stands, subfolders and dotless files
+included, and prints the URL. Link it to the existing project when it asks, so
+the domain stays the same.
+
+### Or through GitHub
+
+```bash
+cd astrea-site          # the folder itself is the repo root
 git init
 git add -A
+git status              # must list assets/, demo/ and vercel.json
 git commit -m "Astrea site"
 git remote add origin git@github.com:<org>/<repo>.git
 git push -u origin main
 ```
 
-Then in Vercel: **Add New → Project → import the repo**. Framework preset
-**Other**, build command empty, output directory empty (root). Deploy.
+Run `git status` before committing and confirm all three appear. In Vercel:
+**Add New → Project → import the repo**, framework preset **Other**, build
+command empty, output directory empty. If the repo has `astrea-site/` as a
+subfolder rather than at its root, set **Root Directory** to `astrea-site` in
+the project's Build and Deployment settings.
+
+### Verify after deploying
+
+Open these four URLs. All four must return content, not a 404 page:
+
+```
+https://<your-domain>/assets/css/styles.css      → CSS source
+https://<your-domain>/assets/js/demo.js          → JS source
+https://<your-domain>/demo                       → the trader demo
+https://<your-domain>/validation.html            → should redirect to /validation
+```
+
+The last one is the vercel.json check: if it does not redirect, the config file
+is missing and clean URLs are off.
 
 `vercel.json` sets `cleanUrls: true`, which is what makes `/platform` serve
 `platform.html` and `/demo` serve `demo/index.html`. It also sets a long cache
-on `/assets/*` and three standard security headers. Keep the file at the repo
-root.
+on `/assets/*` and three standard security headers. Keep the file at the
+deployment root.
 
 ### Local preview
 
@@ -64,9 +116,11 @@ Clean URLs do not work under `python -m http.server`, so locally use
   `window.ASTREA_DEMO`: the day list, the German anchor series, and per-zone
   `cleared` / `forecast` / `mase`.
 - `assets/js/demo.js` — the renderer. Draws the SVG chart, the four summary
-  cards, the day table and the driver panel. It computes mean error, the
+  modules, the day table and the driver panel. It computes mean error, the
   out-of-sample mean and the signed bias from the arrays at load, so nothing
-  on the page can drift out of step with the data.
+  on the page can drift out of step with the data. Chart colors are declared
+  once in the `C` object at the top and mirror the CSS tokens; the legend
+  swatches in `demo/index.html` are the one place they are repeated.
 
 To put the demo on live numbers, replace `demo-data.js` with an endpoint that
 emits the same shape. Nothing else changes.
@@ -84,28 +138,93 @@ reverse when you add to the site.
 
 ## Design system
 
+The site is built as an instrument, not a brochure: white ground, hairline
+grid, monospace labels, numbers set larger than the prose. Sections are
+numbered channels with the index in the left gutter; modules are cells of a 1px
+grid rather than floating cards. It is a single committed light theme — every
+color is painted explicitly, so nothing inherits a ground from a host.
+
+**The palette is the joint venture.** Green is Nuvve's, sampled from
+nuvve.com. Navy and sky are CamerEye's, sampled from camereye.ai. The display
+face is Nuvve's Montserrat; the body face is CamerEye's Source Sans. Pill
+buttons come from both parents, who use them. Mono carries the data, which is
+Astrea's own.
+
 Everything is in `assets/css/styles.css`, as custom properties on `:root`.
 Change a token there and it propagates.
 
 ```
---navy    #0E2A47   headers, hero and footer grounds, primary text
---ground  #F7F6F2   page background
---gold    #9A7B2E   accent, text-safe weight
---gold-bright #C8A659  accent on navy
---teal    #2F7D6E   positive / forecast series
---rust    #A8503A   misses, flagged values
+--paper     #FFFFFF   page ground
+--mist      #F5F7F2   alternating band (Nuvve off-white, nudged green)
+--line      #DEE5E9   hairlines (the grid is made of these)
+--ink       #0A436A   CamerEye navy — headlines, figures, table headers
+--ink-2     #44607A   body copy
+--muted     #5F7384   footnotes, mono labels
+--green     #55732D   Nuvve dark green — the accent, 5.0:1 on white
+--green-mid #759840   forecast series, module rules
+--lime      #ABCA47   Nuvve lime — fills, the live dot, current-page mark
+--sky       #9AD3E8   CamerEye sky — reasoning plane, out-of-sample band
+--flag      #BF5A1E   semantic only — flagged miss, positive error
 ```
 
-Type is Source Serif 4 for display, IBM Plex Sans for body, IBM Plex Mono for
-figures, loaded from Google Fonts. All three have declared fallbacks, so the
-page holds its layout if the font request is blocked.
+Green is the accent and carries no meaning on its own. Orange is semantic and
+appears only on data. Keeping that split is what stops the page turning into a
+Christmas tree as sections get added. Note the lightness discipline: `--green`
+is the only green safe for small text, `--green-mid` is for lines and rules,
+and `--lime` is decorative only — never put 12px type on it.
+
+In the demo chart, navy is the market and green is us. That reads as the JV
+without needing a caption.
+
+Three patterns worth knowing before you edit the CSS. `.mod p`, `.slab p` and
+`.seq-col p` set a body size, so a utility class on one of those paragraphs
+(`.figure`, `.tag`, `.note`) must out-rank them — those overrides live in the
+"specificity guards" block at the end of the file. Buttons and the zone toggle
+are pills; modules, tables and panels are square — that contrast is deliberate.
+And the selected-day readout on the demo is the one inverted panel on the site;
+if you add a second, the first stops being a focal point.
+
+## Claims discipline
+
+The 16 October prep note lists claims that must not go in front of a buyer
+until they are backed up. Two of them had been on this site and are now gone:
+
+- "Proven on batteries operated by Nuvve in live wholesale and ancillary
+  markets, not on a back-test alone" → replaced with *scored on Danish
+  day-ahead data in both bidding zones, against the price that cleared, out of
+  sample from 29 September. Asset-level validation on Nuvve batteries runs
+  next.*
+- "Astrea is validated on batteries Nuvve operates…" on `/company` → replaced
+  with the two-parent module and a *What is shown today* block that states the
+  record is Danish market data and that operated-asset validation is not
+  claimed.
+
+The site still says Nuvve **operates** batteries in live markets, which is true
+of the parent and is framed as the route to asset-level validation rather than
+as something Astrea has done.
+
+Nothing on the site uses "proprietary engine", a spike-catching claim, or an
+error-rate percentage without a horizon and a window. Keep it that way: any new
+number needs its metric, its horizon and its out-of-sample window beside it.
+
+## Open question: who the demo is for
+
+The prep note is explicit that the buyer is the asset owner, not a trading
+desk. The demo is currently titled **Trader demo** in the nav and on the page.
+If the owner positioning holds, that label works against it, and the page
+itself — forecast against cleared, driver behind each miss — is already an
+owner's view rather than a desk's. Renaming it *Forecast record* or *Owner
+view* is a two-line change in `demo/index.html` and the nav block of every
+page; the `/demo` URL can stay.
 
 ## Before it goes live
 
 - `hello@astrea.ai` on `/company` is a placeholder. Swap in the real inbox.
 - Add `astrea.ai` (or whichever domain) in Vercel → Settings → Domains.
-- The leadership bios and the Nuvve ticker line are taken from the deck. Give
-  them a read before the site is public.
+- The leadership bios are taken from the deck. Give them a read before the site
+  is public.
+- Confirm the joint-venture wording in the footer matches how the entity is
+  actually described in filings.
 - Every number on `/validation` and `/demo` traces to the 6 October accuracy
   review. When that record is extended, update `demo-data.js` and the three
-  stat cards on `/validation` together.
+  stat modules on `/validation` together.

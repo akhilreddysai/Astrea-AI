@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trader demo — Astrea</title>
+<meta name="description" content="Interactive Danish day-ahead record: Astrea's forecast against the cleared price in DK1 and DK2, with driver attribution.">
+<meta property="og:title" content="Trader demo — Astrea">
+<meta property="og:description" content="Interactive Danish day-ahead record: Astrea's forecast against the cleared price in DK1 and DK2, with driver attribution.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Montserrat:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap site-in">
+    <a class="brand" href="/">Astrea</a>
+    <button class="mtoggle" id="navToggle" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="menu" id="menu">
+      <a class="mlink" href="/platform">Platform</a>
+      <a class="mlink" href="/validation">Validation</a>
+      <a class="mlink" href="/company">Company</a>
+      <div class="dd">
+        <button class="dd-btn" id="ddBtn" aria-expanded="false" aria-haspopup="true" aria-controls="ddmenu">Demo <span class="dd-caret" aria-hidden="true"></span></button>
+        <div class="dd-menu" id="ddmenu">
+          <a class="dd-item" href="/demo"><strong>Trader demo</strong><span>Day-ahead forecast against the cleared price, DK1 and DK2</span></a>
+          <a class="dd-item" href="/validation#record"><strong>Forecast record</strong><span>Fourteen graded calls, with driver attribution</span></a>
+        </div>
+      </div>
+      <a class="btn" href="/company#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="rail">
+  <div class="wrap rail-in">
+    <div class="rail-cell"><span class="rail-k">DK1 MAE</span><span class="rail-v">&euro;27.82</span></div>
+    <div class="rail-cell"><span class="rail-k">DK2 MAE</span><span class="rail-v">&euro;29.50</span></div>
+    <div class="rail-cell"><span class="rail-k">MASE D+1</span><span class="rail-v up">0.61 / 0.54</span></div>
+    <div class="rail-cell"><span class="rail-k">Window</span><span class="rail-v">23 Sep &ndash; 6 Oct 2026</span></div>
+    <div class="rail-cell"><span class="live">Scored against settlement</span></div>
+  </div>
+</div>
+
+<main>
+
+<section class="ch ch-tight">
+  <div class="wrap ch-cols">
+    <div class="ch-ix">00</div>
+    <div class="stack" style="gap:18px">
+      <p class="tag">Trader demo</p>
+      <h1 class="display" style="max-width:20ch">Day-ahead forecast against the price that cleared.</h1>
+      <p class="lead">The Danish day-ahead record, 23 September to 6 October 2026. Each point was issued one day before its delivery day. Select a zone, then select any day for the drivers behind it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch">
+  <div class="wrap stack" style="gap:24px">
+
+    <div class="demo-bar">
+      <div class="seg" role="group" aria-label="Bidding zone">
+        <button type="button" data-zone="DK1" aria-pressed="true">DK1</button>
+        <button type="button" data-zone="DK2" aria-pressed="false">DK2</button>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:#0A436A"></i>Cleared</span>
+        <span><i class="sw" style="background:#759840"></i>Astrea forecast</span>
+        <span><i class="sw-box" style="background:#F2F8FB"></i>Out of sample</span>
+      </div>
+    </div>
+
+    <div class="mods m4" id="demoStats"></div>
+
+    <div class="chart-wrap">
+      <div id="chart"></div>
+      <p class="demo-note" id="chartNote"></p>
+    </div>
+
+    <div class="detail" id="dayDetail" aria-live="polite"></div>
+
+    <div class="stack" style="gap:14px">
+      <p class="tag ch-rule">Day by day</p>
+      <p class="note">Error is the cleared price minus the forecast, so a positive error means the market came in above us. The German anchor is shown where it appears in the model's driver attribution.</p>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr>
+            <th>Delivery day</th>
+            <th class="num">Forecast</th>
+            <th class="num">Cleared</th>
+            <th class="num">Error</th>
+            <th class="num">German anchor</th>
+            <th>Sample</th>
+          </tr></thead>
+          <tbody id="demoRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="slab">
+      <p class="tag">About this demo</p>
+      <p>This page runs on a fixed extract of the Danish day-ahead record so it can be read without a login. The production system refreshes daily, scores every call against settlement, and exposes the same view through an API. Figures are daily-mean day-ahead prices in &euro;/MWh, from a one-day-ahead hindcast of the deployed model on forecast-weather inputs.</p>
+    </div>
+
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <a class="brand" href="/">Astrea</a>
+        <p>Forecasting and dispatch intelligence for utilities and battery owners. A joint venture of Nuvve and CamerEye.</p>
+      </div>
+      <nav class="foot-nav">
+        <a href="/platform">Platform</a>
+        <a href="/validation">Validation</a>
+        <a href="/demo">Trader demo</a>
+        <a href="/company">Company</a>
+        <a href="/company#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="foot-bot">
+      <span>&copy; 2026 Astrea &middot; A joint venture of Nuvve Holding Corp (NASDAQ: NVVE) and CamerEye</span>
+      <span>San Diego, California</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/nav.js" defer></script>
+<script src="/assets/js/demo-data.js" defer></script>
+<script src="/assets/js/demo.js" defer></script>
+</body>
+</html>

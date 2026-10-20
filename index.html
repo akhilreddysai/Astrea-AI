@@ -6,24 +6,25 @@
 <title>Astrea — Forecasting the grid, with every number audited</title>
 <meta name="description" content="Load forecasting for the cooperatives and municipal utilities that data centers are overwhelming. Battery revenue in Europe and Japan runs on the same engine.">
 <meta property="og:title" content="Astrea — Forecasting the grid, with every number audited">
-<meta property="og:description" content="Language models reason. Deterministic engines compute. Every forecast scored against what actually cleared.">
+<meta property="og:description" content="Load forecasting for the cooperatives and municipal utilities that data centers are overwhelming. Battery revenue in Europe and Japan runs on the same engine.">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Montserrat:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 
-<header class="nav">
-  <div class="wrap nav-in">
-    <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
-    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navlinks">Menu</button>
-    <nav class="nav-links" id="navlinks">
-      <a class="nav-link" href="/platform">Platform</a>
-      <a class="nav-link" href="/validation">Validation</a>
-      <a class="nav-link" href="/company">Company</a>
+<header class="site">
+  <div class="wrap site-in">
+    <a class="brand" href="/">Astrea</a>
+    <button class="mtoggle" id="navToggle" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="menu" id="menu">
+      <a class="mlink" href="/platform">Platform</a>
+      <a class="mlink" href="/validation">Validation</a>
+      <a class="mlink" href="/company">Company</a>
       <div class="dd">
         <button class="dd-btn" id="ddBtn" aria-expanded="false" aria-haspopup="true" aria-controls="ddmenu">Demo <span class="dd-caret" aria-hidden="true"></span></button>
         <div class="dd-menu" id="ddmenu">
@@ -31,207 +32,263 @@
           <a class="dd-item" href="/validation#record"><strong>Forecast record</strong><span>Fourteen graded calls, with driver attribution</span></a>
         </div>
       </div>
-      <a class="nav-cta" href="/company#contact">Contact</a>
+      <a class="btn" href="/company#contact">Contact</a>
     </nav>
   </div>
 </header>
+
+<div class="rail">
+  <div class="wrap rail-in">
+    <div class="rail-cell"><span class="rail-k">DK1 MAE</span><span class="rail-v">&euro;27.82</span></div>
+    <div class="rail-cell"><span class="rail-k">DK2 MAE</span><span class="rail-v">&euro;29.50</span></div>
+    <div class="rail-cell"><span class="rail-k">MASE D+1</span><span class="rail-v up">0.61 / 0.54</span></div>
+    <div class="rail-cell"><span class="rail-k">Window</span><span class="rail-v">23 Sep &ndash; 6 Oct 2026</span></div>
+    <div class="rail-cell"><span class="live">Scored against settlement</span></div>
+  </div>
+</div>
 
 <main>
 
 <section class="hero">
   <div class="wrap hero-in">
-    <p class="eyebrow" style="color:var(--gold-bright)">Forecasting and dispatch intelligence</p>
-    <h1>Load forecasting for the co-ops and munis that data centers are overwhelming.</h1>
-    <p class="lead">Building the grid's digital twin. Battery fleets in Europe and Japan run on the same engine. Every forecast is scored against what actually cleared, and every number traces to a run ID.</p>
-    <div class="hero-actions">
-      <a class="btn btn-gold" href="/demo">See the trader demo</a>
-      <a class="btn btn-ghost" href="/validation">Read the validation</a>
+    <div class="ch-ix">00</div>
+    <div class="hero-main">
+      <p class="tag">Forecasting and dispatch intelligence</p>
+      <h1 class="display">Load forecasting for the co-ops and munis that data centers are overwhelming.</h1>
+      <p class="lead">Building the grid's digital twin. Battery fleets in Europe and Japan run on the same engine. Every forecast is scored against what actually cleared, and every number traces to a run ID.</p>
+      <div class="btns">
+        <a class="btn" href="/demo">See the trader demo</a>
+        <a class="btn btn-ghost" href="/validation">Read the validation</a>
+      </div>
     </div>
-    <div class="pipe">
-      <span class="pipe-step">Data</span><span class="pipe-arrow">&rarr;</span>
-      <span class="pipe-step">Forecast</span><span class="pipe-arrow">&rarr;</span>
-      <span class="pipe-step">Dispatch</span><span class="pipe-arrow">&rarr;</span>
-      <span class="pipe-step">Audit</span>
+    <div class="spec">
+      <p class="spec-head">Signal path</p>
+      <div class="spec-row"><span class="spec-n">01</span><span class="spec-t">Data</span><span class="spec-d">market, weather, grid</span></div>
+      <div class="spec-row"><span class="spec-n">02</span><span class="spec-t">Forecast</span><span class="spec-d">P10 / P50 / P90</span></div>
+      <div class="spec-row"><span class="spec-n">03</span><span class="spec-t">Dispatch</span><span class="spec-d">bids and schedules</span></div>
+      <div class="spec-row"><span class="spec-n">04</span><span class="spec-t">Audit</span><span class="spec-d">run ID, SHA-256</span></div>
+      <p class="spec-head" style="border-top:1px solid var(--line)">Coverage</p>
+      <div class="spec-row"><span class="spec-t">DK1 / DK2</span><span class="spec-d">live</span></div>
+      <div class="spec-row"><span class="spec-t">ERCOT / CAISO</span><span class="spec-d">same core</span></div>
+      <div class="spec-row"><span class="spec-t">EU + Japan</span><span class="spec-d">battery fleets</span></div>
     </div>
   </div>
 </section>
 
-<section class="sec" id="why">
-  <div class="wrap stack" style="gap:34px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">Why now</p>
-      <h2 class="h-lg">New load is arriving faster than small utilities can plan for it.</h2>
-      <p class="lead">US five-year peak demand forecasts have risen sevenfold in three years, driven by data centers. Cooperatives and municipal utilities have to decide what to build for loads that may never arrive.</p>
-    </div>
-    <div class="grid g3">
-      <div class="card">
-        <p class="stat">166 GW</p>
-        <p class="stat-label">US peak growth, 2025&ndash;2030</p>
-        <p>About 55% from data centers. Forecasts are often overstated, which is its own planning risk.</p>
-      </div>
-      <div class="card">
-        <p class="stat">830 + 60</p>
-        <p class="stat-label">Distribution and G&amp;T co-ops</p>
-        <p>Serving about 42 million people, with 42% of US distribution lines.</p>
-      </div>
-      <div class="card">
-        <p class="stat">~2,000</p>
-        <p class="stat-label">Public power communities</p>
-        <p>Municipal utilities serving more than 55 million Americans.</p>
-      </div>
-    </div>
-    <div class="card card-navy card-gold">
-      <p class="card-label" style="color:var(--gold-bright)">What they need</p>
-      <p style="font-size:19px;line-height:1.5">A defensible view of which large loads will arrive, when, and what they do to the peak &mdash; without hiring a forecasting department or putting the cost on existing members.</p>
-    </div>
-    <p class="note">Sources: Grid Strategies, <em>National Load Growth Report</em>, November 2025; NRECA Electric Co-op Fact Sheet, April 2026; American Public Power Association; CFC 2026 Trends Report.</p>
-  </div>
-</section>
-
-<section class="sec sec-navy" id="insight">
-  <div class="wrap stack" style="gap:34px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">The insight</p>
-      <h2 class="h-lg">Let AI reason. Never let it calculate.</h2>
-      <p class="lead">Language models reason well, and they also invent numbers. Astrea splits the work: models decide what to look at and explain the answer; deterministic engines produce every figure.</p>
-    </div>
-    <div class="grid g2" style="gap:18px">
-      <div class="plane plane-reason">
-        <p class="plane-head">Reasoning plane &middot; LLM agents</p>
-        <ul class="plane-body">
-          <li>Supervisor and specialist agents handle intent, routing, causal data selection and synthesis</li>
-          <li>Reasons over topology and causality; narrates, cites and routes work to the solvers</li>
-          <li>Never computes a number &mdash; no forecast maths, no value into a bid, no raw timeseries</li>
-        </ul>
-      </div>
-      <div class="plane plane-compute">
-        <p class="plane-head">Computation plane &middot; deterministic engines</p>
-        <ul class="plane-body">
-          <li>Forecasting service: ARIMA/SARIMAX baseline and a Temporal Fusion Transformer producing P10/P50/P90</li>
-          <li>Optimization service: Gurobi mixed-integer programming for battery dispatch and market bids</li>
-          <li>Versioned and sandboxed: every value carries a run ID and SHA-256 hash, fully reproducible</li>
-        </ul>
-      </div>
-    </div>
-    <p class="contract" style="color:var(--on-navy-faint)">calls &middot; validated inputs &nbsp;&rarr;&nbsp; numbers + variable importance</p>
-    <div class="grid g2">
-      <div class="card card-navy">
-        <p class="card-label" style="color:var(--gold-bright)">Analyst in the loop</p>
-        <p>A person verifies every causal link. Model swaps are gated on a 50-plus scenario regression suite, with signed validation per upgrade.</p>
-      </div>
-      <div class="card card-navy">
-        <p class="card-label" style="color:var(--gold-bright)">Validated in Denmark</p>
-        <p>Day-ahead error 39&ndash;46% below the seasonal-naive benchmark, with 91&ndash;94% of what remains traced to a single measurable driver. <a href="/validation" style="color:var(--gold-bright)">See the record &rarr;</a></p>
+<section class="ch" id="why">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">01</div>
+<div class="ch-body">
+<p class="tag ch-rule">Why now</p>
+<h2 class="display">New load is arriving faster than small utilities can plan for it.</h2>
+<p class="lead">US five-year peak demand forecasts have risen sevenfold in three years, driven by data centers. Cooperatives and municipal utilities have to decide what to build for loads that may never arrive.</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="stack" style="gap:22px">
+        <div class="mods m3">
+          <div class="mod">
+            <p class="figure">166<span class="u">GW</span></p>
+            <p class="tag">US peak growth, 2025&ndash;2030</p>
+            <p>About 55% from data centers. Forecasts are often overstated, which is its own planning risk.</p>
+          </div>
+          <div class="mod">
+            <p class="figure">830<span class="u">+ 60</span></p>
+            <p class="tag">Distribution and G&amp;T co-ops</p>
+            <p>Serving about 42 million people, with 42% of US distribution lines.</p>
+          </div>
+          <div class="mod">
+            <p class="figure">~2,000</p>
+            <p class="tag">Public power communities</p>
+            <p>Municipal utilities serving more than 55 million Americans.</p>
+          </div>
+        </div>
+        <div class="slab">
+          <p class="tag">What they need</p>
+          <p class="big">A defensible view of which large loads will arrive, when, and what they do to the peak &mdash; without hiring a forecasting department or putting the cost on existing members.</p>
+        </div>
+        <p class="note">Sources: Grid Strategies, <em>National Load Growth Report</em>, November 2025; NRECA Electric Co-op Fact Sheet, April 2026; American Public Power Association; CFC 2026 Trends Report.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="sec" id="time">
-  <div class="wrap stack" style="gap:34px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">How Astrea works in time</p>
-      <h2 class="h-lg">Two weeks forward to see it. One week back to learn.</h2>
-      <p class="lead">The value sits in the few days that break the pattern. Astrea picks them up two weeks out, sharpens their timing every day, and grades every call once it has settled.</p>
-    </div>
-    <div class="tl">
-      <div class="tl-col">
-        <p class="tl-when">D+14 &middot; detect</p>
-        <h3>See it coming</h3>
-        <p>A heat wave, wind lull, outage or new large load first appears as a probability, wide and uncertain.</p>
-      </div>
-      <div class="tl-col">
-        <p class="tl-when">D+9 to D+5 &middot; refine</p>
-        <h3>Narrow the window</h3>
-        <p>Each daily refresh tightens when it lands, how deep and how long. Hold capacity, move maintenance, hedge.</p>
-      </div>
-      <div class="tl-col">
-        <p class="tl-when">D+1 &middot; lock in</p>
-        <h3>A dated shape</h3>
-        <p>Bids and dispatch for tomorrow. Out to D+5, state of charge or the utility's peak plan.</p>
-      </div>
-      <div class="tl-col">
-        <p class="tl-when">D&minus;7 &middot; grade</p>
-        <h3>Score every call</h3>
-        <p>Each miss split into four causes: forecast, optimizer, market access, availability. Each has a different fix.</p>
-      </div>
-    </div>
-    <div class="card card-accent">
-      <p class="card-label">Stated plainly</p>
-      <p style="font-size:18px">Fourteen days forward decide what the asset or the utility does. Seven days back decide what the forecast is worth. Scored on lead time, timing convergence, shift capture and false alarms.</p>
-    </div>
-  </div>
-</section>
-
-<section class="sec sec-alt" id="markets">
-  <div class="wrap stack" style="gap:34px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">Two engines, one platform</p>
-      <h2 class="h-lg">US load forecasting. European and Japanese battery revenue.</h2>
-      <p class="lead">Both start small and step up as the customer moves from trial to full integration. The same forecasting core serves each.</p>
-    </div>
-    <div class="grid g2">
-      <div class="card card-gold">
-        <p class="card-label" style="color:var(--gold)">US co-ops and munis</p>
-        <h3>Load forecasting</h3>
-        <p>The utility signs for an entry deployment, then rolls the platform across its system. Priced as an annual platform fee that scales with utility size.</p>
-        <hr class="rule" style="margin:8px 0">
-        <p style="color:var(--ink-faint);font-size:15px">Bought through joint action agencies and G&amp;T cooperatives &mdash; one integration serves many member utilities.</p>
-      </div>
-      <div class="card card-accent">
-        <p class="card-label">Europe and Japan</p>
-        <h3>Battery owners</h3>
-        <p>Onboarding at a share of the asset's realized revenue while Astrea forecasts and advises. The rate steps up once forecasts drive dispatch directly.</p>
-        <hr class="rule" style="margin:8px 0">
-        <p style="color:var(--ink-faint);font-size:15px">The fee follows what the battery actually earns, so it falls when market outturn falls.</p>
+<section class="ch ch-fill" id="insight">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">02</div>
+<div class="ch-body">
+<p class="tag ch-rule">The insight</p>
+<h2 class="display">Let AI reason. Never let it calculate.</h2>
+<p class="lead">Language models reason well, and they also invent numbers. Astrea splits the work: models decide what to look at and explain the answer; deterministic engines produce every figure.</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="stack" style="gap:22px">
+        <div>
+          <div class="planes">
+            <div class="plane p-reason">
+              <p class="plane-head">Reasoning plane &middot; LLM agents</p>
+              <ul>
+                <li>Supervisor and specialist agents handle intent, routing, causal data selection and synthesis</li>
+                <li>Reasons over topology and causality; narrates, cites and routes work to the solvers</li>
+                <li>Never computes a number &mdash; no forecast math, no value into a bid, no raw timeseries</li>
+              </ul>
+            </div>
+            <div class="plane p-compute">
+              <p class="plane-head">Computation plane &middot; deterministic engines</p>
+              <ul>
+                <li>Forecasting service: ARIMA/SARIMAX baseline and a Temporal Fusion Transformer producing P10/P50/P90</li>
+                <li>Optimization service: Gurobi mixed-integer programming for battery dispatch and market bids</li>
+                <li>Versioned and sandboxed: every value carries a run ID and SHA-256 hash, fully reproducible</li>
+              </ul>
+            </div>
+          </div>
+          <p class="contract">calls &middot; validated inputs &nbsp;&rarr;&nbsp; numbers + variable importance</p>
+        </div>
+        <div class="mods m2">
+          <div class="mod mod-fill">
+            <p class="tag">Analyst in the loop</p>
+            <p>A person verifies every causal link. Model swaps are gated on a 50-plus scenario regression suite, with signed validation per upgrade.</p>
+          </div>
+          <div class="mod mod-fill">
+            <p class="tag">Validated in Denmark</p>
+            <p>Day-ahead error 39&ndash;46% below the seasonal-naive benchmark on Danish market data, with 91&ndash;94% of what remains traced to a single measurable driver. <a href="/validation">See the record &rarr;</a></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="sec" id="different">
-  <div class="wrap stack" style="gap:34px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">What makes it different</p>
-      <h2 class="h-lg">Others sell forecasts. Astrea's proof compounds.</h2>
-      <p class="lead">The question worth asking any forecasting vendor: can you show accuracy against outturn, on assets you operate, for every interval &mdash; not a number you reported about yourself?</p>
-    </div>
-    <div class="grid g3">
-      <div class="card">
-        <p class="card-label">Scored continuously</p>
-        <p>Every forecast is logged and graded against what actually settled. The audit trail is part of the product, not a report written afterwards.</p>
-      </div>
-      <div class="card">
-        <p class="card-label">Validated on live assets</p>
-        <p>Proven on batteries operated by Nuvve in live wholesale and ancillary markets, not on a back-test alone.</p>
-      </div>
-      <div class="card">
-        <p class="card-label">Switching costs that grow</p>
-        <p>A validated causal store that grows with every market event, and forecasts that end up inside a utility's dispatch and regulatory filings.</p>
+<section class="ch" id="time">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">03</div>
+<div class="ch-body">
+<p class="tag ch-rule">How Astrea works in time</p>
+<h2 class="display">Two weeks forward to see it. One week back to learn.</h2>
+<p class="lead">The value sits in the few days that break the pattern. Astrea picks them up two weeks out, sharpens their timing every day, and grades every call once it has settled.</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="stack" style="gap:22px">
+        <div class="seq">
+          <div class="seq-col">
+            <p class="seq-when">D+14 detect</p>
+            <h3>See it coming</h3>
+            <p>A heat wave, wind lull, outage or new large load first appears as a probability, wide and uncertain.</p>
+          </div>
+          <div class="seq-col">
+            <p class="seq-when">D+9&ndash;5 refine</p>
+            <h3>Narrow the window</h3>
+            <p>Each daily refresh tightens when it lands, how deep and how long. Hold capacity, move maintenance, hedge.</p>
+          </div>
+          <div class="seq-col">
+            <p class="seq-when">D+1 lock</p>
+            <h3>A dated shape</h3>
+            <p>Bids and dispatch for tomorrow. Out to D+5, state of charge or the utility's peak plan.</p>
+          </div>
+          <div class="seq-col">
+            <p class="seq-when">D&minus;7 grade</p>
+            <h3>Score every call</h3>
+            <p>Each miss split into four causes: forecast, optimizer, market access, availability. Each has a different fix.</p>
+          </div>
+        </div>
+        <div class="slab slab-up">
+          <p class="tag tag-up">Stated plainly</p>
+          <p class="big">Fourteen days forward decide what the asset or the utility does. Seven days back decide what the forecast is worth. Scored on lead time, timing convergence, shift capture and false alarms.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="sec sec-navy">
-  <div class="wrap stack" style="gap:22px;align-items:flex-start">
-    <h2 class="h-lg" style="max-width:20ch">See a forecast graded against what actually cleared.</h2>
-    <p class="lead" style="max-width:58ch">The trader demo runs the Danish day-ahead record: fourteen one-day-ahead calls in both bidding zones, each set against the price that settled, with the driver behind every miss.</p>
-    <div class="hero-actions">
-      <a class="btn btn-gold" href="/demo">Open the demo</a>
-      <a class="btn btn-ghost" href="/company#contact">Talk to us</a>
+<section class="ch ch-fill" id="markets">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">04</div>
+<div class="ch-body">
+<p class="tag ch-rule">Two engines, one platform</p>
+<h2 class="display">US load forecasting. European and Japanese battery revenue.</h2>
+<p class="lead">Both start small and step up as the customer moves from trial to full integration. The same forecasting core serves each.</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="mods m2">
+        <div class="mod mod-top">
+          <p class="tag">US co-ops and munis</p>
+          <h3>Load forecasting</h3>
+          <p>The utility signs for an entry deployment, then rolls the platform across its system. Priced as an annual platform fee that scales with utility size.</p>
+          <p class="note">Bought through joint action agencies and G&amp;T cooperatives &mdash; one integration serves many member utilities.</p>
+        </div>
+        <div class="mod mod-up">
+          <p class="tag tag-up">Europe and Japan</p>
+          <h3>Battery owners</h3>
+          <p>Onboarding at a share of the asset's realized revenue while Astrea forecasts and advises. The rate steps up once forecasts drive dispatch directly.</p>
+          <p class="note">The fee follows what the battery actually earns, so it falls when market outturn falls.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
+<section class="ch" id="different">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">05</div>
+<div class="ch-body">
+<p class="tag ch-rule">What makes it different</p>
+<h2 class="display">Others sell forecasts. Astrea's proof compounds.</h2>
+<p class="lead">The question worth asking any forecasting vendor: can you show accuracy against outturn, on assets you operate, for every interval &mdash; not a number you reported about yourself?</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="mods m3">
+        <div class="mod">
+          <p class="tag">Scored continuously</p>
+          <p>Every forecast is logged and graded against what actually settled. The audit trail is part of the product, not a report written afterwards.</p>
+        </div>
+        <div class="mod">
+          <p class="tag">Validated on market data</p>
+          <p>Scored on Danish day-ahead data in both bidding zones, against the price that cleared, out of sample from 29 September. Asset-level validation on Nuvve batteries runs next.</p>
+        </div>
+        <div class="mod">
+          <p class="tag">Switching costs that grow</p>
+          <p>A validated causal store that grows with every market event, and forecasts that end up inside a utility's dispatch and regulatory filings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch ch-fill">
+  <div class="wrap ch-cols">
+    <div class="ch-ix">&rarr;</div>
+    <div class="stack" style="gap:22px;align-items:flex-start">
+      <h2 class="display" style="max-width:18ch">See a forecast graded against what actually cleared.</h2>
+      <p class="lead" style="max-width:58ch">The trader demo runs the Danish day-ahead record: fourteen one-day-ahead calls in both bidding zones, each set against the price that settled, with the driver behind every miss.</p>
+      <div class="btns">
+        <a class="btn" href="/demo">Open the demo</a>
+        <a class="btn btn-ghost" href="/company#contact">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
 </main>
 
 <footer class="foot">
   <div class="wrap">
     <div class="foot-top">
-      <div style="max-width:360px">
-        <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
-        <p style="margin-top:14px;line-height:1.6">Forecasting and dispatch intelligence for utilities and battery owners. Built inside an operating energy company.</p>
+      <div>
+        <a class="brand" href="/">Astrea</a>
+        <p>Forecasting and dispatch intelligence for utilities and battery owners. A joint venture of Nuvve and CamerEye.</p>
       </div>
       <nav class="foot-nav">
         <a href="/platform">Platform</a>
@@ -242,7 +299,7 @@
       </nav>
     </div>
     <div class="foot-bot">
-      <span>&copy; 2026 Astrea. A Nuvve Holding Corp company (NASDAQ: NVVE).</span>
+      <span>&copy; 2026 Astrea &middot; A joint venture of Nuvve Holding Corp (NASDAQ: NVVE) and CamerEye</span>
       <span>San Diego, California</span>
     </div>
   </div>

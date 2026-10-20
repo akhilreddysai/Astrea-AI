@@ -4,26 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Platform — Astrea</title>
-<meta name="description" content="Language models reason, deterministic engines compute. Every forecast logged, scored against outturn and traceable to a run ID.">
+<meta name="description" content="Market data to an audited forecast: the pipeline, the agent layer, and the governance that makes every number reproducible.">
 <meta property="og:title" content="Platform — Astrea">
-<meta property="og:description" content="Language models reason, deterministic engines compute. Every forecast logged, scored against outturn and traceable to a run ID.">
+<meta property="og:description" content="Market data to an audited forecast: the pipeline, the agent layer, and the governance that makes every number reproducible.">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Montserrat:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 
-<header class="nav">
-  <div class="wrap nav-in">
-    <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
-    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navlinks">Menu</button>
-    <nav class="nav-links" id="navlinks">
-      <a class="nav-link" href="/platform">Platform</a>
-      <a class="nav-link" href="/validation">Validation</a>
-      <a class="nav-link" href="/company">Company</a>
+<header class="site">
+  <div class="wrap site-in">
+    <a class="brand" href="/">Astrea</a>
+    <button class="mtoggle" id="navToggle" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="menu" id="menu">
+      <a class="mlink" href="/platform">Platform</a>
+      <a class="mlink" href="/validation">Validation</a>
+      <a class="mlink" href="/company">Company</a>
       <div class="dd">
         <button class="dd-btn" id="ddBtn" aria-expanded="false" aria-haspopup="true" aria-controls="ddmenu">Demo <span class="dd-caret" aria-hidden="true"></span></button>
         <div class="dd-menu" id="ddmenu">
@@ -31,115 +32,140 @@
           <a class="dd-item" href="/validation#record"><strong>Forecast record</strong><span>Fourteen graded calls, with driver attribution</span></a>
         </div>
       </div>
-      <a class="nav-cta" href="/company#contact">Contact</a>
+      <a class="btn" href="/company#contact">Contact</a>
     </nav>
   </div>
 </header>
 
+<div class="rail">
+  <div class="wrap rail-in">
+    <div class="rail-cell"><span class="rail-k">DK1 MAE</span><span class="rail-v">&euro;27.82</span></div>
+    <div class="rail-cell"><span class="rail-k">DK2 MAE</span><span class="rail-v">&euro;29.50</span></div>
+    <div class="rail-cell"><span class="rail-k">MASE D+1</span><span class="rail-v up">0.61 / 0.54</span></div>
+    <div class="rail-cell"><span class="rail-k">Window</span><span class="rail-v">23 Sep &ndash; 6 Oct 2026</span></div>
+    <div class="rail-cell"><span class="live">Scored against settlement</span></div>
+  </div>
+</div>
+
 <main>
 
-<section class="sec sec-navy">
-  <div class="wrap stack" style="gap:18px">
-    <p class="eyebrow">Platform</p>
-    <h1 class="h-xl" style="max-width:19ch">From market data to a forecast you can audit.</h1>
-    <p class="lead">Every forecast is logged and scored against what actually happened. The audit trail is part of the product, not a report written afterwards.</p>
-  </div>
-</section>
-
-<section class="sec">
-  <div class="wrap stack" style="gap:30px">
-    <h2 class="h-lg">The pipeline</h2>
-    <div class="flow">
-      <div class="flow-box">
-        <h4>Inputs</h4>
-        <ul>
-          <li>Wholesale market prices</li>
-          <li>Weather and renewable output</li>
-          <li>Load and grid data</li>
-          <li>Telemetry from operated batteries</li>
-        </ul>
-      </div>
-      <div class="flow-box">
-        <h4>Astrea engine</h4>
-        <ul>
-          <li>Price forecasting</li>
-          <li>Load forecasting</li>
-          <li>Forecast-versus-outturn scoring</li>
-        </ul>
-      </div>
-      <div class="flow-box">
-        <h4>Outputs</h4>
-        <ul>
-          <li>Day-ahead and intraday forecasts</li>
-          <li>Bid and dispatch schedules</li>
-          <li>Accuracy and audit reports</li>
-        </ul>
-      </div>
-      <div class="flow-box">
-        <h4>Customers</h4>
-        <ul>
-          <li>US utilities</li>
-          <li>European battery owners</li>
-        </ul>
-      </div>
-    </div>
-    <div class="card card-accent">
-      <p class="card-label">The loop that matters</p>
-      <p style="font-size:18px">Outturn flows back. Every forecast is scored against what settled, and the models retrain on the result.</p>
+<section class="ch ch-tight">
+  <div class="wrap ch-cols">
+    <div class="ch-ix">00</div>
+    <div class="stack" style="gap:18px">
+      <p class="tag">Platform</p>
+      <h1 class="display" style="max-width:17ch">From market data to a forecast you can audit.</h1>
+      <p class="lead">Every forecast is logged and scored against what actually happened. The audit trail is part of the product, not a report written afterwards.</p>
     </div>
   </div>
 </section>
 
-<section class="sec sec-alt">
-  <div class="wrap stack" style="gap:30px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">Agents and the causal loop</p>
-      <h2 class="h-lg">One supervisor. Six specialists. Every number traceable.</h2>
-      <p class="lead">Ask it what you would ask an analyst. The supervisor routes the question, specialists call the engines, and the answer comes back cited to a run ID.</p>
-    </div>
-    <div class="card card-navy">
-      <p class="card-label" style="color:var(--gold-bright)">Supervisor agent</p>
-      <p style="font-size:18px">Routes intent and synthesizes a cited answer. It never produces a figure itself.</p>
-    </div>
-    <div class="grid g3">
-      <div class="card"><p class="card-label">Market intelligence</p><p>Price, load and renewable forecasting.</p></div>
-      <div class="card"><p class="card-label">Data query</p><p>Live and historical market, weather and grid data.</p></div>
-      <div class="card"><p class="card-label">Signal and causality</p><p>Outages, weather and news resolved into validated drivers.</p></div>
-      <div class="card"><p class="card-label">Scenario</p><p>Re-runs forecasts under what-if parameters without touching the baseline.</p></div>
-      <div class="card"><p class="card-label">Optimization</p><p>Battery dispatch schedules and bid curves.</p></div>
-      <div class="card"><p class="card-label">Monitor</p><p>Actuals against forecast; triggers a causal review when error thresholds trip.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec">
-  <div class="wrap stack" style="gap:30px">
-    <div class="stack" style="gap:14px">
-      <p class="eyebrow">Governance</p>
-      <h2 class="h-lg">Why the numbers hold up.</h2>
-    </div>
-    <div class="grid g3">
-      <div class="card card-gold">
-        <h3>Run ID and hash</h3>
-        <p>Every value carries a run ID and a SHA-256 hash of the inputs that produced it. Any figure in any report can be regenerated.</p>
-      </div>
-      <div class="card card-gold">
-        <h3>Gated model swaps</h3>
-        <p>No model reaches production without passing a regression suite of more than fifty scenarios, with signed validation for each upgrade.</p>
-      </div>
-      <div class="card card-gold">
-        <h3>Analyst in the loop</h3>
-        <p>A person verifies the causal links the system proposes. Attribution is reviewed, not asserted.</p>
+<section class="ch">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">01</div>
+<div class="ch-body">
+<p class="tag ch-rule">The pipeline</p>
+<h2 class="display">Outturn is an input, not a postscript.</h2>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="stack" style="gap:22px">
+        <div class="mods m4">
+          <div class="mod">
+            <p class="tag">01 Inputs</p>
+            <p>Wholesale market prices<br>Weather and renewable output<br>Load and grid data<br>Telemetry from operated batteries</p>
+          </div>
+          <div class="mod">
+            <p class="tag">02 Astrea engine</p>
+            <p>Price forecasting<br>Load forecasting<br>Forecast-versus-outturn scoring</p>
+          </div>
+          <div class="mod">
+            <p class="tag">03 Outputs</p>
+            <p>Day-ahead and intraday forecasts<br>Bid and dispatch schedules<br>Accuracy and audit reports</p>
+          </div>
+          <div class="mod">
+            <p class="tag">04 Customers</p>
+            <p>US utilities<br>European battery owners</p>
+          </div>
+        </div>
+        <div class="slab">
+          <p class="tag">The loop that matters</p>
+          <p class="big">Outturn flows back. Every forecast is scored against what settled, and the models retrain on the result.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="sec sec-navy">
-  <div class="wrap stack" style="gap:20px;align-items:flex-start">
-    <h2 class="h-lg" style="max-width:20ch">Every claim on this site is measured.</h2>
-    <p class="lead" style="max-width:56ch">The Danish day-ahead record is published in full, including the misses and what caused them.</p>
-    <a class="btn btn-gold" href="/validation">Read the validation</a>
+<section class="ch ch-fill">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">02</div>
+<div class="ch-body">
+<p class="tag ch-rule">Agents and the causal loop</p>
+<h2 class="display">One supervisor. Six specialists. Every number traceable.</h2>
+<p class="lead">Ask it what you would ask an analyst. The supervisor routes the question, specialists call the engines, and the answer comes back cited to a run ID.</p>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="stack" style="gap:22px">
+        <div class="slab">
+          <p class="tag">Supervisor agent</p>
+          <p class="big">Routes intent and synthesizes a cited answer. It never produces a figure itself.</p>
+        </div>
+        <div class="mods m3">
+          <div class="mod"><p class="tag">Market intelligence</p><p>Price, load and renewable forecasting.</p></div>
+          <div class="mod"><p class="tag">Data query</p><p>Live and historical market, weather and grid data.</p></div>
+          <div class="mod"><p class="tag">Signal and causality</p><p>Outages, weather and news resolved into validated drivers.</p></div>
+          <div class="mod"><p class="tag">Scenario</p><p>Re-runs forecasts under what-if parameters without touching the baseline.</p></div>
+          <div class="mod"><p class="tag">Optimization</p><p>Battery dispatch schedules and bid curves.</p></div>
+          <div class="mod"><p class="tag">Monitor</p><p>Actuals against forecast; triggers a causal review when error thresholds trip.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch">
+  <div class="wrap">
+<div class="ch-head">
+<div class="ch-ix">03</div>
+<div class="ch-body">
+<p class="tag ch-rule">Governance</p>
+<h2 class="display">Why the numbers hold up.</h2>
+</div>
+</div>
+    <div class="ch-cols">
+      <div></div>
+      <div class="mods m3">
+        <div class="mod mod-top">
+          <h3>Run ID and hash</h3>
+          <p>Every value carries a run ID and a SHA-256 hash of the inputs that produced it. Any figure in any report can be regenerated.</p>
+        </div>
+        <div class="mod mod-top">
+          <h3>Gated model swaps</h3>
+          <p>No model reaches production without passing a regression suite of more than fifty scenarios, with signed validation for each upgrade.</p>
+        </div>
+        <div class="mod mod-top">
+          <h3>Analyst in the loop</h3>
+          <p>A person verifies the causal links the system proposes. Attribution is reviewed, not asserted.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch ch-fill">
+  <div class="wrap ch-cols">
+    <div class="ch-ix">&rarr;</div>
+    <div class="stack" style="gap:20px;align-items:flex-start">
+      <h2 class="display" style="max-width:18ch">Every claim on this site is measured.</h2>
+      <p class="lead" style="max-width:56ch">The Danish day-ahead record is published in full, including the misses and what caused them.</p>
+      <a class="btn" href="/validation">Read the validation</a>
+    </div>
   </div>
 </section>
 </main>
@@ -147,9 +173,9 @@
 <footer class="foot">
   <div class="wrap">
     <div class="foot-top">
-      <div style="max-width:360px">
-        <a class="brand" href="/"><span class="brand-mark"></span>Astrea</a>
-        <p style="margin-top:14px;line-height:1.6">Forecasting and dispatch intelligence for utilities and battery owners. Built inside an operating energy company.</p>
+      <div>
+        <a class="brand" href="/">Astrea</a>
+        <p>Forecasting and dispatch intelligence for utilities and battery owners. A joint venture of Nuvve and CamerEye.</p>
       </div>
       <nav class="foot-nav">
         <a href="/platform">Platform</a>
@@ -160,13 +186,12 @@
       </nav>
     </div>
     <div class="foot-bot">
-      <span>&copy; 2026 Astrea. A Nuvve Holding Corp company (NASDAQ: NVVE).</span>
+      <span>&copy; 2026 Astrea &middot; A joint venture of Nuvve Holding Corp (NASDAQ: NVVE) and CamerEye</span>
       <span>San Diego, California</span>
     </div>
   </div>
 </footer>
 
 <script src="/assets/js/nav.js" defer></script>
-
 </body>
 </html>
