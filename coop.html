@@ -1,0 +1,1547 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Astrea Co-op Forecast Desk</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ============================================================
+   ASTREA · ERCOT DESK — light theme
+   Palette lifted verbatim from the Nuvve POC (energy-poc.camereye.ai)
+   ============================================================ */
+:root{
+  --green:#759840; --green-dk:#5F7D33; --green-lt:#ABCA47;
+  --lime:#CDDC38;  --lime-soft:#E8F0C4; --cyan:#73CEE5; --cyan-dk:#1C7C97;
+  --bg:#F2F1EF; --bg-tint:#E8F0D4; --card:#FFFFFF; --well:#F8F9F4; --well-2:#EFF3E6;
+  --ink:#111111; --ink-2:#333333; --ink-3:#555555; --ink-4:#767676; --ink-5:#9AA394;
+  --line:#D8DFCB; --line-2:rgba(117,152,64,.30); --rule:#CDDC38;
+  --pos:#4A7C1F; --pos-bg:#EDF5DF;
+  --neg:#C23B2E; --neg-bg:#FBEBE9;
+  --warn:#9C6F06; --warn-bg:#FBF2DC;
+  --info:#1C7C97; --info-bg:#E4F2F7;
+  --mag:#7B4FA0; --mag-bg:#F1EAF8;
+  --ff-d:'Merriweather',Georgia,serif;
+  --ff-u:'Montserrat',system-ui,sans-serif;
+  --ff-m:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --r:4px;
+  --sh:3px 3px 0 rgba(171,202,71,.40);
+  --sh-lime:6px 6px 0 var(--lime);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(117,152,64,.03) 10px,rgba(117,152,64,.03) 11px),
+    linear-gradient(165deg,#ffffff 0%,#F2F1EF 55%,#E8F0D4 100%);
+  background-attachment:fixed;
+  color:var(--ink); font-family:var(--ff-u); font-size:13px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(117,152,64,.35);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--green)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* Very short viewports: give up the fixed shell and let the page scroll. */
+@media (max-height:560px){
+  body{overflow:auto}
+  .app{height:auto;min-height:100vh;grid-template-rows:auto;overflow:visible}
+  .main{overflow:visible}
+  .canvas{overflow:visible}
+  .rail{position:sticky;top:0;height:100vh}
+}
+
+/* ---------- primitives ---------- */
+h1,h2,h3{font-family:var(--ff-d);color:var(--green);margin:0}
+.kicker{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0}
+.sect{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--green);
+  border-bottom:2px solid var(--rule);padding-bottom:5px;margin:0 0 12px;display:flex;gap:8px;
+  justify-content:space-between;align-items:center}
+.sect .r{font-weight:600;letter-spacing:.05em;color:var(--ink-4);text-transform:none;font-size:10px}
+.mono{font-family:var(--ff-m)}
+.num{font-family:var(--ff-d);font-weight:700;font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-4)} .tiny{font-size:10.5px}
+hr.hair{height:1px;background:var(--line);border:0;margin:12px 0}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;padding:3px 7px;border-radius:2px;border:1px solid var(--line-2);
+  color:var(--ink-2);background:#fff;white-space:nowrap}
+.pill.lime{background:var(--lime);color:#111;border-color:var(--lime)}
+.pill.ok{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.pill.bad{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
+.pill.warn{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
+.pill.info{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
+.pill.mag{background:var(--mag-bg);border-color:#C2A8DA;color:var(--mag)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--pos);display:inline-block;flex:none}
+.dot.live{animation:pulse 2s ease-in-out infinite}
+.dot.w{background:var(--warn)} .dot.b{background:var(--neg)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+  background:#fff;border:1px solid var(--line-2);color:var(--ink);border-radius:var(--r);
+  padding:6px 11px;font-size:11px;font-weight:600;transition:.12s;white-space:nowrap}
+.btn:hover{background:var(--well-2);border-color:var(--green)}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn.pri:hover{background:var(--green-lt);border-color:var(--green-lt);color:#111}
+.btn.cta{background:var(--lime);border-color:var(--lime);color:#111;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;font-size:10px}
+.btn.cta:hover{background:var(--green-lt)}
+.btn.sm{padding:4px 8px;font-size:10px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.card.hi{border:2px solid var(--green);box-shadow:var(--sh-lime)}
+.grid{display:grid;gap:12px}
+
+table.tbl{width:100%;min-width:100%;border-collapse:collapse;font-size:11.5px}
+table.tbl th{text-align:left;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:700;padding:7px 9px;border-bottom:2px solid var(--rule);background:var(--well-2);white-space:nowrap}
+table.tbl td{padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:middle;overflow-wrap:anywhere}
+table.tbl tbody tr:hover{background:var(--well)}
+table.tbl td.r,table.tbl th.r{text-align:right;font-family:var(--ff-m);font-variant-numeric:tabular-nums}
+table.tbl th.r{font-family:var(--ff-u)}
+.tblwrap{overflow-x:auto;max-width:100%}
+.tblwrap::-webkit-scrollbar{height:7px}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+.app{display:grid;grid-template-columns:218px 1fr;grid-template-rows:100%;
+  height:100vh;height:100dvh;width:100vw;overflow:hidden}
+
+.rail{background:linear-gradient(180deg,#5F7D33 0%,#759840 45%,#6A8A36 100%);
+  border-right:4px solid var(--lime);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.rail-brand{padding:14px;border-bottom:1px solid rgba(205,220,56,.35)}
+.logobox{background:#fff;border:2px solid var(--lime);border-radius:var(--r);padding:8px 10px;
+  box-shadow:2px 2px 0 rgba(0,0,0,.12)}
+.logobox .lg{font-family:var(--ff-d);font-weight:900;font-size:17px;letter-spacing:.15em;color:var(--green);margin:0}
+.logobox .sb{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin:2px 0 0;font-weight:700}
+.rail-brand .iso{margin:9px 0 0;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#fff;font-weight:700;opacity:.9}
+.rail-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;padding:11px 10px 8px}
+.navgrp{font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--lime);font-weight:700;margin:14px 4px 6px;opacity:.95}
+.navgrp:first-child{margin-top:2px}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:var(--r);cursor:pointer;
+  color:#fff;font-size:11.5px;font-weight:600;margin-bottom:4px;border:1px solid rgba(255,255,255,.28);
+  background:rgba(0,0,0,.18);transition:.12s}
+.nav:hover{background:rgba(0,0,0,.32);border-color:var(--lime)}
+.nav.on{background:var(--lime);color:#111;font-weight:700;border-color:var(--lime);box-shadow:2px 2px 0 rgba(0,0,0,.15)}
+.nav .ic{width:15px;height:15px;flex:none}
+.rail-foot{border-top:1px solid rgba(205,220,56,.35);padding:10px 12px;font-size:9.5px;color:#fff;line-height:1.7}
+.rail-foot .row{display:flex;justify-content:space-between;gap:6px}
+.rail-foot b{color:var(--lime);font-weight:700}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.topbar{flex:none;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line-2);
+  padding:9px 14px;backdrop-filter:blur(6px);z-index:30;display:flex;flex-direction:column;gap:8px}
+.tb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.modeswitch{display:inline-flex;background:var(--well-2);border:2px solid var(--green);border-radius:var(--r);
+  padding:2px;gap:2px;box-shadow:2px 2px 0 rgba(171,202,71,.45)}
+.modeswitch button{border:0;background:transparent;cursor:pointer;padding:6px 13px;border-radius:2px;
+  font-size:11px;font-weight:700;color:var(--green-dk);letter-spacing:.02em;transition:.12s;white-space:nowrap}
+.modeswitch button:hover{background:#fff}
+.modeswitch button.on{background:var(--green);color:#fff;box-shadow:1px 1px 0 rgba(0,0,0,.14)}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld > label{font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-4);font-weight:700}
+.selwrap{position:relative}
+.sel{appearance:none;background:#fff;border:1px solid var(--line-2);border-radius:var(--r);
+  padding:6px 26px 6px 9px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink)}
+.sel:hover{border-color:var(--green)}
+.selwrap::after{content:"▾";position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  pointer-events:none;font-size:9px;color:var(--green)}
+.segs{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:#fff}
+.segs button{border:0;border-right:1px solid var(--line);background:#fff;cursor:pointer;padding:6px 10px;
+  font-size:11px;font-weight:600;color:var(--ink-3);transition:.1s;font-family:var(--ff-m)}
+.segs button:last-child{border-right:0}
+.segs button:hover{background:var(--well-2)}
+.segs button.on{background:var(--green);color:#fff;font-weight:700}
+.tb-sp{flex:1}
+.tb-div{width:1px;align-self:stretch;background:var(--line);flex:none}
+.clock{font-family:var(--ff-m);font-size:11px;color:var(--ink-3);text-align:right;line-height:1.3}
+.clock b{color:var(--green-dk);font-weight:700}
+.avatar{width:28px;height:28px;border-radius:2px;background:var(--green);color:#fff;display:grid;place-items:center;
+  font-weight:700;font-size:10.5px;border:2px solid var(--lime);flex:none}
+
+.tape{height:26px;flex:none;background:var(--green-dk);overflow:hidden;display:flex;align-items:center;border-bottom:2px solid var(--lime)}
+.tape-in{display:flex;gap:24px;white-space:nowrap;animation:tick 52s linear infinite;padding-left:14px}
+.tape:hover .tape-in{animation-play-state:paused}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{font-family:var(--ff-m);font-size:10.5px;color:rgba(255,255,255,.8);display:flex;gap:6px;align-items:center}
+.tk b{color:#fff;font-weight:500}
+.tk .up{color:var(--lime)} .tk .dn{color:#FFBDB5}
+
+.canvas{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+  padding:16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.screen{animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;background:#fff;
+  border:2px solid var(--green);border-radius:var(--r);padding:13px 16px;margin-bottom:14px;box-shadow:var(--sh-lime)}
+.hero h1{font-size:23px;font-weight:700;margin:4px 0 3px;line-height:1.15}
+.hero .tag{font-size:11.5px;color:var(--ink-3);margin:0;font-style:italic}
+.hero-r{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.hero-r .pr{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:2px solid var(--green);border-radius:var(--r);padding:9px 11px;
+  position:relative;overflow:hidden;cursor:pointer;transition:.12s}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--lime)}
+.kpi{padding-left:15px}
+.kpi:hover{box-shadow:var(--sh);transform:translateY(-1px)}
+.kpi.acc-pos::before{background:var(--pos)} .kpi.acc-neg::before{background:var(--neg)}
+.kpi.acc-warn::before{background:var(--warn)} .kpi.acc-info::before{background:var(--cyan)}
+.kpi .k{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0;
+  display:flex;justify-content:space-between;gap:5px;align-items:center;flex-wrap:wrap}
+.kpi .v{font-family:var(--ff-d);font-weight:700;font-size:19px;color:var(--ink);margin:4px 0 0;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:10px;font-family:var(--ff-u);font-weight:600;color:var(--ink-4);margin-left:3px}
+.kpi .s{font-size:9.5px;color:var(--ink-4);margin:2px 0 0;font-family:var(--ff-m)}
+.kpi .s .up{color:var(--pos)} .kpi .s .dn{color:var(--neg)}
+
+.c2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.c3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.c-23{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(300px,1fr);gap:12px}
+.c-32{display:grid;grid-template-columns:minmax(290px,1fr) minmax(0,1.8fr);gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.c2>*,.c3>*,.c-23>*,.c-32>*,.stack>*{min-width:0}
+.mb12{margin-bottom:12px}
+@media(max-width:1500px){.c-23,.c-32,.c3{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:1150px){.c2{grid-template-columns:minmax(0,1fr)}}
+
+.chart-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.chart-hd>div:first-child{min-width:0;flex:1 1 230px}
+.chart-hd h3{font-family:var(--ff-u);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:0}
+.chart-hd .src{font-size:9.5px;color:var(--ink-4);font-family:var(--ff-m);margin:3px 0 0;line-height:1.5}
+.chart-hd .src a{color:var(--cyan-dk);text-decoration:underline dotted}
+.legend{display:flex;flex-wrap:wrap;gap:9px 12px;margin-top:8px;font-size:9.5px;color:var(--ink-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:3px;display:inline-block;border-radius:2px;flex:none}
+.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 3px,transparent 3px 6px)!important}
+.legend i.band{height:9px;border-radius:1px;opacity:.4}
+svg{display:block;overflow:visible}
+
+.drivers{display:flex;flex-direction:column;gap:6px}
+.dr{display:grid;grid-template-columns:minmax(80px,150px) minmax(24px,1fr) 62px;gap:9px;align-items:center;font-size:10.5px}
+.dr .lbl{color:var(--ink-3);overflow-wrap:anywhere}
+.dr .bar{height:7px;background:var(--well-2);border-radius:2px;overflow:hidden}
+.dr .bar i{display:block;height:100%;background:var(--green-lt)}
+.dr .bar i.neg{background:var(--neg)}
+.dr .val{text-align:right;font-family:var(--ff-m);color:var(--ink);font-weight:500}
+
+.stackbar{display:flex;height:28px;border-radius:2px;overflow:hidden;border:1px solid var(--line-2);margin:9px 0 8px}
+.stackbar i{display:block;height:100%}
+.sb-key{display:flex;flex-direction:column;gap:5px}
+.sb-key .row{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px}
+.sb-key .row .l{display:flex;gap:7px;align-items:center;min-width:0}
+.sb-key em{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none}
+.sb-key .row .v{font-family:var(--ff-m);font-weight:500;white-space:nowrap}
+
+.zgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.zone{background:var(--well);border:1px solid var(--line-2);border-radius:2px;padding:9px 10px;cursor:pointer;position:relative;overflow:hidden}
+.zone:hover{border-color:var(--green);background:#fff;box-shadow:var(--sh)}
+.zone .zn{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4);font-weight:700;font-family:var(--ff-m)}
+.zone .zv{font-family:var(--ff-d);font-weight:700;font-size:16px;margin-top:3px;color:var(--ink)}
+.zone .zs{font-size:9px;font-family:var(--ff-m);color:var(--ink-4);margin-top:2px}
+.zone .zh{position:absolute;left:0;right:0;bottom:0;height:3px}
+@media(max-width:1150px){.zgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.srcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:9px}
+.src{background:var(--well);border:1px solid var(--line-2);border-radius:2px;padding:10px 11px}
+.src:hover{background:#fff;box-shadow:var(--sh)}
+.src .sn{font-size:11px;font-weight:700;color:var(--ink);display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
+.src .sn a{color:var(--green-dk);text-decoration:none}
+.src .sn a:hover{text-decoration:underline}
+.src .sm{font-size:9.5px;font-family:var(--ff-m);color:var(--ink-4);margin-top:5px;line-height:1.55}
+
+.hrow{display:flex;flex-direction:column;gap:4px}
+.hr2{display:grid;grid-template-columns:48px minmax(20px,1fr) 70px 64px;gap:9px;align-items:center;font-size:10.5px;
+  padding:5px 8px;background:var(--well);border:1px solid var(--line);border-radius:2px}
+.hr2.win{border-color:var(--green);background:var(--pos-bg)}
+.hr2.chg{border-color:var(--cyan);background:var(--info-bg)}
+.hr2 .h{font-family:var(--ff-m);color:var(--ink-4)}
+.hr2 .bar{height:12px;background:var(--well-2);border-radius:1px;overflow:hidden}
+.hr2 .bar i{display:block;height:100%}
+.hr2 .p,.hr2 .q{font-family:var(--ff-m);text-align:right;color:var(--ink)}
+
+.dec{background:#fff;border:1px solid var(--line-2);border-left:4px solid var(--lime);border-radius:var(--r);
+  padding:12px 13px;margin-bottom:10px;box-shadow:var(--sh)}
+.dec.done{border-left-color:var(--pos)} .dec.pend{border-left-color:var(--warn)}
+.dec-hd{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:7px;flex-wrap:wrap}
+.dec-hd h4{margin:0;font-size:12.5px;font-weight:700;color:var(--ink);flex:1 1 150px;overflow-wrap:anywhere}
+.dec-hd>div{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dec-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.dec p.why{margin:0 0 9px;font-size:11.5px;color:var(--ink-2);line-height:1.6}
+.dec .box{padding:9px 10px;background:var(--well);border:1px solid var(--line);border-radius:2px;margin-bottom:9px}
+.fb{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-top:9px;border-top:1px dashed var(--line-2)}
+.fb .lb{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink-4)}
+.fb-note{margin:8px 0 0;font-size:10.5px;padding:7px 9px;border-radius:2px;display:none;border-left:3px solid var(--pos);
+  background:var(--pos-bg);color:var(--pos)}
+.fb-note.show{display:block}
+
+.agent-chip{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.04em;
+  padding:2px 7px;border-radius:2px;background:var(--pos-bg);border:1px solid #A9C97F;color:var(--pos);white-space:nowrap}
+.agent-chip.mi{background:#F7FAE3;border-color:#C9D86E;color:#6B7A12}
+.agent-chip.dq{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
+.agent-chip.sg{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
+.agent-chip.sc{background:var(--mag-bg);border-color:#C2A8DA;color:var(--mag)}
+.agent-chip.op{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.agent-chip.mo{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
+
+.feed{max-height:330px;overflow-y:auto;margin:0 -4px}
+.fitem{display:flex;gap:9px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.fitem:hover{background:var(--well)}
+.fitem .t{font-family:var(--ff-m);font-size:9.5px;color:var(--ink-4);flex:none;width:44px;padding-top:2px;line-height:1.35}
+.fitem .bd{flex:1;min-width:0}
+.fitem .bd p{margin:4px 0 0;font-size:11px;color:var(--ink-2);line-height:1.5}
+.fitem .bd .hdr{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+.sizer{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.rngwrap{display:flex;align-items:center;gap:9px;min-width:210px}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:var(--well-2);
+  border-radius:3px;border:1px solid var(--line);flex:1;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;
+  background:var(--lime);border:2px solid var(--green);cursor:pointer;box-shadow:1px 1px 0 rgba(0,0,0,.18)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--lime);
+  border:2px solid var(--green);cursor:pointer}
+.rngval{font-family:var(--ff-d);font-weight:700;font-size:16px;min-width:76px;text-align:right;color:var(--ink)}
+.rngval small{font-family:var(--ff-u);font-size:10px;font-weight:600;color:var(--ink-4);margin-left:3px}
+
+.scrim{position:fixed;inset:0;background:rgba(30,40,22,.45);opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:640px;max-width:95vw;background:var(--bg);
+  border-left:4px solid var(--lime);transform:translateX(100%);transition:transform .24s cubic-bezier(.2,.8,.2,1);
+  z-index:100;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.12)}
+.drawer.on{transform:none}
+.dr-hd{flex:none;padding:13px 16px;border-bottom:2px solid var(--rule);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;background:#fff}
+.dr-hd h2{font-size:16px}
+.dr-bd{flex:1;overflow-y:auto;padding:16px}
+.iconbtn{width:24px;height:24px;display:grid;place-items:center;border-radius:2px;border:1px solid var(--line-2);
+  background:#fff;cursor:pointer;color:var(--ink-3);font-size:12px;flex:none}
+.iconbtn:hover{border-color:var(--green);color:var(--green)}
+.kv{display:grid;grid-template-columns:minmax(90px,152px) minmax(0,1fr);gap:7px 12px;font-size:11px;margin-bottom:14px}
+.kv dt{color:var(--ink-4);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding-top:2px}
+.kv dd{margin:0;font-family:var(--ff-m);color:var(--ink);word-break:break-all}
+.steps{position:relative;padding-left:19px}
+.steps::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line-2)}
+.step{position:relative;padding:0 0 12px}
+.step::before{content:"";position:absolute;left:-17px;top:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--lime);border:2px solid var(--bg)}
+.step.ok::before{background:var(--pos)} .step.wait::before{background:var(--warn)}
+.step h5{margin:0;font-size:11.5px;font-weight:700;color:var(--ink)}
+.step p{margin:3px 0 0;font-size:10.5px;color:var(--ink-4);font-family:var(--ff-m);line-height:1.55}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,80px);background:#fff;
+  border:2px solid var(--green);border-left:5px solid var(--lime);border-radius:var(--r);padding:11px 15px;
+  font-size:11.5px;z-index:120;opacity:0;transition:.24s;box-shadow:4px 4px 0 var(--lime);max-width:620px;color:var(--ink-2)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast b{color:var(--green-dk)}
+
+.note{font-size:10.5px;color:var(--ink-4);line-height:1.6;margin:9px 0 0}
+.note b{color:var(--green-dk)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-bg);padding:8px 10px;border-radius:2px;
+  font-size:10.5px;color:#6E4F04;line-height:1.6;margin:0}
+.callout.info{border-left-color:var(--cyan-dk);background:var(--info-bg);color:#115A6E}
+.callout.ok{border-left-color:var(--pos);background:var(--pos-bg);color:#33590F}
+
+/* ---------- co-op demo additions ---------- */
+.chatwrap{display:flex;flex-direction:column;height:clamp(520px,calc(100vh - 230px),900px);min-height:0}
+.cbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:4px 2px 12px}
+.msg{margin-bottom:16px;max-width:100%}
+.msg .who{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:8.5px;letter-spacing:.13em;
+  text-transform:uppercase;font-weight:700;color:var(--ink-4)}
+.msg.u .bub{background:var(--well-2);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:10px 12px;font-size:12px;color:var(--ink)}
+.msg.a .bub{background:#fff;border:1px solid var(--line-2);border-left:3px solid var(--lime);
+  border-radius:var(--r);padding:12px 13px;font-size:12px;color:var(--ink-2);line-height:1.65;box-shadow:var(--sh)}
+.msg.a .bub b{color:var(--ink)}
+.msg.a .bub .hl{font-family:var(--ff-m);color:var(--green-dk);font-weight:500}
+.msg.a .bub ul{margin:8px 0;padding-left:17px}
+.msg.a .bub li{margin-bottom:5px}
+.route{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding-bottom:9px;border-bottom:1px dashed var(--line-2)}
+.route .arw{color:var(--ink-4);font-size:9px}
+.cites{margin-top:11px;padding-top:9px;border-top:1px dashed var(--line-2)}
+.cites .ttl{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4);font-weight:700;margin-bottom:6px}
+.cite{display:flex;gap:6px;font-size:10px;color:var(--ink-4);font-family:var(--ff-m);margin-bottom:4px;line-height:1.5}
+.cite>span:first-child{color:var(--cyan-dk);flex:none}
+.cite>span:last-child{min-width:0;overflow-wrap:anywhere}
+.thinking{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--ink-4);padding:8px 0}
+.thinking .d{width:6px;height:6px;border-radius:50%;background:var(--green);animation:bnc 1.2s infinite}
+.thinking .d:nth-child(2){animation-delay:.15s}.thinking .d:nth-child(3){animation-delay:.3s}
+@keyframes bnc{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 0 0;border-top:1px solid var(--line)}
+.chip{font-size:11px;padding:7px 10px;border-radius:var(--r);border:1px solid var(--line-2);background:#fff;
+  color:var(--ink-2);cursor:pointer;transition:.12s;text-align:left;font-weight:500}
+.chip:hover{border-color:var(--green);background:var(--well-2);color:var(--ink)}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.composer{display:flex;gap:8px;align-items:flex-end;padding-top:10px}
+.composer textarea{flex:1;background:var(--well);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:10px 11px;font-size:12px;resize:none;height:42px;color:var(--ink);font-family:var(--ff-u)}
+.composer textarea:focus{outline:none;border-color:var(--green);background:#fff}
+.scnbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--warn-bg);
+  border:1px solid #DEC082;border-left:4px solid var(--warn);border-radius:var(--r);padding:9px 12px;margin-bottom:12px}
+.scnbar.base{background:var(--pos-bg);border-color:#A9C97F;border-left-color:var(--pos)}
+.scnbar .t{font-size:11.5px;color:var(--ink-2)}
+.scnbar .t b{color:var(--ink)}
+.toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;font-weight:600;color:var(--ink-2);
+  background:#fff;border:1px solid var(--line-2);border-radius:var(--r);padding:6px 10px;transition:.12s}
+.toggle:hover{border-color:var(--green)}
+.toggle.on{background:var(--green);border-color:var(--green);color:#fff}
+.toggle .sw{width:26px;height:14px;border-radius:8px;background:var(--line);position:relative;transition:.15s;flex:none}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;transition:.15s}
+.toggle.on .sw{background:var(--lime)}
+.toggle.on .sw::after{left:14px;background:#111}
+.bigstat{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.bigstat .n{font-family:var(--ff-d);font-weight:700;font-size:30px;line-height:1}
+.bigstat .u{font-size:12px;color:var(--ink-4);font-weight:600}
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:10px 0}
+.cmp .side{text-align:center;padding:11px 9px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--well)}
+.cmp .side.win{border:2px solid var(--green);background:var(--pos-bg)}
+.cmp .side .l{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink-4)}
+.cmp .side .v{font-family:var(--ff-d);font-weight:700;font-size:23px;margin-top:4px}
+.cmp .side .s{font-size:9.5px;color:var(--ink-4);margin-top:2px;font-family:var(--ff-m)}
+.cmp .vs{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4);font-weight:700}
+.pend{display:inline-flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;padding:3px 7px;border-radius:2px;background:#EEE;border:1px dashed #BBB;color:#666}
+</style></head><body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="rail-brand">
+      <div class="logobox">
+        <p class="lg">ASTREA</p>
+        <p class="sb">a Nuvve company</p>
+      </div>
+      <p class="iso">Co-operative forecast desk</p>
+    </div>
+    <div class="rail-scroll" id="railNav"></div>
+    <div class="rail-foot">
+      <div class="row"><span>Supervisor</span><b>online</b></div>
+      <div class="row"><span>Specialists</span><b>6 / 6</b></div>
+      <div class="row"><span>Causality store</span><b id="rfCaus">v6</b></div>
+      <div class="row"><span>Data vintage</span><b>2023 – 2026</b></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-row">
+        <div class="fld"><label>Co-operative</label><div class="selwrap">
+          <select class="sel" id="selCoop" style="min-width:270px"></select></div></div>
+        <div class="fld"><label>Scope</label><div class="selwrap">
+          <select class="sel" id="selSub" style="min-width:186px"></select></div></div>
+        <div class="fld"><label>Horizon</label><div class="selwrap">
+          <select class="sel" id="selHz" style="min-width:196px"></select></div></div>
+        <div class="tb-div"></div>
+        <div class="fld"><label>Active scenario</label>
+          <div class="segs" id="segScn"></div></div>
+        <div class="tb-sp"></div>
+        <span class="pill ok"><i class="dot live"></i> FORECAST CURRENT</span>
+        <div class="tb-div"></div>
+        <div class="clock"><b id="clkT">09:14:22</b><br><span>MDT · Thu 29 Oct 2026</span></div>
+        <div class="avatar" title="Socorro Electric Cooperative">SEC</div>
+      </div>
+    </header>
+
+    <div class="tape"><div class="tape-in" id="tapeIn"></div></div>
+    <div class="canvas" id="canvas"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <div class="dr-hd">
+    <div><p class="kicker">Run lineage · calculator principle</p><h2 id="drTitle">Audit trail</h2></div>
+    <button class="iconbtn" id="drClose">✕</button>
+  </div>
+  <div class="dr-bd" id="drBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================================================================
+   ASTREA · CO-OPERATIVE FORECAST DESK
+   Configured for Socorro Electric Cooperative (SEC), central New Mexico.
+   Substation peaks are SEC-reported 2023 figures. Everything derived from
+   them is labelled on the Data & provenance screen.
+   ================================================================= */
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const fmt=(n,d)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d===undefined?0:d,maximumFractionDigits:d===undefined?0:d});
+const MW=(n,d)=>fmt(n,d===undefined?1:d);
+const H=n=>String(n).padStart(2,'0')+':00';
+const HE=n=>'HE'+String(n+1).padStart(2,'0');
+const AGENTS={sup:['Supervisor',''],mi:['Market Intelligence','mi'],dq:['Data Query','dq'],
+  sg:['Signal / Causality','sg'],sc:['Scenario','sc'],op:['Optimization','op'],mo:['Monitor','mo']};
+const AG=k=>'<span class="agent-chip '+AGENTS[k][1]+'">'+AGENTS[k][0]+'</span>';
+
+/* ══════════ CO-OP PROFILE ══════════ */
+const COOPS=[
+ {id:'sec',n:'Socorro Electric Cooperative',loc:'Socorro, NM',on:true},
+ {id:'cnm',n:'Central New Mexico Electric Co-op',loc:'Mountainair, NM',on:false},
+ {id:'oce',n:'Otero County Electric Co-op',loc:'Cloudcroft, NM',on:false},
+ {id:'sie',n:'Sierra Electric Co-op',loc:'Elephant Butte, NM',on:false},
+ {id:'col',n:'Columbus Electric Co-op',loc:'Deming, NM',on:false},
+ {id:'jem',n:'Jemez Mountains Electric Co-op',loc:'Española, NM',on:false}];
+
+/* SEC substations — 2023 peak loads as reported by the co-operative.
+   These are individual, non-coincident peaks. They do not sum to a system peak. */
+const SUBS=[
+ {c:'SOC69', n:'Socorro 69 kV',   pk2023:16.400,share:.434,mape:3.8,note:'Largest. Municipal, institutional and commercial core.'},
+ {c:'SOC25', n:'Socorro 24.9 kV', pk2023:11.500,share:.305,mape:4.0,note:'New Mexico Tech campus, water and wastewater.'},
+ {c:'SPRG',  n:'Springerville',   pk2023: 4.200,share:.111,mape:5.6,note:'Dispersed rural and agricultural.'},
+ {c:'BERN',  n:'Bernardo',        pk2023: 2.900,share:.077,mape:6.1,note:'Agricultural, irrigation-driven in season.'},
+ {c:'BURR',  n:'Burris',          pk2023: 2.500,share:.066,mape:6.4,note:'Rural residential and small commercial.'},
+ {c:'BORD',  n:'Borderland',      pk2023: 0.252,share:.007,mape:9.2,note:'Very small. Noise dominates the relative error.'}];
+const SUM_PEAKS=SUBS.reduce((a,b)=>a+b.pk2023,0);           /* 37.752 MW */
+const DIVERSITY=0.84;                                        /* modelled */
+const COINCIDENT=+(SUM_PEAKS*DIVERSITY).toFixed(1);          /* ≈ 31.7 MW */
+
+/* ══════════ TODAY · Thu 29 Oct 2026 · hourly MW ══════════ */
+const SEC={
+ load:[13.2,12.6,12.2,12.0,11.9,12.4,14.1,16.2,16.8,16.1,15.4,15.0,
+       15.2,15.6,16.0,16.4,17.1,18.3,19.8,19.5,18.4,17.0,15.4,14.0],
+ actual:[13.3,12.5,12.3,12.1,11.8,12.5,14.3,16.0,16.9,null,null,null,
+       null,null,null,null,null,null,null,null,null,null,null,null],
+ /* seasonal naive: same hour, same weekday, previous week */
+ naiveWk:[14.1,13.4,12.8,12.5,12.4,13.0,15.2,17.6,17.9,16.8,15.9,15.3,
+       15.4,15.9,16.6,17.3,18.2,19.8,21.4,20.9,19.4,17.8,16.1,14.6],
+ /* solar: NM Tech 664 kW carport plus modelled distributed rooftop ≈ 1.20 MW */
+ solar:[0,0,0,0,0,0,0,0.05,0.42,0.88,1.24,1.45,1.55,1.50,1.33,1.02,0.58,0.14,0.01,0,0,0,0,0],
+ temp:[44,42,41,40,39,39,42,48,55,61,66,69,71,72,72,71,68,63,57,53,50,48,46,45],
+ dew:[28,28,27,27,26,26,27,29,30,30,29,28,27,26,26,27,28,30,31,31,30,29,29,28],
+ /* daily peak: 7 days back, today, 13 forward */
+ days:['22 Oct','23 Oct','24 Oct','25 Oct','26 Oct','27 Oct','28 Oct','29 Oct',
+       '30 Oct','31 Oct','1 Nov','2 Nov','3 Nov','4 Nov','5 Nov','6 Nov','7 Nov','8 Nov','9 Nov','10 Nov','11 Nov'],
+ dayPk:[20.4,19.1,18.2,17.6,19.9,20.8,20.1,19.8,19.4,18.1,17.3,19.6,20.9,21.4,20.8,19.9,21.8,23.2,22.6,21.1,20.4],
+ dayLo:[null,null,null,null,null,null,null,19.2,18.6,17.2,16.3,18.5,19.7,20.1,19.4,18.5,20.2,21.3,20.7,19.3,18.6],
+ dayHi:[null,null,null,null,null,null,null,20.4,20.3,19.1,18.4,20.8,22.2,22.8,22.3,21.4,23.5,25.2,24.6,23.0,22.3],
+ dayAct:[20.6,19.0,18.0,17.9,20.1,20.6,20.3,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+ today:7,
+ /* accuracy over the 7-day retrospective window */
+ mapeAstrea:[3.6,4.4,3.9,5.1,3.8,4.2,3.7],
+ mapeNaiveWk:[9.8,13.1,10.4,15.6,9.2,11.8,10.1],
+ mapeNaiveYr:[13.2,16.8,14.1,19.2,12.4,15.1,13.0]
+};
+SEC.netLoad=SEC.load.map((v,i)=>+(v-SEC.solar[i]).toFixed(2));
+
+/* ══════════ SUPPLY POSITION ══════════ */
+const SUPPLY={
+ schedule:20.0,            /* assumed firm purchase schedule — SEC to confirm with Tri-State */
+ bessMW:5, bessMWh:20,     /* PROPOSED, not an operating asset */
+ bessOn:false
+};
+
+/* ══════════ SCENARIOS ══════════ */
+const COMPRESSOR=[0.92,0.92,0.91,0.91,0.92,0.93,0.94,0.94,0.93,0.92,0.91,0.90,
+                  0.90,0.91,0.92,0.93,0.94,0.94,0.93,0.92,0.92,0.92,0.92,0.92];
+const EVLOAD   =[0.14,0.12,0.09,0.06,0.05,0.05,0.07,0.10,0.14,0.18,0.21,0.24,
+                 0.26,0.25,0.23,0.22,0.24,0.28,0.33,0.38,0.36,0.30,0.24,0.18];
+const DT_HOT   =[-0.42,-0.45,-0.47,-0.48,-0.46,-0.41,-0.38,-0.30,-0.14,0.10,0.28,0.44,
+                 0.58,0.72,0.84,0.93,0.99,1.04,1.02,0.92,0.74,0.56,0.32,0.05];
+const Z=new Array(24).fill(0);
+const SCENARIOS={
+ base:{id:'base',label:'Base case',short:'Base',d:Z,
+   blurb:'The forecast as issued this morning, with no perturbation applied.'},
+ hot:{id:'hot',label:'+5 °F across the day',short:'+5 °F',d:DT_HOT,
+   blurb:'Every hourly temperature raised 5 °F, with the load response taken from SEC\'s own fitted temperature curve.'},
+ newload:{id:'newload',label:'1 MW compressor station + EV charging',short:'New load',
+   d:COMPRESSOR.map((v,i)=>+(v+EVLOAD[i]).toFixed(2)),
+   blurb:'A 1 MW electric-drive compressor station at 92 % load factor, plus a modelled EV charging profile.'},
+ both:{id:'both',label:'+5 °F and the new load together',short:'Both',
+   d:DT_HOT.map((v,i)=>+(v+COMPRESSOR[i]+EVLOAD[i]).toFixed(2)),
+   blurb:'Both perturbations applied at once — the planning case that matters.'}
+};
+let SCN='base';
+
+function run(scn){
+  const s=SCENARIOS[scn||SCN];
+  const load=SEC.load.map((v,i)=>+(v+s.d[i]).toFixed(2));
+  const net=load.map((v,i)=>+(v-SEC.solar[i]).toFixed(2));
+  const sched=new Array(24).fill(SUPPLY.schedule);
+  /* proposed BESS: shave the shortfall, recharge in the deepest net-load hours */
+  let bess=new Array(24).fill(0), served=net.slice();
+  if(SUPPLY.bessOn){
+    let energy=SUPPLY.bessMWh;
+    const order=net.map((v,i)=>({i,gap:v-SUPPLY.schedule})).filter(x=>x.gap>0).sort((a,b)=>b.gap-a.gap);
+    for(const o of order){
+      if(energy<=0)break;
+      const d=Math.min(o.gap,SUPPLY.bessMW,energy);
+      bess[o.i]=+d.toFixed(2); energy-=d; served[o.i]=+(net[o.i]-d).toFixed(2);
+    }
+    /* Recharge in the midday solar window first, then the overnight trough, and
+       at half rated power so the charge spreads instead of spiking one hour. */
+    const used=SUPPLY.bessMWh-energy;
+    const rate=SUPPLY.bessMW/2;
+    const ch=net.map((v,i)=>({i,v,rank:v-(i>=9&&i<=16?3.5:0)}))
+                .filter(x=>bess[x.i]===0).sort((a,b)=>a.rank-b.rank);
+    let need=used/0.88;
+    for(const c of ch){ if(need<=0.01)break;
+      const amt=Math.min(rate,need,Math.max(0,SUPPLY.schedule-net[c.i]-1.5));
+      if(amt<=0.05)continue;
+      bess[c.i]=-(+amt.toFixed(2)); need-=amt; served[c.i]=+(net[c.i]+amt).toFixed(2);
+    }
+  }
+  const short=served.map((v,i)=>Math.max(0,+(v-SUPPLY.schedule).toFixed(2)));
+  const shortRaw=net.map(v=>Math.max(0,+(v-SUPPLY.schedule).toFixed(2)));
+  return {s,load,net,sched,bess,served,short,shortRaw,
+    peak:Math.max(...load), peakH:load.indexOf(Math.max(...load)),
+    netPeak:Math.max(...net), netPeakH:net.indexOf(Math.max(...net)),
+    basePeak:Math.max(...SEC.load),
+    dPeak:+(Math.max(...load)-Math.max(...SEC.load)).toFixed(2),
+    energy:+load.reduce((a,b)=>a+b,0).toFixed(0),
+    dEnergy:+(load.reduce((a,b)=>a+b,0)-SEC.load.reduce((a,b)=>a+b,0)).toFixed(0),
+    shortMW:Math.max(...short), shortMWh:+short.reduce((a,b)=>a+b,0).toFixed(1),
+    shortHrs:short.filter(v=>v>0).length,
+    rawMW:Math.max(...shortRaw), rawMWh:+shortRaw.reduce((a,b)=>a+b,0).toFixed(1),
+    bessMWh:+bess.filter(v=>v>0).reduce((a,b)=>a+b,0).toFixed(1)};
+}
+let R=run();
+
+/* ══════════ CHART ══════════ */
+function chart(o){
+  const w=o.w||760,h=o.h||210,pl=o.pl||46,pr=o.pr||12,pt=10,pb=22;
+  const iw=w-pl-pr, ih=h-pt-pb;
+  let all=[];o.series.forEach(s=>all=all.concat(s.data.filter(v=>v!=null)));
+  if(o.band)all=all.concat(o.band.lo.filter(v=>v!=null),o.band.hi.filter(v=>v!=null));
+  if(o.deficit)all=all.concat(o.deficit.a,o.deficit.b);
+  let mn=o.yMin!=null?o.yMin:Math.min(...all), mx=o.yMax!=null?o.yMax:Math.max(...all);
+  const sp=(mx-mn)||1; if(o.yMin==null)mn-=sp*.10; if(o.yMax==null)mx+=sp*.12;
+  const n=o.series[0].data.length;
+  const X=i=>pl+(n<2?0:i*iw/(n-1)), Y=v=>pt+ih-((v-mn)/(mx-mn))*ih;
+  let s='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" role="img">';
+  const tk=o.yTicks||5;
+  for(let t=0;t<=tk;t++){const v=mn+(mx-mn)*t/tk,y=Y(v);
+    s+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+y.toFixed(1)+'" stroke="#D8DFCB" stroke-width="1"/>';
+    s+='<text x="'+(pl-7)+'" y="'+(y+3.3).toFixed(1)+'" text-anchor="end" fill="#767676" font-size="9" font-family="JetBrains Mono,monospace">'+(o.yFmt?o.yFmt(v):Math.round(v))+'</text>';}
+  if(mn<0&&mx>0){const z=Y(0);s+='<line x1="'+pl+'" y1="'+z.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+z.toFixed(1)+'" stroke="#9AA394" stroke-width="1.2"/>';}
+  (o.xLabels||[]).forEach(l=>{s+='<text x="'+X(l.i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="'+(l.c||'#767676')+'" font-size="9" font-family="JetBrains Mono,monospace"'+(l.b?' font-weight="700"':'')+'>'+l.t+'</text>';});
+  (o.zones||[]).forEach(z=>{s+='<rect x="'+X(z.a).toFixed(1)+'" y="'+pt+'" width="'+(X(z.b)-X(z.a)).toFixed(1)+'" height="'+ih+'" fill="'+z.c+'" fill-opacity="'+(z.op||.12)+'"/>';
+    if(z.t)s+='<text x="'+((X(z.a)+X(z.b))/2).toFixed(1)+'" y="'+(pt+11)+'" text-anchor="middle" fill="'+z.c+'" font-size="8.5" font-weight="700" font-family="JetBrains Mono,monospace">'+z.t+'</text>';});
+  if(o.band){let p='';o.band.hi.forEach((v,i)=>{if(v==null)return;p+=(p?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)});
+    for(let i=o.band.lo.length-1;i>=0;i--){if(o.band.lo[i]==null)continue;p+='L'+X(i).toFixed(1)+','+Y(o.band.lo[i]).toFixed(1)}
+    if(p)s+='<path d="'+p+'Z" fill="'+(o.band.color||'#ABCA47')+'" fill-opacity="'+(o.band.op||.3)+'"/>';}
+  /* shaded region wherever a exceeds b — the purchase shortfall */
+  if(o.deficit){
+    const A=o.deficit.a,B=o.deficit.b,col=o.deficit.color||'#C23B2E';
+    const cross=(i)=>{const d0=A[i-1]-B[i-1],d1=A[i]-B[i];const t=d0/(d0-d1);return i-1+t;};
+    let i=0;
+    while(i<n){
+      if(A[i]>B[i]){
+        let st=i; while(i<n&&A[i]>B[i])i++;
+        const en=i-1;
+        const x0=st>0?cross(st):st, x1=en<n-1?cross(en+1):en;
+        let p='M'+X(x0).toFixed(1)+','+Y(B[st]+(A[st]-B[st])*0).toFixed(1);
+        p='M'+X(x0).toFixed(1)+','+Y(st>0?(B[st-1]+(B[st]-B[st-1])*(x0-(st-1))):B[st]).toFixed(1);
+        for(let k=st;k<=en;k++)p+='L'+X(k).toFixed(1)+','+Y(A[k]).toFixed(1);
+        p+='L'+X(x1).toFixed(1)+','+Y(en<n-1?(B[en]+(B[en+1]-B[en])*(x1-en)):B[en]).toFixed(1);
+        for(let k=en;k>=st;k--)p+='L'+X(k).toFixed(1)+','+Y(B[k]).toFixed(1);
+        s+='<path d="'+p+'Z" fill="'+col+'" fill-opacity="'+(o.deficit.op||.26)+'" stroke="'+col+'" stroke-width="1" stroke-opacity=".5"/>';
+      } else i++;
+    }
+  }
+  o.series.forEach(se=>{
+    if(se.type==='bar'){const bw=Math.max(2,iw/n*(se.bw||.62));
+      se.data.forEach((v,i)=>{if(v==null||v===0)return;const y0=Y(Math.max(0,mn)),y1=Y(v);
+        s+='<rect x="'+(X(i)-bw/2+(se.off||0)).toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,Math.abs(y1-y0)).toFixed(1)+'" fill="'+se.color+'" fill-opacity="'+(se.op||.9)+'" rx="1"/>';});
+      return;}
+    if(se.type==='area'){let p='';se.data.forEach((v,i)=>p+=(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1));
+      s+='<path d="'+p+'L'+X(n-1).toFixed(1)+','+Y(Math.max(0,mn)).toFixed(1)+'L'+X(0).toFixed(1)+','+Y(Math.max(0,mn)).toFixed(1)+'Z" fill="'+se.color+'" fill-opacity="'+(se.op||.22)+'"/>';
+      s+='<path d="'+p+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||1.6)+'"/>';return;}
+    let p='',brk=true;
+    se.data.forEach((v,i)=>{if(v==null){brk=true;return}p+=(brk?'M':'L')+X(i).toFixed(1)+','+Y(v).toFixed(1);brk=false;});
+    s+='<path d="'+p+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||2)+'"'+(se.dash?' stroke-dasharray="'+se.dash+'"':'')+' stroke-linejoin="round" stroke-linecap="round"/>';
+    if(se.dots)se.data.forEach((v,i)=>{if(v!=null)s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.3" fill="'+se.color+'"/>';});
+  });
+  (o.marks||[]).forEach(m=>{s+='<line x1="'+X(m.i).toFixed(1)+'" y1="'+pt+'" x2="'+X(m.i).toFixed(1)+'" y2="'+(pt+ih)+'" stroke="'+m.c+'" stroke-width="1.2" stroke-dasharray="3 3"/>'+
+    '<text x="'+(X(m.i)+4).toFixed(1)+'" y="'+(pt+10)+'" fill="'+m.c+'" font-size="9" font-weight="700" font-family="JetBrains Mono,monospace">'+m.t+'</text>';});
+  (o.hlines||[]).forEach(l=>{s+='<line x1="'+pl+'" y1="'+Y(l.v).toFixed(1)+'" x2="'+(w-pr)+'" y2="'+Y(l.v).toFixed(1)+'" stroke="'+l.c+'" stroke-width="'+(l.w||1.8)+'"'+(l.dash?' stroke-dasharray="'+l.dash+'"':'')+'/>'+
+    (l.t?'<text x="'+(pl+6)+'" y="'+(Y(l.v)-5).toFixed(1)+'" fill="'+l.c+'" font-size="9" font-weight="700" font-family="JetBrains Mono,monospace">'+l.t+'</text>':'');});
+  (o.pts||[]).forEach(q=>{s+='<circle cx="'+X(q.i).toFixed(1)+'" cy="'+Y(q.v).toFixed(1)+'" r="3.6" fill="'+q.c+'" stroke="#fff" stroke-width="1.6"/>';
+    if(q.t)s+='<text x="'+X(q.i).toFixed(1)+'" y="'+(Y(q.v)-9).toFixed(1)+'" text-anchor="middle" fill="'+q.c+'" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">'+q.t+'</text>';});
+  return s+'</svg>';
+}
+const LEG=a=>'<div class="legend">'+a.map(x=>'<span style="color:'+x.c+'"><i class="'+(x.k||'')+'" style="'+(x.k==='dash'?'':'background:'+x.c+';')+'color:'+x.c+'"></i><span style="color:var(--ink-3)">'+x.t+'</span></span>').join('')+'</div>';
+const XL=[0,4,8,12,16,20,23].map(i=>({i,t:H(i)}));
+
+/* ══════════ BUILDERS ══════════ */
+const hero=o=>'<div class="hero"><div><p class="kicker">'+o.kick+'</p><h1>'+o.h+'</h1><p class="tag">'+o.tag+'</p></div>'
+ +'<div class="hero-r"><div class="pr">'+(o.pills||[]).join('')+'</div>'
+ +(o.btns?'<div style="display:flex;gap:6px">'+o.btns+'</div>':'')+'</div></div>';
+const kpi=o=>'<div class="kpi '+(o.acc?'acc-'+o.acc:'')+'" data-act="audit" data-t="'+o.k+'">'
+ +'<p class="k">'+o.k+(o.badge?'<span class="pill '+(o.bc||'')+'" style="font-size:8px;padding:1px 4px">'+o.badge+'</span>':'')+'</p>'
+ +'<p class="v">'+o.v+(o.u?'<small>'+o.u+'</small>':'')+'</p><p class="s">'+(o.s||'')+'</p></div>';
+const card=(b,c)=>'<div class="card '+(c||'')+'">'+b+'</div>';
+const rule=(t,r)=>'<p class="sect">'+t+(r?'<span class="r">'+r+'</span>':'')+'</p>';
+const chartCard=o=>card('<div class="chart-hd"><div><h3>'+o.t+'</h3><p class="src">'+o.src+'</p></div>'
+ +'<div style="display:flex;gap:5px;flex-wrap:wrap">'+(o.pills||[]).join('')+'</div></div>'+o.svg+(o.leg||'')
+ +(o.extra||'')+(o.note?'<p class="note">'+o.note+'</p>':''),o.cls);
+function tbl(head,rows){
+ return '<div class="tblwrap"><table class="tbl"><thead><tr>'+head.map(h=>'<th'+(h[1]?' class="r"':'')+'>'+h[0]+'</th>').join('')+'</tr></thead><tbody>'
+  +rows.filter(Boolean).map(r=>'<tr>'+r.map(c=>typeof c==='object'&&c!==null?'<td class="'+(c.c||'')+'">'+c.v+'</td>':'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+const scnBar=()=>{
+ const s=SCENARIOS[SCN], base=SCN==='base';
+ return '<div class="scnbar '+(base?'base':'')+'">'
+  +'<span class="pill '+(base?'ok':'warn')+'">'+(base?'BASE CASE':'SCENARIO ACTIVE')+'</span>'
+  +'<span class="t"><b>'+s.label+'</b> · '+s.blurb+'</span>'
+  +(base?'':'<span class="t">Peak <b>'+MW(R.peak)+' MW</b> ('+(R.dPeak>0?'+':'')+MW(R.dPeak)+' MW) · energy '+(R.dEnergy>0?'+':'')+R.dEnergy+' MWh</span>')
+  +'<span style="flex:1"></span>'
+  +(base?'':'<button class="btn sm" data-act="scn" data-v="base">Reset to base</button>')
+  +'<button class="btn sm" data-act="go" data-s="scenario">Open scenario lab ↗</button></div>';
+};
+const heatC=v=>['#E8F0D4','#CDDC38','#ABCA47','#759840','#C9A227','#D98324','#C23B2E'][Math.min(6,Math.max(0,Math.round(v*6)))];
+
+/* ══════════ NAV ══════════ */
+const NAV=[['Forecast desk',[['overview','System overview'],['load','Load forecast'],
+   ['solar','Solar & distributed generation'],['supply','Net load & supply position']]],
+  ['Analyse',[['scenario','Scenario lab'],['accuracy','Accuracy vs benchmark'],
+   ['signals','Signals & drivers'],['data','Data & provenance']]]];
+let SCR='overview';
+const SCREENS={};
+
+/* ══════════ SYSTEM OVERVIEW ══════════ */
+SCREENS['overview']=()=>{
+ const r=R;
+ return hero({kick:'Socorro Electric Cooperative · central New Mexico',h:'System overview',
+  tag:'Six substations, roughly 31.7 MW of coincident summer peak, wholesale supply from Tri-State. No SCADA or AMI required to run this forecast.',
+  pills:['<span class="pill ok"><i class="dot live"></i> forecast current 09:14 MDT</span>','<span class="pill info">7 days back · 14 days forward</span>'],
+  btns:'<button class="btn cta" data-act="go" data-s="scenario">Run a scenario ↗</button>'})
+ +scnBar()
+ +'<div class="kpis">'
+ +kpi({k:'Peak today',v:MW(r.peak),u:'MW',s:'at '+HE(r.peakH)+(SCN==='base'?' · P10 19.2 / P90 20.4':' · '+(r.dPeak>0?'+':'')+MW(r.dPeak)+' MW vs base'),acc:SCN==='base'?'pos':'warn'})
+ +kpi({k:'Current load',v:'16.9',u:'MW',s:'09:14 MDT · 53 % of summer peak'})
+ +kpi({k:'Energy today',v:fmt(r.energy),u:'MWh',s:SCN==='base'?'load factor 0.78':(r.dEnergy>0?'+':'')+r.dEnergy+' MWh vs base'})
+ +kpi({k:'Coincident summer peak',v:String(COINCIDENT),u:'MW',s:'modelled · see diversity note',acc:'info',badge:'MODELLED',bc:'warn'})
+ +kpi({k:'Sum of substation peaks',v:'37.8',u:'MW',s:'2023, non-coincident · SEC reported'})
+ +kpi({k:'Local solar',v:'1.86',u:'MW',s:'NM Tech 664 kW + 1.20 MW distributed'})
+ +kpi({k:'Forecast MAPE',v:'4.1',u:'%',s:'vs seasonal naive 11.4 %',acc:'pos'})
+ +kpi({k:'Purchase shortfall',v:r.shortMW>0?MW(r.shortMW):'0.0',u:'MW',s:r.shortMW>0?r.shortHrs+' h · '+MW(r.shortMWh)+' MWh above schedule':'within the assumed schedule',acc:r.shortMW>0?'neg':'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'System load — actual, forecast and seasonal naive',
+   src:'Hourly coincident system load, MW · Astrea run coop·sec·d01 · benchmark is the seasonal naive: same hour, same weekday, previous week',
+   pills:['<span class="pill ok">MAPE 4.1 %</span>','<button class="btn sm" data-act="go" data-s="load">Detail ↗</button>'],
+   svg:chart({h:240,series:[
+     {data:r.load,color:'#759840',w:2.6},
+     {data:SEC.naiveWk,color:'#C23B2E',w:1.8,dash:'5 3'},
+     {data:SEC.actual,color:'#111111',w:2.3}],
+     xLabels:XL,yFmt:v=>v.toFixed(0)+' MW',
+     pts:[{i:r.peakH,v:r.peak,c:'#4A7C1F',t:MW(r.peak)}]}),
+   leg:LEG([{c:'#759840',t:'Astrea forecast'},{c:'#C23B2E',t:'Seasonal naive (same hour, last week)',k:'dash'},{c:'#111111',t:'Actual to 09:14'}]),
+   note:'The naive benchmark is what a co-op without a forecasting tool is effectively using: last week, same hour. It misses the evening peak by <b>1.6 MW</b> today because last Thursday was 6 °F warmer in the afternoon and cooler overnight.'})
+ +chartCard({t:'Seven days back, fourteen days forward',
+   src:'Daily coincident peak, MW · the retrospective window is what Astrea is scored on; the forward window is what SEC plans against',
+   svg:chart({h:206,series:[
+     {data:SEC.dayPk,color:'#759840',w:2.4,dots:true},
+     {data:SEC.dayAct,color:'#111111',w:2.2,dots:true}],
+     band:{lo:SEC.dayLo,hi:SEC.dayHi,color:'#ABCA47',op:.28},
+     xLabels:[0,3,7,10,14,17,20].map(i=>({i,t:SEC.days[i],b:i===7,c:i===7?'#759840':'#767676'})),
+     yFmt:v=>v.toFixed(0),
+     marks:[{i:7,c:'#759840',t:'today'}],
+     pts:[{i:17,v:23.2,c:'#C23B2E',t:'23.2'}]}),
+   leg:LEG([{c:'#111111',t:'Actual peak'},{c:'#759840',t:'Astrea forecast peak'},{c:'#ABCA47',t:'P10–P90',k:'band'}]),
+   note:'The forward window picks up the first real cold mornings of the season around <b>8 November</b>, where the peak moves from the evening to roughly 07:00 as heating load arrives. That transition is the single hardest thing for a naive benchmark to see coming, because last week contains no evidence of it.'})
+ +card(rule('Substations','2023 reported peaks and today\'s forecast')
+   +tbl([['Substation'],['2023 peak',1],['Share',1],['Today fcst',1],['MAPE',1],['Character']],
+     SUBS.map(s=>[ '<b class="mono">'+s.c+'</b><br><span class="tiny muted">'+s.n+'</span>',
+       {v:MW(s.pk2023,s.pk2023<1?3:1),c:'r'},{v:(s.share*100).toFixed(1)+' %',c:'r'},
+       {v:'<b style="color:var(--green-dk)">'+MW(r.peak*s.share,s.pk2023<1?2:1)+'</b>',c:'r'},
+       {v:'<span class="pill '+(s.mape<5?'ok':s.mape<7?'warn':'bad')+'">'+s.mape+' %</span>',c:'r'},
+       '<span class="tiny muted">'+s.note+'</span>'])
+     .concat([['<b>SYSTEM</b>','<span class="tiny muted">sum of individual peaks</span>',
+       {v:'<b>37.8</b>',c:'r'},{v:'100 %',c:'r'},{v:'<b style="color:var(--green-dk)">'+MW(r.peak)+'</b>',c:'r'},
+       {v:'<span class="pill ok">4.1 %</span>',c:'r'},'<span class="tiny muted">coincident, not the sum</span>']]))
+   +'<p class="callout" style="margin-top:10px"><b>The 37.8 MW figure is not a system peak.</b> Those are six individual substation peaks that happened at six different moments in 2023. Applying a modelled diversity factor of <b>0.84</b> puts SEC\'s actual coincident summer peak near <b>'+COINCIDENT+' MW</b>. The difference — about 6 MW — is roughly the size of the proposed battery, and it matters for every capacity conversation SEC has.</p>')
+ +'</div><div class="stack">'
+ +card(rule('Today in one view','Thu 29 Oct 2026 · Socorro')
+   +tbl([['Item'],['Value',1]],[
+     ['Forecast peak',{v:'<b style="color:var(--green-dk)">'+MW(r.peak)+' MW</b> at '+HE(r.peakH),c:'r'}],
+     ['Forecast minimum',{v:MW(Math.min(...r.load))+' MW at '+HE(r.load.indexOf(Math.min(...r.load))),c:'r'}],
+     ['Energy',{v:fmt(r.energy)+' MWh',c:'r'}],
+     ['Local solar at noon',{v:'1.55 MW',c:'r'}],
+     ['Net load peak',{v:MW(r.netPeak)+' MW at '+HE(r.netPeakH),c:'r'}],
+     ['High / low temperature',{v:'72 / 39 °F',c:'r'}],
+     ['Sunset',{v:'18:07 MDT',c:'r'}],
+     ['NM Tech',{v:'fall semester in session',c:'r'}],
+     ['Wholesale supplier',{v:'Tri-State G&amp;T',c:'r'}]])
+   +'<p class="note">Load is <b>53 % of the summer peak</b> this morning. Late October is SEC\'s quietest stretch of the year — which makes it the right week to install a forecast, because nothing is firefighting.</p>','hi')
+ +card(rule('What the forecast is seeing','today\'s largest drivers')
+   +'<div class="drivers">'+[
+     ['Calendar base (Thu, wk 44)',70,'13.9 MW'],['Evening lighting &amp; ramp',26,'+2.1 MW'],
+     ['Cooling response',18,'+1.4 MW'],['NM Tech campus in session',11,'+0.8 MW'],
+     ['Municipal water pumping',9,'+0.6 MW'],['Local solar offset',-13,'−1.0 MW'],
+     ['Morning heating',14,'+1.0 MW']]
+    .map(d=>'<div class="dr"><span class="lbl">'+d[0]+'</span><span class="bar"><i class="'+(d[1]<0?'neg':'')+'" style="width:'+Math.abs(d[1])+'%"></i></span>'
+      +'<span class="val" style="color:'+(d[1]<0?'var(--neg)':'var(--ink)')+'">'+d[2]+'</span></div>').join('')+'</div>'
+   +'<p class="note">Modelled temperature response for SEC today: <b>0.22 MW/°F</b> above the 63 °F balance point, <b>0.15 MW/°F</b> below it. Fitted from the 2023 substation data and local ASOS observations — not a published figure.</p>')
+ +card(rule('Agent activity','this morning')
+   +'<div class="feed">'+[
+    ['09:14','mi','Day-ahead forecast re-issued for 30 Oct. Peak P50 held at 19.4 MW; the 8 Nov cold morning raised 0.4 MW on the overnight GFS.'],
+    ['09:06','dq','Pulled NWS Socorro (KONM) observations, GFS and NBM grids, NM Tech academic calendar, and the SEC substation history through 28 Oct.'],
+    ['08:52','sg','Signal: <i>NMSU–NM Tech home event, Sat 31 Oct</i>. Classified <b>institutional event load</b>. SOC25 evening weight raised for Saturday only.'],
+    ['08:41','mo','Backcast for 28 Oct: Astrea MAPE 3.7 %, seasonal naive 10.1 %. Nine of nine completed days inside tolerance.'],
+    ['08:30','sc','Two standing scenarios refreshed against the current base: +5 °F, and the 1 MW compressor plus EV charging case.']
+   ].map(x=>'<div class="fitem"><span class="t">'+x[0]+'</span><div class="bd"><div class="hdr">'+AG(x[1])+'</div><p>'+x[2]+'</p></div></div>').join('')+'</div>')
+ +'</div></div>';
+};
+
+/* ══════════ LOAD FORECAST ══════════ */
+SCREENS['load']=()=>{
+ const r=R;
+ const subStack=SUBS.map(s=>r.load.map(v=>+(v*s.share).toFixed(2)));
+ const cols=['#759840','#1C7C97','#D99A07','#7B4FA0','#4A7C1F','#C23B2E'];
+ let cum=new Array(24).fill(0);
+ const stacked=subStack.map(a=>{cum=cum.map((v,i)=>v+a[i]);return cum.slice();});
+ return hero({kick:'Market intelligence · load forecasting',h:'Load forecast',
+  tag:'Hourly coincident load for the system and for each of the six substations, scored every day against outturn.',
+  pills:['<span class="pill lime">7 days back · 14 days forward</span>','<span class="pill ok">MAPE 4.1 %</span>']})
+ +scnBar()
+ +'<div class="kpis">'
+ +kpi({k:'Peak today',v:MW(r.peak),u:'MW',s:HE(r.peakH)+' · P10 19.2 / P90 20.4',acc:'pos'})
+ +kpi({k:'Peak D+1',v:'19.4',u:'MW',s:'Fri 30 Oct · HE19'})
+ +kpi({k:'14-day maximum',v:'23.2',u:'MW',s:'Sun 8 Nov · first cold morning',acc:'warn'})
+ +kpi({k:'Load factor',v:'0.78',s:'energy ÷ (peak × 24)'})
+ +kpi({k:'Diversity factor',v:'0.84',s:'coincident ÷ sum of peaks',acc:'info',badge:'MODELLED',bc:'warn'})
+ +kpi({k:'Temperature response',v:'0.22',u:'MW/°F',s:'above the 63 °F balance point'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Hourly load forecast with uncertainty band',
+   src:'Astrea quantile model · P10 / P50 / P90 · run coop·sec·d01 · SHA-256 7b41ce92…08af',
+   pills:['<span class="pill info">hourly</span>'],
+   svg:chart({h:238,series:[
+     {data:r.load,color:'#759840',w:2.6,dots:true},
+     {data:SEC.actual,color:'#111111',w:2.3}],
+     band:{lo:r.load.map(v=>+(v*0.955-0.18).toFixed(2)),hi:r.load.map(v=>+(v*1.048+0.2).toFixed(2)),color:'#ABCA47',op:.3},
+     xLabels:XL,yFmt:v=>v.toFixed(0)+' MW',
+     marks:[{i:r.peakH,c:'#4A7C1F',t:'peak '+HE(r.peakH)}]}),
+   leg:LEG([{c:'#759840',t:'P50 forecast'},{c:'#ABCA47',t:'P10–P90',k:'band'},{c:'#111111',t:'Actual to 09:14'}])})
+ +chartCard({t:'Load by substation — stacked',
+   src:'Allocated from the 2023 reported peaks and each substation\'s own fitted shape · SOC69 and SOC25 carry 74 % of the system',
+   svg:chart({h:206,series:stacked.slice().reverse().map((a,i)=>({data:a,color:cols.slice().reverse()[i],type:'area',op:.5,w:1.2})),
+     yMin:0,xLabels:XL,yFmt:v=>v.toFixed(0)+' MW'}),
+   leg:LEG(SUBS.map((s,i)=>({c:cols[i],t:s.c+' · '+s.n}))),
+   note:'Bernardo and Burris are agricultural and almost flat in late October; in irrigation season they roughly double in the afternoon. Borderland at 252 kW is small enough that a single large motor start is visible in its profile.'})
+ +card(rule('Hourly table','MW · '+(SCN==='base'?'base case':SCENARIOS[SCN].label))
+   +tbl([['HE'],['Base',1],['Scenario',1],['Δ',1],['Solar',1],['Net load',1],['Temp',1],['Naive',1]],
+     r.load.map((v,i)=>[{v:HE(i),c:'r'},{v:MW(SEC.load[i]),c:'r'},
+       {v:'<b style="color:var(--green-dk)">'+MW(v)+'</b>',c:'r'},
+       {v:SCN==='base'?'—':'<span style="color:'+(SCENARIOS[SCN].d[i]>0?'var(--neg)':'var(--pos)')+'">'+(SCENARIOS[SCN].d[i]>0?'+':'')+MW(SCENARIOS[SCN].d[i],2)+'</span>',c:'r'},
+       {v:MW(SEC.solar[i],2),c:'r'},{v:MW(r.net[i]),c:'r'},{v:SEC.temp[i]+' °F',c:'r'},
+       {v:'<span class="muted">'+MW(SEC.naiveWk[i])+'</span>',c:'r'}])))
+ +'</div><div class="stack">'
+ +card(rule('Why the coincident peak is not 37.8 MW','diversity, explained')
+   +'<div class="bigstat"><span class="n" style="color:var(--ink-4)">37.8</span><span class="u">MW · sum of six individual 2023 peaks</span></div>'
+   +'<p class="note">Each substation hit its own maximum on a different day and at a different hour.</p>'
+   +'<hr class="hair">'
+   +'<div class="bigstat"><span class="n" style="color:var(--green)">'+COINCIDENT+'</span><span class="u">MW · estimated coincident system peak</span></div>'
+   +'<p class="note">Applying a modelled diversity factor of <b>0.84</b>, typical for a six-substation rural system with this load mix.</p>'
+   +'<p class="callout warn" style="margin-top:10px">This single number changes capacity planning, the Tri-State demand conversation and the sizing case for the proposed battery. It is also the first thing a year of 15-minute interval data would let us replace with a measured value instead of an estimate.</p>','hi')
+ +card(rule('Forecast horizon','what Astrea issues, and when')
+   +tbl([['Product'],['Horizon'],['Resolution',1],['Refresh',1]],[
+     ['Intra-day','rolling 4 hours',{v:'15 min',c:'r'},{v:'every 15 min',c:'r'}],
+     ['Day-ahead','next 24 hours',{v:'hourly',c:'r'},{v:'hourly',c:'r'}],
+     ['<b>Operating forecast</b>','<b>14 days forward</b>',{v:'<b>hourly</b>',c:'r'},{v:'<b>4× daily</b>',c:'r'}],
+     ['Retrospective scoring','7 days back',{v:'hourly',c:'r'},{v:'daily',c:'r'}],
+     ['Seasonal outlook','12 months',{v:'daily peak',c:'r'},{v:'monthly',c:'r'}]])
+   +'<p class="note">The 7-back / 14-forward window is the default view. Everything in the retrospective half has already been scored against outturn, which is what makes the accuracy figures on this desk auditable rather than asserted.</p>')
+ +card(rule('What Astrea needs from SEC','to move from this demo to a live forecast')
+   +tbl([['Input'],['Requirement'],['Status']],[
+     ['Historical load','~1 year at 15-minute resolution','<span class="pend">TO CONFIRM</span>'],
+     ['Weather history','co-located, same period','<span class="pill ok">AVAILABLE</span>'],
+     ['Known load changes','new interconnections, large additions','<span class="pend">TO CONFIRM</span>'],
+     ['Substation topology','which feeders sit where','<span class="pend">TO CONFIRM</span>'],
+     ['SCADA','<b>not required</b>','<span class="pill ok">NOT NEEDED</span>'],
+     ['AMI','<b>not required</b>','<span class="pill ok">NOT NEEDED</span>']])
+   +'<p class="callout ok" style="margin-top:10px">Advanced SCADA and AMI are <b>not prerequisites</b> for the distribution-level load forecast. That is the point of starting here: SEC gets forward visibility without first funding a monitoring upgrade.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SOLAR & DER ══════════ */
+SCREENS['solar']=()=>{
+ const r=R;
+ const nmt=SEC.solar.map(v=>+(v*0.357).toFixed(3));
+ const dist=SEC.solar.map(v=>+(v*0.643).toFixed(3));
+ const pct=r.load.map((v,i)=>+((SEC.solar[i]/v)*100).toFixed(1));
+ return hero({kick:'Market intelligence · distributed generation',h:'Solar &amp; distributed generation',
+  tag:'New Mexico Tech\'s 664 kW carport plus modelled distributed rooftop. Small today — large enough to matter at midday, and growing.',
+  pills:['<span class="pill info">1.86 MW nameplate</span>','<span class="pill ok">MAE 6.2 %</span>']})
+ +scnBar()
+ +'<div class="kpis">'
+ +kpi({k:'Nameplate',v:'1.86',u:'MW',s:'664 kW NMT + 1.20 MW distributed'})
+ +kpi({k:'Peak output today',v:'1.55',u:'MW',s:'HE13 · 83 % of nameplate',acc:'pos'})
+ +kpi({k:'Energy today',v:'10.2',u:'MWh',s:'2.7 % of system energy'})
+ +kpi({k:'Peak penetration',v:'10.2',u:'% of load',s:'at HE13 · 1.55 of 15.2 MW',acc:'info'})
+ +kpi({k:'At system peak',v:'0.01',u:'MW',s:'HE19 · sun is down',acc:'neg'})
+ +kpi({k:'Solar MAE (D+1)',v:'6.2',u:'%',s:'clear-sky climate helps',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Distributed generation against load',
+   src:'NM Tech 664 kW carport (SEC-reported) plus modelled distributed rooftop · clear-sky day, 4,600 ft elevation',
+   svg:chart({h:230,series:[
+     {data:r.load,color:'#9AA394',w:1.6},
+     {data:dist,color:'#D99A07',type:'area',op:.4,w:1.4},
+     {data:SEC.solar,color:'#C9A227',w:2.4},
+     {data:r.net,color:'#759840',w:2.6}],
+     yMin:0,xLabels:XL,yFmt:v=>v.toFixed(0)+' MW',
+     pts:[{i:12,v:1.55,c:'#C9A227',t:'1.55'}]}),
+   leg:LEG([{c:'#9AA394',t:'Gross load'},{c:'#C9A227',t:'Total local solar'},{c:'#D99A07',t:'of which distributed rooftop'},{c:'#759840',t:'Net load'}]),
+   note:'Solar covers <b>10.2 % of load at midday</b> and <b>nothing at all at the evening peak</b>. Sunset in Socorro today is 18:07 MDT and the system peaks at 19:00. That gap is the entire argument for the proposed battery, and it is visible without any new metering.'})
+ +chartCard({t:'Solar as a share of load, by hour',
+   src:'Local generation ÷ gross load · the midday shoulder is where distributed solar changes SEC\'s purchase profile',
+   svg:chart({h:180,series:[{data:pct,color:'#C9A227',type:'bar',bw:.6}],
+     yMin:0,xLabels:XL,yFmt:v=>v.toFixed(0)+'%'}),
+   leg:LEG([{c:'#C9A227',t:'Solar share of load (%)'}])})
+ +'</div><div class="stack">'
+ +card(rule('Known local generation','and what is only proposed')
+   +tbl([['Resource'],['Rating',1],['Status']],[
+     ['NM Tech solar carport',{v:'664 kW',c:'r'},'<span class="pill ok">OPERATING</span>'],
+     ['Distributed rooftop (modelled)',{v:'~1.20 MW',c:'r'},'<span class="pill warn">ESTIMATED</span>'],
+     ['Battery energy storage',{v:'5 MW / 20 MWh',c:'r'},'<span class="pend">PROPOSED</span>'],
+     ['Interconnection infrastructure',{v:'—',c:'r'},'<span class="pend">PROPOSED</span>']])
+   +'<p class="callout warn" style="margin-top:10px">The <b>5 MW / 20 MWh battery is a proposed future asset</b>, not an operating resource. It appears on this desk only where it is explicitly toggled on, and it is labelled every time. The distributed rooftop figure is our estimate and would be replaced by SEC\'s own interconnection register.</p>','hi')
+ +card(rule('New Mexico Tech','a single large, well-behaved customer')
+   +'<p class="note" style="margin-top:0">NM Tech sits on the <b>Socorro 24.9 kV</b> substation and is one of the few SEC loads where the calendar is known a year in advance. The academic calendar, home events and summer shutdown are all usable explanatory variables — and all free.</p>'
+   +tbl([['Calendar state'],['Effect on SOC25',1]],[
+     ['Fall / spring semester in session',{v:'baseline',c:'r'}],
+     ['Home event evening',{v:'+0.3 to +0.6 MW',c:'r'}],
+     ['Winter break',{v:'−0.9 MW',c:'r'}],
+     ['Summer shutdown',{v:'−1.4 MW',c:'r'}],
+     ['Carport solar at noon',{v:'−0.55 MW',c:'r'}]])
+   +'<p class="note">Values are modelled from the 2023 substation profile and the published academic calendar. A year of interval data would let us fit them properly.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ NET LOAD & SUPPLY POSITION ══════════ */
+SCREENS['supply']=()=>{
+ const r=R, sch=SUPPLY.schedule;
+ const short=r.shortMW>0;
+ const absorbed=SUPPLY.bessOn&&r.rawMW>0;
+ return hero({kick:'Optimization agent · supply position',h:'Net load &amp; supply position',
+  tag:'Where the forecast crosses what SEC has arranged to buy. The shaded region is energy the co-operative would have to source above its schedule.',
+  pills:['<span class="pill '+(short?'bad':'ok')+'">'+(short?'SHORTFALL '+MW(r.shortMW)+' MW':'WITHIN SCHEDULE')+'</span>',
+   '<span class="pill info">Tri-State G&amp;T supply</span>'],
+  btns:'<button class="btn cta" data-act="go" data-s="scenario">Change the scenario ↗</button>'})
+ +scnBar()
+ +card('<p class="sect">Supply assumptions<span class="r">set these to match SEC\'s actual arrangements</span></p>'
+   +'<div class="sizer">'
+   +'<div class="fld" style="flex:1 1 320px"><label>Assumed firm purchase schedule</label><div class="rngwrap">'
+     +'<input type="range" id="schd" min="14" max="28" step="0.5" value="'+sch+'">'
+     +'<span class="rngval">'+MW(sch)+'<small>MW</small></span></div></div>'
+   +'<div class="fld"><label>Proposed 5 MW / 20 MWh battery</label>'
+     +'<button class="toggle '+(SUPPLY.bessOn?'on':'')+'" data-act="bess"><span class="sw"></span>'
+     +(SUPPLY.bessOn?'Included':'Excluded')+'</button></div>'
+   +'<div class="fld"><label>Scenario</label><div class="segs" id="supScn">'
+     +Object.values(SCENARIOS).map(s=>'<button data-act="scn" data-v="'+s.id+'" class="'+(SCN===s.id?'on':'')+'">'+s.short+'</button>').join('')+'</div></div>'
+   +'</div>'
+   +'<p class="callout" style="margin-top:12px"><b>The schedule figure is an assumption, not SEC data.</b> Ted\'s material does not include the Tri-State contract terms, so the default of 20.0 MW is a placeholder to make the mechanic visible. Replace it with the real schedule and every number on this screen becomes SEC\'s own.</p>','hi')
+ +'<div style="height:12px"></div>'
+ +'<div class="kpis">'
+ +kpi({k:'Net load peak',v:MW(r.netPeak),u:'MW',s:HE(r.netPeakH)+' · after local solar',acc:short?'neg':'pos'})
+ +kpi({k:'Purchase schedule',v:MW(sch),u:'MW',s:'assumed · SEC to confirm',acc:'info'})
+ +kpi({k:'Shortfall, peak',v:r.shortMW>0?MW(r.shortMW):'0.0',u:'MW',s:r.shortMW>0?'must be sourced above schedule':'none',acc:r.shortMW>0?'neg':'pos'})
+ +kpi({k:'Shortfall, energy',v:r.shortMWh>0?MW(r.shortMWh):'0.0',u:'MWh',s:r.shortHrs+' hour'+(r.shortHrs===1?'':'s')+' above schedule',acc:r.shortMWh>0?'neg':'pos'})
+ +kpi({k:'Headroom at peak',v:MW(Math.max(0,sch-r.netPeak)),u:'MW',s:'before the schedule binds'})
+ +(SUPPLY.bessOn
+   ? kpi({k:'Battery discharged',v:MW(r.bessMWh),u:'MWh',s:'of 20 MWh · PROPOSED asset',acc:'pos',badge:'PROPOSED',bc:'warn'})
+   : kpi({k:'Shortfall if unmitigated',v:r.rawMW>0?MW(r.rawMW):'0.0',u:'MW',s:'no battery in service today',acc:r.rawMW>0?'neg':'pos'}))
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Net load against available supply'+(SUPPLY.bessOn?' — with the proposed battery':''),
+   src:'Gross load less local solar, against the assumed firm purchase schedule. The shaded region is the shortfall: energy SEC would have to buy above its arranged position.',
+   pills:[short?'<span class="pill bad">SHORTFALL '+MW(r.shortMW)+' MW · '+MW(r.shortMWh)+' MWh</span>':'<span class="pill ok">NO SHORTFALL</span>'],
+   svg:chart({h:260,series:[
+     {data:r.load,color:'#C6CFBC',w:1.4},
+     {data:SUPPLY.bessOn?r.net:null,color:'#9AA394',w:1.5,dash:'3 3'},
+     {data:SUPPLY.bessOn?r.served:r.net,color:'#759840',w:2.8},
+     {data:r.sched,color:'#C23B2E',w:2.2,dash:'6 4'}].filter(x=>x.data),
+     deficit:{a:SUPPLY.bessOn?r.served:r.net,b:r.sched,color:'#C23B2E',op:.3},
+     yMin:0,xLabels:XL,yFmt:v=>v.toFixed(0)+' MW',
+     pts:r.shortMW>0?[{i:r.short.indexOf(Math.max(...r.short)),v:(SUPPLY.bessOn?r.served:r.net)[r.short.indexOf(Math.max(...r.short))],c:'#C23B2E',t:'+'+MW(r.shortMW)}]:[]}),
+   leg:[{c:'#C6CFBC',t:'Gross load'}]
+     .concat(SUPPLY.bessOn?[{c:'#9AA394',t:'Net load before battery',k:'dash'}]:[])
+     .concat([{c:'#759840',t:SUPPLY.bessOn?'Net load after battery':'Net load (load − local solar)'},
+       {c:'#C23B2E',t:'Assumed purchase schedule '+MW(sch)+' MW',k:'dash'}])
+     .map(x=>x) .length ? LEG([{c:'#C6CFBC',t:'Gross load'}]
+     .concat(SUPPLY.bessOn?[{c:'#9AA394',t:'Net load before battery',k:'dash'}]:[])
+     .concat([{c:'#759840',t:SUPPLY.bessOn?'Net load after battery':'Net load (load − local solar)'},
+       {c:'#C23B2E',t:'Assumed purchase schedule '+MW(sch)+' MW',k:'dash'}])) : '',
+   note:short
+     ? 'The red region is the problem. At <b>'+HE(r.short.indexOf(Math.max(...r.short)))+'</b> the system needs <b>'+MW(r.shortMW)+' MW</b> more than the schedule provides, and across '+r.shortHrs+' hour'+(r.shortHrs===1?'':'s')+' that is <b>'+MW(r.shortMWh)+' MWh</b> SEC has to source on short notice. Under most wholesale arrangements that is the most expensive energy a co-operative buys all year, and it can reset a demand ratchet that then applies for months.'
+     : (SUPPLY.bessOn&&r.rawMW>0
+        ? 'The shortfall is gone. Without the battery this scenario would have needed <b>'+MW(r.rawMW)+' MW</b> above schedule across <b>'+MW(r.rawMWh)+' MWh</b>. The proposed 5 MW / 20 MWh unit absorbs all of it, charging in the midday trough and discharging into the evening peak.'
+        : 'Net load stays inside the assumed schedule all day. That is the expected result for a late-October weekday — SEC\'s quiet season. Switch the scenario above to see what breaks it.')})
+ +(SUPPLY.bessOn?chartCard({t:'Proposed battery dispatch',
+   src:'5 MW / 20 MWh · charge below the axis, discharge above · PROPOSED asset, shown only because it is toggled on',
+   pills:['<span class="pend">PROPOSED ASSET</span>'],
+   svg:chart({h:166,pl:40,series:[
+     {data:r.bess.map(v=>v>0?v:null),color:'#4A7C1F',type:'bar',bw:.55},
+     {data:r.bess.map(v=>v<0?v:null),color:'#1C7C97',type:'bar',bw:.55}],
+     yMin:-5.5,yMax:5.5,yTicks:4,xLabels:XL,yFmt:v=>Math.abs(v).toFixed(0)}),
+   leg:LEG([{c:'#4A7C1F',t:'Discharge MW'},{c:'#1C7C97',t:'Charge MW'}]),
+   note:'A 4-hour battery is well matched to SEC\'s shape: the evening peak lasts about three hours and the midday solar trough is the natural charging window.'}):'')
+ +card(rule('Hour by hour','MW · where the schedule binds')
+   +tbl([['HE'],['Gross load',1],['Solar',1],['Net load',1],['Schedule',1]]
+     .concat(SUPPLY.bessOn?[['Battery',1],['After battery',1]]:[]).concat([['Shortfall',1],['']]),
+     r.load.map((v,i)=>{
+       const s0=r.short[i];
+       return [{v:HE(i),c:'r'},{v:MW(v),c:'r'},{v:MW(SEC.solar[i],2),c:'r'},{v:MW(r.net[i]),c:'r'},{v:MW(sch),c:'r'}]
+        .concat(SUPPLY.bessOn?[{v:r.bess[i]?MW(r.bess[i],2):'—',c:'r'},{v:MW(r.served[i]),c:'r'}]:[])
+        .concat([{v:s0>0?'<b style="color:var(--neg)">+'+MW(s0,2)+'</b>':'—',c:'r'},
+          s0>0?'<span class="pill bad">BUY</span>':'<span class="pill ok">COVERED</span>']);})))
+ +'</div><div class="stack">'
+ +card(rule('What a shortfall costs','the question a CEO asks next')
+   +'<p class="note" style="margin-top:0">Astrea forecasts the <b>quantity and timing</b> of the shortfall. Converting it to dollars needs SEC\'s wholesale contract, which is not in the material we have.</p>'
+   +tbl([['What we can state today'],['']],[
+     ['Shortfall quantity','<span class="pill ok">'+(r.shortMWh>0?MW(r.shortMWh)+' MWh':'0 MWh')+'</span>'],
+     ['Hours affected','<span class="pill ok">'+r.shortHrs+'</span>'],
+     ['Peak excursion','<span class="pill ok">'+(r.shortMW>0?MW(r.shortMW)+' MW':'none')+'</span>'],
+     ['How many days ahead it was visible','<span class="pill ok">up to 14</span>'],
+     ['Cost per MWh above schedule','<span class="pend">NEEDS CONTRACT</span>'],
+     ['Demand ratchet exposure','<span class="pend">NEEDS CONTRACT</span>'],
+     ['Annualised avoided cost','<span class="pend">NEEDS CONTRACT</span>']])
+   +'<p class="callout" style="margin-top:10px">We would rather show the gap than guess the price. Once SEC shares the Tri-State terms, the same engine produces the dollar figure — and that is the number the cost-benefit case should be built on, not an illustrative one.</p>','hi')
+ +card(rule('Why this matters without a market','SEC buys wholesale, it does not trade')
+   +'<p class="note" style="margin-top:0">SEC is a distribution co-operative. It has no market position to optimise and no price exposure to hedge. What it has is a <b>purchase schedule</b> and an obligation to serve.</p>'
+   +'<p class="note">Forecasting earns its keep in three specific ways here, none of which require a market:</p>'
+   +'<div class="steps" style="margin-top:10px">'
+   +[['Schedule the right quantity','Fewer hours above schedule, fewer short-notice purchases.'],
+     ['See a peak before it arrives','Up to 14 days of warning on a cold morning or a new load energising.'],
+     ['Size what comes next','The battery, the substation upgrade, the interconnection study — all rest on a peak number SEC can defend.']]
+    .map((x,i)=>'<div class="step ok"><h5>'+(i+1)+' · '+x[0]+'</h5><p>'+x[1]+'</p></div>').join('')+'</div>')
+ +card(rule('If the proposed battery existed today','5 MW / 20 MWh')
+   +'<div class="cmp">'
+   +'<div class="side'+(!SUPPLY.bessOn?' win':'')+'"><div class="l">Without battery</div>'
+   +'<div class="v" style="color:'+(r.rawMW>0?'var(--neg)':'var(--ink)')+'">'+(r.rawMW>0?MW(r.rawMW):'0.0')+'</div>'
+   +'<div class="s">MW above schedule</div></div>'
+   +'<div class="vs">vs</div>'
+   +'<div class="side'+(SUPPLY.bessOn?' win':'')+'"><div class="l">With battery</div>'
+   +'<div class="v" style="color:var(--pos)">'+(SUPPLY.bessOn?(r.shortMW>0?MW(r.shortMW):'0.0'):'0.0')+'</div>'
+   +'<div class="s">MW above schedule</div></div></div>'
+   +'<p class="note">On this scenario the proposed unit would absorb <b>'+(r.rawMWh>0?MW(r.rawMWh):'0.0')+' MWh</b> of shortfall using <b>'+(r.rawMWh>0?Math.round(r.rawMWh/20*100):0)+' %</b> of its usable energy. The constraint is power, not energy — a 4-hour battery is generously sized for SEC\'s three-hour evening peak.</p>'
+   +'<p class="callout warn">Shown only as a <b>proposed</b> asset. Nothing on this desk treats it as in service.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCENARIO LAB — chat ══════════ */
+const ANSWERS={
+ hot:()=>{const r=run('hot');return{
+  route:['sup','sc','mi'],
+  html:'<b>Five degrees warmer adds 1.0 MW to the evening peak — but it takes load <i>off</i> the morning.</b><br><br>'
+   +'Late October sits near the bottom of SEC\'s load-temperature curve, so the answer is not a simple uplift. Your fitted balance point is about <span class="hl">63 °F</span>, and a +5 °F day moves the system across it in both directions:'
+   +'<ul><li><b>Overnight and early morning −0.4 to −0.5 MW.</b> Less heating. Today\'s low of 39 °F becomes 44 °F.</li>'
+   +'<li><b>Afternoon and evening +0.6 to +1.0 MW.</b> More cooling, on a day that was already reaching 72 °F.</li>'
+   +'<li><b>Peak moves from '+MW(SEC.load[18])+' to <span class="hl">'+MW(r.peak)+' MW</span></b> at '+HE(r.peakH)+', a rise of '+MW(r.dPeak)+' MW.</li>'
+   +'<li>Energy over the day changes by only <span class="hl">'+(r.dEnergy>0?'+':'')+r.dEnergy+' MWh</span> — the morning saving cancels much of the afternoon cost.</li></ul>'
+   +'That peak now sits <b>'+MW(r.rawMW)+' MW above the assumed 20.0 MW purchase schedule</b> for '+r.shortHrs+' hour'+(r.shortHrs===1?'':'s')+', about '+MW(r.rawMWh)+' MWh SEC would need to source above its arranged position.<br><br>'
+   +'<b>The number worth taking to Friday\'s meeting is not this one.</b> The same +5 °F applied to SEC\'s summer peak day is worth roughly <span class="hl">+3.2 MW</span>, because at 95 °F the system is on the steep part of the curve, not the flat bottom. In late October a heat anomaly is a nuisance. In July it is a capacity event.',
+  cites:[['Fitted temperature response','0.22 MW/°F above 63 °F, 0.15 MW/°F below — modelled from the 2023 substation data and KONM observations'],
+    ['NWS Socorro (KONM)','Today 72 °F / 39 °F; scenario applies +5 °F to every hour'],
+    ['run coop·sec·s01','Scenario re-run of the same forecast artifact, 24 hourly points']],
+  impact:'+'+MW(r.dPeak)+' MW at peak', scn:'hot'};},
+
+ newload:()=>{const r=run('newload');return{
+  route:['sup','sc','op'],
+  html:'<b>The compressor is the bigger number. The EV charging is the more awkward one.</b><br><br>'
+   +'<b>1 MW compressor station.</b> Electric-drive gas compression runs essentially flat, so I have modelled it at a <span class="hl">92 % load factor</span>, around 0.92 MW in every hour. It adds <span class="hl">22 MWh a day</span> and lifts the overnight minimum as much as the peak. From a planning standpoint it is well behaved: it is large, it is predictable, and it is visible the moment it energises.'
+   +'<ul><li>Peak contribution <span class="hl">+0.93 MW</span></li><li>Minimum load rises from '+MW(Math.min(...SEC.load))+' to '+MW(Math.min(...r.load))+' MW</li>'
+   +'<li>Load factor improves — the system gets flatter, which is usually good for a purchase schedule</li></ul>'
+   +'<b>EV charging.</b> I have assumed two 150 kW DC fast chargers on the I-25 corridor plus about forty residential level-2 units, diversified. Peak around <span class="hl">0.38 MW</span>. The problem is <i>when</i>: residential charging starts when people get home, so it lands at <span class="hl">'+HE(19)+'</span> — directly on top of SEC\'s existing evening peak.'
+   +'<ul><li>Peak contribution <span class="hl">+0.33 MW</span> at the system peak hour, out of 0.38 MW maximum</li>'
+   +'<li>Coincidence with system peak is <b>87 %</b>. Almost none of it diversifies away.</li></ul>'
+   +'<b>Together:</b> peak moves '+MW(SEC.load[18])+' → <span class="hl">'+MW(r.peak)+' MW</span>, up '+MW(r.dPeak)+' MW, and energy rises '+r.dEnergy+' MWh. That puts SEC <b>'+MW(r.rawMW)+' MW above the assumed schedule</b> across '+r.shortHrs+' hours and '+MW(r.rawMWh)+' MWh.<br><br>'
+   +'The actionable point: the compressor can very likely be scheduled around the peak, and managed EV charging shifts most of that 0.33 MW past 21:00 for the cost of a tariff change rather than a capacity purchase.',
+  cites:[['Compressor profile','1 MW nameplate at 92 % load factor — assumed, no SEC interconnection data supplied'],
+    ['EV profile','2 × 150 kW DCFC on I-25 plus ~40 residential L2 at 7.2 kW, diversified — assumed'],
+    ['run coop·sec·s02','Scenario re-run, 24 hourly points']],
+  impact:'+'+MW(r.dPeak)+' MW at peak', scn:'newload'};},
+
+ both:()=>{const r=run('both');return{
+  route:['sup','sc','op','mo'],
+  html:'<b>Together they put SEC '+MW(r.rawMW)+' MW over schedule for '+r.shortHrs+' hours.</b><br><br>'
+   +'This is the combination worth planning against, because the two are not independent. A warmer evening is exactly when people arrive home and plug in, and the compressor does not care about either.'
+   +'<ul><li>Peak <b>'+MW(SEC.load[18])+' → <span class="hl">'+MW(r.peak)+' MW</span></b>, up '+MW(r.dPeak)+' MW</li>'
+   +'<li>Energy <span class="hl">+'+r.dEnergy+' MWh</span> on the day</li>'
+   +'<li>Shortfall above the assumed 20.0 MW schedule: <b>'+MW(r.rawMW)+' MW peak, '+MW(r.rawMWh)+' MWh total</b>, across '+HE(r.shortRaw.findIndex(v=>v>0))+'–'+HE(r.shortRaw.length-1-[...r.shortRaw].reverse().findIndex(v=>v>0))+'</li></ul>'
+   +'<b>The proposed 5 MW / 20 MWh battery absorbs all of it</b> and uses about '+Math.round(r.rawMWh/20*100)+' % of its usable energy doing so. Toggle it on in the supply position screen and the red region disappears.<br><br>'
+   +'And the honest caveat: this is a <b>late-October</b> day, SEC\'s quietest. The same two changes on the summer peak would add roughly <span class="hl">4.5 MW</span> to a 31.7 MW system. That is the case that should size the battery, not this one.',
+  cites:[['Combined scenario','+5 °F temperature response plus the compressor and EV profiles'],
+    ['Proposed BESS','5 MW / 20 MWh — a proposed future asset, not in service'],
+    ['run coop·sec·s03','Scenario re-run, 24 hourly points']],
+  impact:'+'+MW(r.dPeak)+' MW at peak', scn:'both'};},
+
+ base:()=>({route:['sup'],scn:'base',
+  html:'Back to the base case. Peak <b>'+MW(Math.max(...SEC.load))+' MW</b> at '+HE(18)+', '+fmt(SEC.load.reduce((a,b)=>a+b,0))+' MWh over the day, no shortfall against the assumed 20.0 MW schedule.',
+  cites:[['run coop·sec·d01','Day-ahead forecast as issued 09:14 MDT']]}),
+
+ accuracy:()=>({route:['sup','mo'],
+  html:'<b>4.1 % against 11.4 % for the seasonal naive. A 64 % reduction in mean absolute error.</b><br><br>'
+   +'Over the seven-day retrospective window, scored hour by hour against SEC\'s own outturn:'
+   +'<ul><li><b>Astrea</b> — MAPE <span class="hl">4.1 %</span>, MAE <span class="hl">0.61 MW</span></li>'
+   +'<li><b>Seasonal naive, same hour last week</b> — MAPE 11.4 %, MAE 1.72 MW</li>'
+   +'<li><b>Seasonal naive, same hour same weekday last year</b> — MAPE 14.8 %, MAE 2.24 MW</li></ul>'
+   +'At the peak hour, which is the one that costs money, the naive benchmark is out by <span class="hl">±2.9 MW</span> and Astrea by <span class="hl">±0.9 MW</span>.<br><br>'
+   +'One qualification worth making to a CEO: the seasonal naive is the right benchmark for SEC because it is what the co-operative is effectively using today. Against a <i>tuned commercial forecaster</i> the gap narrows considerably — we quote 10–20 % improvement in that comparison, not 64 %.',
+  cites:[['Seven-day retrospective','Hourly, scored against SEC outturn 22–28 Oct 2026'],
+    ['Benchmark definition','Seasonal naive = load at the same hour on the same weekday, one week prior'],
+    ['run coop·sec·m07','Rolling accuracy backcast']]}),
+
+ drivers:()=>({route:['sup','sg','dq'],
+  html:'<b>Seven drivers carry today\'s forecast, and three of them cost nothing to obtain.</b>'
+   +'<ul><li><b>Calendar base 13.9 MW</b> — lagged load on a same-weekday panel</li>'
+   +'<li><b>Evening lighting and ramp +2.1 MW</b> — sunset is 18:07 MDT and moving earlier about a minute a day</li>'
+   +'<li><b>Cooling response +1.4 MW</b> — 72 °F afternoon against a 63 °F balance point</li>'
+   +'<li><b>Morning heating +1.0 MW</b> — 39 °F low</li>'
+   +'<li><b>NM Tech in session +0.8 MW</b> — from the published academic calendar</li>'
+   +'<li><b>Municipal water pumping +0.6 MW</b></li>'
+   +'<li><b>Local solar −1.0 MW</b> at midday, nothing at the peak</li></ul>'
+   +'The free ones are the academic calendar, the sunset table and the NWS forecast. None of them need SCADA, AMI or any new instrumentation at SEC — which is the main reason a distribution-level forecast can be stood up quickly here.',
+  cites:[['NWS Socorro (KONM)','Hourly temperature and dew point'],
+    ['NM Tech academic calendar','Published, fall 2026'],
+    ['SEC substation history','2023 reported peaks, six substations']]})
+};
+
+const CHIPS=[
+ ['What if it is 5 degrees hotter?','hot'],
+ ['Add a 1 MW compressor station and EV charging','newload'],
+ ['Show me both together','both'],
+ ['How accurate is this against a seasonal naive?','accuracy'],
+ ['What is driving the forecast today?','drivers'],
+ ['Reset to the base case','base']];
+
+function matchIntent(t){
+ const q=t.toLowerCase();
+ if(/reset|base case|clear|start over|back to base/.test(q))return 'base';
+ if(/both|together|combine|all of|at once/.test(q))return 'both';
+ if(/accur|naive|benchmark|mape|error|how good|better than/.test(q))return 'accuracy';
+ if(/driv|why|explain|what.*causing|contribut/.test(q))return 'drivers';
+ if(/compressor|ev\b|electric vehicle|charging|new load|interconnect|added load/.test(q))return 'newload';
+ if(/(\b5\b|five|\b10\b|ten)?.*(degree|hotter|warmer|warm|heat|temperature|hot)/.test(q))return 'hot';
+ return null;
+}
+let THREAD=[{r:'a',html:'<b>Good morning.</b> I have SEC\'s forecast for Thursday 29 October loaded: peak <span class="hl">19.8 MW</span> at 19:00, 371 MWh over the day, scored at <span class="hl">4.1 % MAPE</span> over the last seven days against a seasonal naive at 11.4 %.<br><br>Two scenarios are pre-loaded and ready — a +5 °F day, and a 1 MW compressor station with EV charging. Ask for either in your own words, or use the buttons below. Anything you run here also updates the supply position screen.',
+  route:['sup'],cites:[['run coop·sec·d01','Day-ahead forecast issued 09:14 MDT, Thu 29 Oct 2026']]}];
+
+function msgHTML(m,i){
+ if(m.r==='u')return '<div class="msg u"><div class="who">Rauni Montoya · SEC</div><div class="bub">'+m.html+'</div></div>';
+ return '<div class="msg a"><div class="who">Astrea · supervisor</div><div class="bub">'
+  +(m.route?'<div class="route">'+m.route.map(k=>AG(k)).join('<span class="arw">→</span>')+'</div>':'')
+  +m.html
+  +(m.cites?'<div class="cites"><div class="ttl">Sources · every number traceable</div>'
+    +m.cites.map((c,j)=>'<div class="cite"><span>['+(j+1)+']</span><span>'+c[0]+' — '+c[1]+'</span></div>').join('')+'</div>':'')
+  +(m.impact?'<div style="margin-top:10px"><span class="pill warn">'+m.impact+'</span> <button class="btn sm" data-act="go" data-s="supply">See the supply impact ↗</button></div>':'')
+  +'</div></div>';
+}
+function renderChat(){
+ const b=$('#cbody'); if(!b)return;
+ b.innerHTML=THREAD.map(msgHTML).join('');
+ b.scrollTop=b.scrollHeight;
+}
+function ask(key,typed){
+ THREAD.push({r:'u',html:typed||CHIPS.find(c=>c[1]===key)[0]});
+ renderChat();
+ const b=$('#cbody');
+ const t=document.createElement('div');
+ t.className='thinking';
+ t.innerHTML='<span class="d"></span><span class="d"></span><span class="d"></span><span>Supervisor routing · re-running the forecast under the perturbed inputs…</span>';
+ b.appendChild(t); b.scrollTop=b.scrollHeight;
+ setTimeout(()=>{
+  const a=ANSWERS[key]();
+  THREAD.push(Object.assign({r:'a'},a));
+  if(a.scn){SCN=a.scn;R=run();}
+  go('scenario');
+ },900);
+}
+function askFree(txt){
+ const k=matchIntent(txt);
+ if(k){ask(k,txt);return;}
+ THREAD.push({r:'u',html:txt});
+ renderChat();
+ setTimeout(()=>{
+  THREAD.push({r:'a',route:['sup'],
+   html:'I can answer that properly once SEC\'s interval data is loaded. In this demonstration I have four things wired end to end: a <b>+5 °F</b> temperature scenario, a <b>1 MW compressor station with EV charging</b>, the two <b>combined</b>, and the <b>accuracy comparison</b> against a seasonal naive. Try one of those, or ask what is driving today\'s forecast.',
+   cites:[['Demonstration scope','Pre-conditioned scenarios; free text is matched on intent']]});
+  renderChat();
+ },700);
+}
+
+SCREENS['scenario']=()=>{
+ const r=R;
+ return hero({kick:'Scenario agent · ask it what you would ask an analyst',h:'Scenario lab',
+  tag:'Change a condition in plain language. The forecast re-runs, and every other screen on this desk follows.',
+  pills:['<span class="pill '+(SCN==='base'?'ok':'warn')+'">'+SCENARIOS[SCN].label+'</span>']})
+ +'<div class="c2" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start">'
+ +card('<p class="sect">Conversation<span class="r">type a question or pick one below</span></p>'
+   +'<div class="chatwrap"><div class="cbody" id="cbody"></div>'
+   +'<div class="chips">'+CHIPS.map(c=>'<button class="chip '+(SCN===c[1]?'on':'')+'" data-act="ask" data-k="'+c[1]+'">'+c[0]+'</button>').join('')+'</div>'
+   +'<div class="composer"><textarea id="cin" placeholder="e.g. what happens if it is 5 degrees hotter?"></textarea>'
+   +'<button class="btn pri" id="csend" style="height:42px;padding:0 16px">Ask</button></div></div>')
+ +'<div class="stack">'
+ +card(rule('Effect on load','base case against the active scenario')
+   +'<div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:12px">'
+   +kpi({k:'Peak',v:MW(r.peak),u:'MW',s:SCN==='base'?'base case':(r.dPeak>0?'+':'')+MW(r.dPeak)+' MW vs base',acc:SCN==='base'?'pos':'warn'})
+   +kpi({k:'Energy',v:fmt(r.energy),u:'MWh',s:SCN==='base'?'base case':(r.dEnergy>0?'+':'')+r.dEnergy+' MWh vs base'})
+   +kpi({k:'Shortfall',v:r.rawMW>0?MW(r.rawMW):'0.0',u:'MW',s:'above the 20.0 MW schedule',acc:r.rawMW>0?'neg':'pos'})
+   +kpi({k:'Hours over',v:String(r.shortRaw.filter(v=>v>0).length),s:r.rawMWh>0?MW(r.rawMWh)+' MWh to source':'none',acc:r.rawMW>0?'neg':'pos'})
+   +'</div>'
+   +chart({h:214,series:[
+     {data:SEC.load,color:'#9AA394',w:1.8,dash:'5 3'},
+     {data:r.load,color:'#759840',w:2.8}],
+     hlines:[{v:SUPPLY.schedule,c:'#C23B2E',w:1.8,dash:'6 4',t:'purchase schedule '+MW(SUPPLY.schedule)+' MW'}],
+     yMin:10,xLabels:XL,yFmt:v=>v.toFixed(0)+' MW',
+     pts:[{i:r.peakH,v:r.peak,c:SCN==='base'?'#4A7C1F':'#C23B2E',t:MW(r.peak)}]})
+   +LEG([{c:'#9AA394',t:'Base case',k:'dash'},{c:'#759840',t:SCENARIOS[SCN].label},{c:'#C23B2E',t:'Assumed purchase schedule',k:'dash'}]),'hi')
+ +(SCN!=='base'?card(rule('Hourly change','MW added or removed by the scenario')
+   +chart({h:170,pl:42,series:[{data:SCENARIOS[SCN].d,color:'#C23B2E',type:'bar',bw:.6}],
+     xLabels:XL,yFmt:v=>(v>0?'+':'')+v.toFixed(1)})
+   +LEG([{c:'#C23B2E',t:'Change vs base case (MW)'}])
+   +'<p class="note">'+(SCN==='hot'
+     ? 'Note the sign change. A warmer late-October day <b>reduces</b> overnight heating load and <b>increases</b> afternoon cooling load. Net energy barely moves; the peak does.'
+     : SCN==='newload'
+     ? 'The compressor is the flat block across all 24 hours. The EV charging is the rise after 17:00 — and it lands on the existing peak rather than filling the overnight valley.'
+     : 'Both effects stack in the evening. The morning heating saving from the warmer day is more than offset by the compressor running through the night.')+'</p>'):'')
+ +card(rule('What this scenario would need to be real','before it goes in a board paper')
+   +tbl([['Assumption'],['Source']],
+     SCN==='hot'?[['+5 °F applied to every hour','User-specified scenario'],
+       ['0.22 MW/°F cooling response','<span class="pill warn">MODELLED</span> from 2023 substation data'],
+       ['0.15 MW/°F heating response','<span class="pill warn">MODELLED</span>'],
+       ['63 °F balance point','<span class="pill warn">MODELLED</span>'],
+       ['Summer-peak equivalent +3.2 MW','<span class="pill warn">MODELLED</span>']]
+     :SCN==='newload'?[['1 MW compressor nameplate','User-specified scenario'],
+       ['92 % load factor, flat','<span class="pill warn">ASSUMED</span> — typical electric-drive compression'],
+       ['2 × 150 kW DCFC on I-25','<span class="pill warn">ASSUMED</span>'],
+       ['~40 residential L2 at 7.2 kW','<span class="pill warn">ASSUMED</span>'],
+       ['87 % coincidence with system peak','<span class="pill warn">MODELLED</span>'],
+       ['Actual interconnection requests','<span class="pend">NEEDED FROM SEC</span>']]
+     :SCN==='both'?[['Both perturbations combined','User-specified scenario'],
+       ['Additive, no interaction term','<span class="pill warn">ASSUMED</span>'],
+       ['Proposed 5 MW / 20 MWh battery','<span class="pend">PROPOSED ASSET</span>'],
+       ['Summer-peak equivalent +4.5 MW','<span class="pill warn">MODELLED</span>']]
+     :[['Base forecast','Astrea run coop·sec·d01'],
+       ['2023 substation peaks','<span class="pill ok">SEC REPORTED</span>'],
+       ['Diversity factor 0.84','<span class="pill warn">MODELLED</span>'],
+       ['Purchase schedule 20.0 MW','<span class="pend">ASSUMPTION</span>']]))
+ +'</div></div>';
+};
+
+/* ══════════ ACCURACY VS BENCHMARK ══════════ */
+SCREENS['accuracy']=()=>{
+ const d=['22 Oct','23 Oct','24 Oct','25 Oct','26 Oct','27 Oct','28 Oct'];
+ return hero({kick:'Monitor agent · scored against outturn',h:'Accuracy vs benchmark',
+  tag:'The benchmark is the seasonal naive, because that is what SEC is effectively using today: last week, same hour.',
+  pills:['<span class="pill ok">MAPE 4.1 % vs 11.4 %</span>','<span class="pill info">7-day retrospective, hourly</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'Astrea MAPE',v:'4.1',u:'%',s:'hourly, 7-day window',acc:'pos'})
+ +kpi({k:'Seasonal naive (week)',v:'11.4',u:'%',s:'same hour, last week',acc:'neg'})
+ +kpi({k:'Seasonal naive (year)',v:'14.8',u:'%',s:'same hour, same weekday, last year',acc:'neg'})
+ +kpi({k:'Error reduction',v:'64',u:'%',s:'vs the weekly naive',acc:'pos'})
+ +kpi({k:'Astrea MAE',v:'0.61',u:'MW',s:'naive 1.72 MW',acc:'pos'})
+ +kpi({k:'Peak-hour error',v:'±0.9',u:'MW',s:'naive ±2.9 MW',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Daily MAPE across the retrospective window',
+   src:'Hourly absolute percentage error, averaged per day, scored against SEC outturn · 22–28 October 2026',
+   pills:['<span class="pill ok">64 % lower error</span>'],
+   svg:chart({h:230,series:[
+     {data:SEC.mapeNaiveYr,color:'#C23B2E',type:'bar',bw:.26,off:-13},
+     {data:SEC.mapeNaiveWk,color:'#D99A07',type:'bar',bw:.26,off:0},
+     {data:SEC.mapeAstrea,color:'#759840',type:'bar',bw:.26,off:13}],
+     yMin:0,xLabels:d.map((t,i)=>({i,t})),yFmt:v=>v.toFixed(0)+'%'}),
+   leg:LEG([{c:'#759840',t:'Astrea'},{c:'#D99A07',t:'Seasonal naive — last week'},{c:'#C23B2E',t:'Seasonal naive — last year'}]),
+   note:'The worst naive day is <b>25 October</b> at 15.6 %. That Sunday was 11 °F cooler than the Sunday before it, and a benchmark that copies last week has no mechanism to know. Astrea came in at 5.1 % — its own worst day of the window, but still a third of the naive error.'})
+ +chartCard({t:'Forecast against actual — 28 October',
+   src:'The most recent completed day, hourly · all three series scored against the same outturn',
+   svg:chart({h:206,series:[
+     {data:[13.6,13.0,12.6,12.3,12.2,12.8,14.6,16.8,17.4,16.6,15.8,15.4,15.6,16.0,16.5,17.0,17.7,18.9,20.3,20.1,18.9,17.4,15.8,14.4],color:'#111111',w:2.4},
+     {data:[13.4,12.8,12.5,12.2,12.1,12.6,14.4,16.5,17.2,16.4,15.7,15.3,15.5,15.9,16.3,16.8,17.5,18.6,20.0,19.7,18.6,17.2,15.6,14.2],color:'#759840',w:2.2,dash:'4 3'},
+     {data:[14.8,14.1,13.5,13.1,13.0,13.7,15.9,18.4,18.7,17.6,16.6,16.0,16.1,16.6,17.3,18.1,19.0,20.7,22.4,21.9,20.3,18.6,16.8,15.3],color:'#C23B2E',w:1.9,dash:'5 3'}],
+     xLabels:XL,yFmt:v=>v.toFixed(0)+' MW'}),
+   leg:LEG([{c:'#111111',t:'Actual'},{c:'#759840',t:'Astrea',k:'dash'},{c:'#C23B2E',t:'Seasonal naive',k:'dash'}]),
+   note:'The naive benchmark overshoots the peak by <b>2.1 MW</b> here. On a day when SEC is near its purchase schedule, a 2 MW overshoot is the difference between scheduling correctly and buying short.'})
+ +card(rule('Error by substation','where the forecast is strong and where it is not')
+   +tbl([['Substation'],['Astrea MAPE',1],['Naive MAPE',1],['Reduction',1],['Why']],
+     SUBS.map(s=>{const nv=+(s.mape*2.7).toFixed(1);
+      return ['<b class="mono">'+s.c+'</b>',{v:'<b style="color:var(--green-dk)">'+s.mape+' %</b>',c:'r'},
+       {v:nv+' %',c:'r'},{v:'<span style="color:var(--pos)">−'+Math.round((1-s.mape/nv)*100)+' %</span>',c:'r'},
+       '<span class="tiny muted">'+(s.pk2023>10?'Large and diverse — easiest to forecast':s.pk2023>2?'Moderate size, weather-driven':'Small; a single motor start moves the percentage')+'</span>'];}))
+   +'<p class="note">Relative error rises as substation size falls. That is arithmetic, not a model failure: Borderland is 252 kW, so one irrigation pump starting is 10 % of the substation. In absolute MW the forecast is tighter there than anywhere else on the system.</p>')
+ +'</div><div class="stack">'
+ +card(rule('What the benchmark actually is','and why it is the fair one here')
+   +'<p class="note" style="margin-top:0">A <b>seasonal naive</b> forecast says: load at this hour will be what it was at the same hour on the same weekday last week. It needs no model, no weather and no software — which is precisely why it is the honest benchmark for a co-operative that does not yet have a forecasting tool.</p>'
+   +'<div class="cmp">'
+   +'<div class="side"><div class="l">Seasonal naive</div><div class="v" style="color:var(--neg)">11.4%</div><div class="s">MAPE · MAE 1.72 MW</div></div>'
+   +'<div class="vs">vs</div>'
+   +'<div class="side win"><div class="l">Astrea</div><div class="v" style="color:var(--pos)">4.1%</div><div class="s">MAPE · MAE 0.61 MW</div></div></div>'
+   +'<p class="callout" style="margin-top:10px"><b>Be careful with this number externally.</b> A 64 % reduction is real against a naive benchmark. Against a <i>tuned commercial forecaster</i> the honest figure is 10–20 %. Which comparison applies depends entirely on what SEC is replacing, and it is worth being explicit about that in any proposal.</p>','hi')
+ +card(rule('Reliability — SAIDI','what we can and cannot claim')
+   +'<p class="note" style="margin-top:0">SEC\'s historical SAIDI has been provided separately and is not loaded into this demonstration.</p>'
+   +tbl([['Question'],['Status']],[
+     ['Does better forecasting reduce SAIDI?','<span class="pend">NOT ESTABLISHED</span>'],
+     ['Can forecasting support operational planning?','<span class="pill ok">YES — directly</span>'],
+     ['Can it flag emerging capacity risk?','<span class="pill ok">YES — up to 14 days</span>'],
+     ['Is a quantified SAIDI link available today?','<span class="pend">NO</span>'],
+     ['Could one be established with SEC data?','<span class="pill info">TESTABLE</span>']])
+   +'<p class="callout warn" style="margin-top:10px"><b>We should not imply that forecasting improvements automatically translate into SAIDI improvements.</b> They are different mechanisms. What is plausible, and testable with SEC\'s outage history alongside a year of interval data, is a relationship between <i>unanticipated peaks</i> and <i>equipment-stress interruptions</i>. Until that is measured, it stays a hypothesis.</p>'
+   +'<p class="note">Proposed test: join SEC\'s outage records to the forecast error record, and ask whether interruption frequency is elevated on days where actual load exceeded the planned position. If there is a relationship, it will show up there first.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SIGNALS & DRIVERS ══════════ */
+const SIGGROUPS=[
+ ['Weather','available today, no SEC infrastructure required',[
+  ['NWS Socorro (KONM)','Hourly temperature, dew point, wind, cloud','live','ok'],
+  ['NOAA GFS / NBM','Forecast grids out to 14 days','live','ok'],
+  ['Heating &amp; cooling degree hours','Balance point 63 °F, fitted','live','ok'],
+  ['Wind and lightning','Operational risk, not load — feeds the outage view','live','ok'],
+  ['Wildfire exposure','Seasonal risk overlay for central NM','live','ok']]],
+ ['Calendar and institutional','free, and unusually predictive for a co-op this size',[
+  ['NM Tech academic calendar','Semester, breaks, summer shutdown','live','ok'],
+  ['NM Tech events','Home events lift SOC25 in the evening','live','ok'],
+  ['Socorro municipal calendar','Public events, county fair','live','ok'],
+  ['Federal and state holidays','Standard calendar effects','live','ok'],
+  ['Sunset table','Drives the evening lighting ramp','live','ok']]],
+ ['Load composition','from SEC — the single biggest accuracy lever',[
+  ['Substation interval load','1 year at 15-minute resolution','needed','pend'],
+  ['Feeder topology','Which feeders sit on which substation','needed','pend'],
+  ['Large customer register','Municipal, institutional, agricultural','needed','pend'],
+  ['Irrigation pumping schedule','Bernardo and Burris, seasonal','needed','pend'],
+  ['Water and wastewater pumping','Municipal, partly schedulable','needed','pend']]],
+ ['Distributed resources','what is behind the meter',[
+  ['NM Tech 664 kW carport','SEC-reported, operating','live','ok'],
+  ['Distributed rooftop register','Interconnection list','needed','pend'],
+  ['Proposed 5 MW / 20 MWh BESS','Future asset, not in service','proposed','pend']]],
+ ['Forward-looking load','the ones that change the planning case',[
+  ['New interconnection requests','Compressor stations, industrial','needed','pend'],
+  ['EV charging deployments','Public DCFC and residential L2','needed','pend'],
+  ['Municipal infrastructure plans','Development pipeline','needed','pend'],
+  ['Economic development','Announced projects in the territory','live','ok']]],
+ ['Upstream supply','the Tri-State relationship',[
+  ['Purchase schedule','Contract position by hour','needed','pend'],
+  ['Demand ratchet terms','How a peak excursion is billed','needed','pend'],
+  ['Upstream interruptions','Supply-side events','needed','pend']]]];
+
+SCREENS['signals']=()=>{
+ const live=SIGGROUPS.reduce((a,g)=>a+g[2].filter(r=>r[2]==='live').length,0);
+ const need=SIGGROUPS.reduce((a,g)=>a+g[2].filter(r=>r[2]!=='live').length,0);
+ return hero({kick:'Data query agent · what drives a co-operative forecast',h:'Signals &amp; drivers',
+  tag:'Half of what makes this forecast work is public and free. The other half is SEC\'s own data, and it is the half that moves the accuracy.',
+  pills:['<span class="pill ok">'+live+' live today</span>','<span class="pend">'+need+' needed from SEC</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'Signals configured',v:String(live+need),s:'across six categories'})
+ +kpi({k:'Live without SEC data',v:String(live),s:'weather, calendar, public sources',acc:'pos'})
+ +kpi({k:'Needed from SEC',v:String(need),s:'mostly load composition',acc:'warn'})
+ +kpi({k:'SCADA required',v:'No',s:'not a prerequisite',acc:'pos'})
+ +kpi({k:'AMI required',v:'No',s:'not a prerequisite',acc:'pos'})
+ +kpi({k:'Minimum to go live',v:'1 yr',s:'load at 15-min + weather',acc:'info'})
+ +'</div>'
+ +SIGGROUPS.map(g=>card(rule(g[0],g[1])
+   +'<div class="srcgrid">'+g[2].map(r=>'<div class="src"><div class="sn">'+r[0]
+     +(r[3]==='ok'?'<span class="pill ok" style="font-size:7.5px">LIVE</span>':'<span class="pend" style="font-size:7.5px">'+(r[2]==='proposed'?'PROPOSED':'NEEDED')+'</span>')
+     +'</div><div class="sm">'+r[1]+'</div></div>').join('')+'</div>')).join('<div style="height:12px"></div>')
+ +'<div style="height:12px"></div>'
+ +'<div class="c2">'
+ +card(rule('The deployment path','what Friday\'s conversation could commit to')
+   +'<div class="steps">'
+   +[['30-day evaluation','SEC provides a year of substation load at 15-minute resolution. Astrea runs in parallel, scored daily against outturn, with no change to how SEC operates.'],
+     ['Benchmark report','A measured accuracy figure against SEC\'s own naive baseline, a measured coincident peak to replace the 0.84 estimate, and a quantified shortfall exposure against the real Tri-State schedule.'],
+     ['Decision point','SEC decides on the basis of its own numbers. If the forecast does not beat the benchmark on SEC data, there is nothing to buy.'],
+     ['Implementation','Cloud-hosted. Local or customer-cloud deployment available if SEC prefers.'],
+     ['Ongoing','Daily forecasts, scenario access, and a scored accuracy record that accumulates.']]
+    .map((x,i)=>'<div class="step '+(i<1?'ok':'')+'"><h5>'+(i+1)+' · '+x[0]+'</h5><p>'+x[1]+'</p></div>').join('')+'</div>'
+   +'<p class="callout ok" style="margin-top:10px">The evaluation is the proposal. A co-operative board does not need to be convinced by a vendor\'s accuracy claim when it can be shown the result on its own load.</p>','hi')
+ +card(rule('Today versus the roadmap','be clear which is which')
+   +tbl([['Capability'],['Status']],[
+     ['Load forecasting, system and substation','<span class="pill ok">DEPLOYABLE TODAY</span>'],
+     ['Distributed generation forecasting','<span class="pill ok">DEPLOYABLE TODAY</span>'],
+     ['Scenario analysis','<span class="pill ok">DEPLOYABLE TODAY</span>'],
+     ['Driver explanation and Q&amp;A','<span class="pill ok">DEPLOYABLE TODAY</span>'],
+     ['Accuracy scoring against outturn','<span class="pill ok">DEPLOYABLE TODAY</span>'],
+     ['Distribution constraint analysis','<span class="pill mag">ROADMAP</span>'],
+     ['Interconnection screening','<span class="pill mag">ROADMAP</span>'],
+     ['Power-flow analysis','<span class="pill mag">ROADMAP</span>'],
+     ['Topology modelling','<span class="pill mag">ROADMAP</span>'],
+     ['Fault and anomaly analysis','<span class="pill mag">ROADMAP</span>']])
+   +'<p class="callout warn" style="margin-top:10px">The roadmap items would be genuinely valuable to a co-operative with limited engineering resource — which is exactly why they should not be presented as though they ship today. Everything on this desk is in the first group.</p>')
+ +'</div>';
+};
+
+/* ══════════ DATA & PROVENANCE ══════════ */
+SCREENS['data']=()=>hero({kick:'Every figure labelled',h:'Data &amp; provenance',
+  tag:'What came from SEC, what came from a public source, and what is our own estimate. Nothing on this desk is presented as measured when it is not.',
+  pills:['<span class="pill ok">4 SEC-reported</span>','<span class="pill warn">11 modelled</span>','<span class="pend">9 awaiting data</span>']})
+ +card(rule('Source register','Socorro Electric Cooperative demonstration')
+   +tbl([['Figure'],['Value',1],['Basis'],['Confidence']],[
+    ['Substation peak — Socorro 69',{v:'16.400 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Substation peak — Socorro 24.9',{v:'11.500 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Substation peak — Springerville',{v:'4.200 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Substation peak — Bernardo',{v:'2.900 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Substation peak — Burris',{v:'2.500 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Substation peak — Borderland',{v:'0.252 MW',c:'r'},'SEC-reported, 2023','<span class="pill ok">REPORTED</span>'],
+    ['Sum of individual peaks',{v:'37.752 MW',c:'r'},'Arithmetic sum — <b>not a system peak</b>','<span class="pill ok">DERIVED</span>'],
+    ['NM Tech solar carport',{v:'664 kW',c:'r'},'Reported','<span class="pill ok">REPORTED</span>'],
+    ['Diversity factor',{v:'0.84',c:'r'},'Typical for a six-substation rural system','<span class="pill warn">MODELLED</span>'],
+    ['Coincident summer peak',{v:'31.7 MW',c:'r'},'Sum × diversity factor','<span class="pill warn">MODELLED</span>'],
+    ['Hourly load shape',{v:'—',c:'r'},'Fitted to the reported peaks and regional climatology','<span class="pill warn">MODELLED</span>'],
+    ['Distributed rooftop solar',{v:'~1.20 MW',c:'r'},'Estimated — no interconnection register supplied','<span class="pill warn">MODELLED</span>'],
+    ['Temperature response',{v:'0.22 / 0.15 MW/°F',c:'r'},'Fitted; no published figure exists for SEC','<span class="pill warn">MODELLED</span>'],
+    ['Balance point',{v:'63 °F',c:'r'},'Fitted','<span class="pill warn">MODELLED</span>'],
+    ['Substation shares',{v:'43 / 31 / 11 / 8 / 7 / 1 %',c:'r'},'From the 2023 peaks','<span class="pill warn">MODELLED</span>'],
+    ['Accuracy figures',{v:'4.1 % vs 11.4 %',c:'r'},'Illustrative — computed on the modelled series','<span class="pill warn">MODELLED</span>'],
+    ['Purchase schedule',{v:'20.0 MW',c:'r'},'Placeholder — Tri-State terms not supplied','<span class="pend">ASSUMPTION</span>'],
+    ['Compressor load factor',{v:'92 %',c:'r'},'Typical electric-drive compression','<span class="pill warn">ASSUMED</span>'],
+    ['EV charging profile',{v:'0.38 MW peak',c:'r'},'2 × 150 kW DCFC + ~40 L2, diversified','<span class="pill warn">ASSUMED</span>'],
+    ['Proposed BESS',{v:'5 MW / 20 MWh',c:'r'},'Proposed future asset, not in service','<span class="pend">PROPOSED</span>'],
+    ['SEC SAIDI history',{v:'—',c:'r'},'Provided separately, not loaded here','<span class="pend">NOT LOADED</span>'],
+    ['Interval load data',{v:'—',c:'r'},'Not yet provided','<span class="pend">NEEDED</span>'],
+    ['Tri-State contract terms',{v:'—',c:'r'},'Not provided','<span class="pend">NEEDED</span>']]))
+ +'<div style="height:12px"></div>'
+ +'<div class="c2">'
+ +card(rule('What this demonstration is','and what it is not')
+   +'<p class="callout" style="margin-bottom:10px"><b>This is a shaped demonstration, not a forecast of SEC\'s actual load.</b> The six substation peaks are real and SEC-reported. Everything hourly is a modelled shape fitted to those peaks and to central New Mexico climatology, because no interval data has been provided yet.</p>'
+   +'<p class="note">What it does demonstrate faithfully: the method, the explanation, the scenario mechanics, the accuracy framing and the supply-position logic. Load one year of 15-minute data and every modelled row above becomes a measured one — with no change to the screens.</p>'
+   +'<hr class="hair">'
+   +'<p class="sect" style="border:0;margin:0 0 8px">Three things worth correcting early</p>'
+   +['<b>37.752 MW is not SEC\'s system peak.</b> It is six individual peaks from six different moments. The coincident figure is closer to 31.7 MW, and the gap is about the size of the proposed battery.',
+     '<b>The accuracy numbers are illustrative.</b> They are computed on a modelled series, so they show the shape of the comparison, not SEC\'s real error. A 30-day evaluation on actual data replaces them.',
+     '<b>No SAIDI claim is made.</b> There is no established link between forecast accuracy and interruption duration, and this demonstration does not assert one.']
+    .map(t=>'<p class="callout warn" style="margin-bottom:8px">'+t+'</p>').join(''),'hi')
+ +card(rule('Public sources used','no licence or SEC infrastructure required')
+   +'<div class="srcgrid" style="grid-template-columns:1fr">'
+   +[['NWS Socorro · KONM','Hourly observations and forecast','https://www.weather.gov/abq/'],
+     ['NOAA GFS / NBM','Forecast grids to 14 days','https://www.nco.ncep.noaa.gov/pmb/products/gfs/'],
+     ['New Mexico Tech','Academic calendar and campus solar','https://www.nmt.edu/'],
+     ['Tri-State G&amp;T','Wholesale supplier to SEC','https://tristate.coop/'],
+     ['Socorro Electric Cooperative','Member and service territory information','https://www.socorroelectric.com/'],
+     ['NOAA Solar Calculator','Sunrise and sunset for the evening ramp','https://gml.noaa.gov/grad/solcalc/']]
+    .map(s=>'<div class="src"><div class="sn"><a href="'+s[2]+'" target="_blank" rel="noopener">'+s[0]+' ↗</a></div><div class="sm">'+s[1]+'</div></div>').join('')
+   +'</div>'
+   +'<p class="note">Everything in this list is free and already public. It is the reason a distribution-level forecast can be stood up at SEC without first funding a monitoring upgrade — the weather, the calendar and the sun are the same whether or not a co-operative has SCADA.</p>')
+ +'</div>';
+
+/* ══════════ NAV · ROUTER · EVENTS ══════════ */
+function ICON(k){
+ const p={overview:'M2 12h3l2-6 3 10 2-7 2 3h3',load:'M2 13l3-3 3 2 4-7 2 3',
+  solar:'M8 5.2a2.8 2.8 0 100 5.6 2.8 2.8 0 000-5.6M8 1v2M8 13v2M1 8h2M13 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M12.7 3.3l-1.4 1.4M4.7 11.3l-1.4 1.4',
+  supply:'M2 11h12M2 11l3-5 3 3 3-6 3 8',scenario:'M3 3h10v7H8l-3 3v-3H3z',
+  accuracy:'M2 13l4-4 3 2 5-7M2 3v11h12',signals:'M8 2a6 6 0 100 12 6 6 0 000-12zM8 5v4M8 11h.01',
+  data:'M2 4c0-1 3-2 6-2s6 1 6 2v8c0 1-3 2-6 2s-6-1-6-2z'};
+ return '<svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="'+(p[k]||p.data)+'"/></svg>';
+}
+function renderNav(){
+ $('#railNav').innerHTML=NAV.map(g=>'<div class="navgrp">'+g[0]+'</div>'
+  +g[1].map(n=>'<div class="nav '+(SCR===n[0]?'on':'')+'" data-act="go" data-s="'+n[0]+'" role="button" tabindex="0">'
+    +ICON(n[0])+'<span>'+n[1]+'</span></div>').join('')).join('');
+}
+function renderTape(){
+ const r=R;
+ const t=[['SEC PEAK TODAY',MW(r.peak),'MW @'+HE(r.peakH),SCN==='base'?'':(r.dPeak>0?'+':'')+MW(r.dPeak),'dn'],
+  ['ENERGY',fmt(r.energy),'MWh','','f'],['NET LOAD PEAK',MW(r.netPeak),'MW','','f'],
+  ['LOCAL SOLAR','1.55','MW @HE13','','f'],['COINCIDENT SUMMER PK','31.7','MW','modelled','f'],
+  ['SUM OF SUB PEAKS','37.8','MW 2023','non-coincident','f'],
+  ['MAPE','4.1','% Astrea','vs 11.4% naive','up'],['MAE','0.61','MW','naive 1.72','up'],
+  ['PURCHASE SCHEDULE',MW(SUPPLY.schedule),'MW','assumed','f'],
+  ['SHORTFALL',r.shortMW>0?MW(r.shortMW):'0.0','MW',r.shortMW>0?MW(r.shortMWh)+' MWh':'none',r.shortMW>0?'dn':'up'],
+  ['SCENARIO',SCENARIOS[SCN].short,'','','f'],['14-DAY MAX','23.2','MW 8 Nov','cold morning','f']]
+  .map(x=>'<span class="tk">'+x[0]+' <b>'+x[1]+'</b> '+x[2]+(x[3]?' <span class="'+(x[4]==='up'?'up':x[4]==='dn'?'dn':'')+'">'+x[3]+'</span>':'')+'</span>').join('');
+ $('#tapeIn').innerHTML=t+t;
+}
+function renderTop(){
+ $('#selCoop').innerHTML=COOPS.map(c=>'<option '+(c.id==='sec'?'selected':'')+(c.on?'':' disabled')+'>'
+   +c.n+' — '+c.loc+(c.on?'':' · not configured')+'</option>').join('');
+ $('#selSub').innerHTML=['All substations (system)'].concat(SUBS.map(s=>s.c+' · '+s.n))
+   .map((o,i)=>'<option '+(i===0?'selected':'')+'>'+o+'</option>').join('');
+ $('#selHz').innerHTML=['7 days back · 14 days forward','Day-ahead hourly','Intra-day (4 h rolling)','Seasonal (12 months)']
+   .map((o,i)=>'<option '+(i===0?'selected':'')+'>'+o+'</option>').join('');
+ $('#segScn').innerHTML=Object.values(SCENARIOS)
+   .map(s=>'<button data-act="scn" data-v="'+s.id+'" class="'+(SCN===s.id?'on':'')+'">'+s.short+'</button>').join('');
+}
+function wrapTables(root){
+ $$('table.tbl',root).forEach(t=>{ if(t.parentElement&&t.parentElement.classList.contains('tblwrap'))return;
+  const w=document.createElement('div'); w.className='tblwrap';
+  t.parentNode.insertBefore(w,t); w.appendChild(t); });
+}
+function go(s){
+ if(!SCREENS[s])return;
+ SCR=s; renderNav(); renderTop(); renderTape();
+ const c=$('#canvas'); c.innerHTML='<div class="screen">'+SCREENS[s]()+'</div>'; wrapTables(c); c.scrollTop=0;
+ if(s==='scenario'){renderChat(); const i=$('#cin'); if(i)i.focus();}
+}
+function setScn(v){ SCN=v; R=run(); go(SCR);
+ toast(v==='base'?'<b>Base case restored.</b> Peak '+MW(R.peak)+' MW, no shortfall against the assumed schedule.'
+  :'<b>'+SCENARIOS[v].label+'.</b> Peak '+MW(R.peak)+' MW ('+(R.dPeak>0?'+':'')+MW(R.dPeak)+' MW), '
+   +(R.rawMW>0?MW(R.rawMW)+' MW above the assumed purchase schedule across '+MW(R.rawMWh)+' MWh.':'still within the assumed schedule.'));
+}
+function openAudit(t){
+ $('#drTitle').textContent=t||'Audit trail';
+ $('#drBody').innerHTML='<dl class="kv">'
+  +[['run_id','coop·sec·d01'],['Co-operative','Socorro Electric Cooperative'],
+    ['Agent','Market Intelligence (specialist)'],['Engine','Quantile gradient boosting + calendar/weather features'],
+    ['Scenario',SCENARIOS[SCN].label],['Issued','2026-10-29 09:14 MDT'],['Duration','1.8 s'],
+    ['Horizon','7 days back · 14 days forward, hourly'],['Artifact SHA-256','7b41ce92fd30a8c5519e7b26cc4418a0d208af'],
+    ['Container','python:3.11-slim · no network egress'],['Seed','fixed — 20261029'],
+    ['Reproducible','yes']].map(r=>'<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>').join('')+'</dl>'
+  +'<p class="sect">Input manifest</p>'
+  +'<div class="tblwrap"><table class="tbl"><thead><tr><th>Input</th><th>Source</th><th>Confidence</th></tr></thead><tbody>'
+  +[['Substation peaks 2023','SEC-reported','<span class="pill ok">REPORTED</span>'],
+    ['Hourly shape','Fitted to peaks + climatology','<span class="pill warn">MODELLED</span>'],
+    ['Temperature and dew point','NWS Socorro KONM','<span class="pill ok">PUBLIC</span>'],
+    ['Forecast grids','NOAA GFS / NBM','<span class="pill ok">PUBLIC</span>'],
+    ['Academic calendar','New Mexico Tech','<span class="pill ok">PUBLIC</span>'],
+    ['Sunset table','NOAA solar calculator','<span class="pill ok">PUBLIC</span>'],
+    ['NM Tech carport','664 kW, reported','<span class="pill ok">REPORTED</span>'],
+    ['Distributed rooftop','Estimated','<span class="pill warn">MODELLED</span>'],
+    ['Purchase schedule','Placeholder','<span class="pend">ASSUMPTION</span>'],
+    ['Interval load data','Not supplied','<span class="pend">NEEDED</span>']]
+   .map(r=>'<tr><td class="tiny">'+r[0]+'</td><td class="tiny muted">'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')
+  +'</tbody></table></div>'
+  +'<p class="sect" style="margin-top:16px">Execution trace</p><div class="steps">'
+  +[['ok','Supervisor · intent parsed','Routed to Market Intelligence with Scenario as a dependency. No numeric operation performed by the language model.'],
+    ['ok','Data Query · pull','NWS observations and forecast grids, academic calendar, sunset table, SEC substation history.'],
+    ['ok','Forecasting service','Hourly P10/P50/P90, system and six substations. Deterministic, seeded.'],
+    ['ok','Scenario service','Perturbation applied to the same artifact — the base forecast is never overwritten.'],
+    ['ok','Monitor · scoring','Retrospective window scored against outturn; seasonal naive computed on the same series.'],
+    ['ok','Supervisor · synthesis','Narrated and cited. Every figure read from the model output, none generated.']]
+   .map(s=>'<div class="step '+s[0]+'"><h5>'+s[1]+'</h5><p>'+s[2]+'</p></div>').join('')+'</div>'
+  +'<div class="card" style="margin-top:6px;background:var(--pos-bg);border-color:#A9C97F;box-shadow:none">'
+  +'<p class="kicker">The contract</p><p class="tiny" style="margin:7px 0 0;line-height:1.75;color:var(--ink-2)">'
+  +'The language model reasons, routes and explains. It <b style="color:var(--neg)">never</b> computes a forecast value. '
+  +'Every number traces to a versioned artifact and a run ID, and every figure on this desk carries a confidence label.</p></div>';
+ wrapTables($('#drBody'));
+ $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+}
+const closeAll=()=>{$('#drawer').classList.remove('on');$('#scrim').classList.remove('on');};
+let tmr; function toast(t){const e=$('#toast');e.innerHTML=t;e.classList.add('on');clearTimeout(tmr);tmr=setTimeout(()=>e.classList.remove('on'),5600);}
+
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-act]'); if(!el)return;
+ const a=el.dataset.act;
+ if(a==='go')go(el.dataset.s);
+ else if(a==='scn')setScn(el.dataset.v);
+ else if(a==='ask')ask(el.dataset.k);
+ else if(a==='audit')openAudit(el.dataset.t);
+ else if(a==='bess'){SUPPLY.bessOn=!SUPPLY.bessOn;R=run();go(SCR);
+   toast(SUPPLY.bessOn
+    ?'<b>Proposed 5 MW / 20 MWh battery included.</b> This is a future asset, not an operating resource — it is labelled everywhere it appears.'
+    :'<b>Battery excluded.</b> Showing SEC\'s position with only the resources that exist today.');}
+});
+document.addEventListener('input',e=>{
+ if(e.target.id==='schd'){SUPPLY.schedule=+e.target.value;R=run();
+   const v=e.target.closest('.rngwrap').querySelector('.rngval');
+   if(v)v.innerHTML=MW(SUPPLY.schedule)+'<small>MW</small>';}
+});
+document.addEventListener('change',e=>{
+ if(e.target.id==='schd'){go(SCR);}
+ else if(e.target.id==='selSub')toast('Scope → <b>'+e.target.value+'</b>. In the deployed product this filters every screen to that substation.');
+ else if(e.target.id==='selHz')toast('Horizon → <b>'+e.target.value+'</b>.');
+ else if(e.target.id==='selCoop')toast('Only Socorro Electric Cooperative is configured in this demonstration.');
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape')closeAll();
+ if(e.key==='Enter'&&!e.shiftKey&&e.target.id==='cin'){e.preventDefault();
+   const v=e.target.value.trim(); if(!v)return; e.target.value=''; askFree(v);}
+});
+document.addEventListener('click',e=>{
+ if(e.target.id==='csend'){const i=$('#cin'),v=i.value.trim(); if(!v)return; i.value=''; askFree(v);}
+});
+$('#drClose').onclick=closeAll; $('#scrim').onclick=closeAll;
+setInterval(()=>{const d=new Date();
+ $('#clkT').textContent='09:14:'+String(d.getSeconds()).padStart(2,'0');},1000);
+
+renderTop(); renderTape(); renderNav(); go('overview');
+</script>
+</body></html>
