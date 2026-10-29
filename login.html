@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Astrea — Sign in</title>
+<meta name="description" content="Astrea ERCOT Desk — private demonstration environment.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --green:#759840; --green-dk:#5F7D33; --green-lt:#ABCA47; --lime:#CDDC38;
+  --bg:#F2F1EF; --card:#FFFFFF; --well:#F8F9F4;
+  --ink:#111; --ink-3:#555; --ink-4:#767676;
+  --line:rgba(117,152,64,.30); --neg:#C23B2E; --neg-bg:#FBEBE9;
+  --ff-d:'Merriweather',Georgia,serif; --ff-u:'Montserrat',system-ui,sans-serif;
+  --ff-m:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--ff-u); color:var(--ink); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  display:grid; place-items:center; padding:24px;
+  background:
+    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(117,152,64,.03) 10px,rgba(117,152,64,.03) 11px),
+    linear-gradient(165deg,#fff 0%,#F2F1EF 55%,#E8F0D4 100%);
+  background-attachment:fixed;
+}
+.wrap{width:100%;max-width:412px}
+.brand{
+  background:var(--card); border:2px solid var(--lime); border-radius:4px;
+  padding:14px 16px; box-shadow:3px 3px 0 rgba(0,0,0,.10); margin-bottom:18px;
+}
+.brand h1{font-family:var(--ff-d);font-weight:900;font-size:22px;letter-spacing:.16em;color:var(--green);margin:0}
+.brand p{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-4);margin:4px 0 0;font-weight:700}
+.card{
+  background:var(--card); border:2px solid var(--green); border-radius:4px;
+  padding:26px 24px; box-shadow:6px 6px 0 var(--lime);
+}
+.kicker{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0}
+h2{font-family:var(--ff-d);font-size:21px;color:var(--green);margin:6px 0 6px;line-height:1.2}
+.sub{font-size:12.5px;color:var(--ink-3);margin:0 0 20px}
+label{display:block;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-4);font-weight:700;margin-bottom:6px}
+.pwrow{position:relative;display:flex}
+input[type=password],input[type=text]{
+  width:100%; font-family:var(--ff-m); font-size:14px; padding:11px 44px 11px 12px;
+  border:1px solid var(--line); border-radius:4px; background:var(--well); color:var(--ink);
+}
+input:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(171,202,71,.35)}
+.peek{
+  position:absolute; right:4px; top:4px; bottom:4px; width:36px; border:0; background:transparent;
+  cursor:pointer; color:var(--ink-4); font-size:15px; border-radius:3px;
+}
+.peek:hover{color:var(--green);background:var(--well)}
+button.go{
+  width:100%; margin-top:16px; padding:12px; border:2px solid var(--green); border-radius:4px;
+  background:var(--green); color:#fff; font-family:var(--ff-u); font-weight:700; font-size:12px;
+  letter-spacing:.07em; text-transform:uppercase; cursor:pointer; transition:.13s;
+}
+button.go:hover:not(:disabled){background:var(--green-lt);border-color:var(--green-lt);color:#111}
+button.go:disabled{opacity:.55;cursor:progress}
+.err{
+  display:none; margin-top:14px; padding:9px 11px; border-radius:3px; font-size:12px;
+  background:var(--neg-bg); border-left:3px solid var(--neg); color:#8E2C21;
+}
+.err.show{display:block}
+.foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--ink-4);line-height:1.65}
+.foot b{color:var(--green-dk)}
+.meta{text-align:center;margin-top:16px;font-size:10px;color:var(--ink-4);font-family:var(--ff-m);letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">
+    <h1>ASTREA</h1>
+    <p>a Nuvve company</p>
+  </div>
+
+  <div class="card">
+    <p class="kicker">ERCOT operations desk</p>
+    <h2>Private demonstration</h2>
+    <p class="sub">This environment is shared under NDA. Enter the access password to continue.</p>
+
+    <form id="f" autocomplete="off" novalidate>
+      <label for="pw">Access password</label>
+      <div class="pwrow">
+        <input id="pw" name="password" type="password" required autofocus
+               autocomplete="current-password" spellcheck="false" aria-describedby="err">
+        <button type="button" class="peek" id="peek" aria-label="Show password" title="Show password">👁</button>
+      </div>
+      <button type="submit" class="go" id="go">Open the desk</button>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
+    </form>
+
+    <p class="foot">
+      Load and renewable forecasting, and market price forecasting for battery storage, on the
+      <b>ERCOT</b> interconnection. Figures are drawn from ERCOT's published market information.
+      Access is logged. If you need a password, contact your Astrea contact.
+    </p>
+  </div>
+
+  <p class="meta">ASTREA AI · A NUVVE COMPANY</p>
+</main>
+
+<script>
+(function () {
+  var f = document.getElementById('f'),
+      pw = document.getElementById('pw'),
+      go = document.getElementById('go'),
+      err = document.getElementById('err'),
+      peek = document.getElementById('peek');
+
+  function next() {
+    var p = new URLSearchParams(location.search).get('next') || '/';
+    // Only ever redirect inside this origin.
+    return (p.charAt(0) === '/' && p.charAt(1) !== '/') ? p : '/';
+  }
+
+  peek.addEventListener('click', function () {
+    var show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    peek.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    pw.focus();
+  });
+
+  pw.addEventListener('input', function () { err.classList.remove('show'); });
+
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!pw.value) { show('Enter the access password.'); return; }
+    go.disabled = true; go.textContent = 'Checking…'; err.classList.remove('show');
+
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: pw.value })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (res.ok) { location.replace(next()); return; }
+        show(res.j && res.j.error ? res.j.error : 'That password is not recognised.');
+      })
+      .catch(function () { show('Could not reach the server. Try again.'); })
+      .finally(function () { go.disabled = false; go.textContent = 'Open the desk'; });
+  });
+
+  function show(m) {
+    err.textContent = m; err.classList.add('show');
+    pw.select(); pw.focus();
+  }
+})();
+</script>
+</body>
+</html>

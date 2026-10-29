@@ -1,310 +1,1543 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Astrea — Forecasting the grid, with every number audited</title>
-<meta name="description" content="Load forecasting for the cooperatives and municipal utilities that data centers are overwhelming. Battery revenue in Europe and Japan runs on the same engine.">
-<meta property="og:title" content="Astrea — Forecasting the grid, with every number audited">
-<meta property="og:description" content="Load forecasting for the cooperatives and municipal utilities that data centers are overwhelming. Battery revenue in Europe and Japan runs on the same engine.">
-<meta property="og:type" content="website">
-<meta name="theme-color" content="#FFFFFF">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Montserrat:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
-<link rel="stylesheet" href="/assets/css/styles.css?v=2">
-<link rel="icon" href="/assets/favicon.svg?v=2" type="image/svg+xml">
-</head>
-<body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Astrea ERCOT Desk - agentic load, renewable and market price forecasting for the Texas interconnection, with a live BESS revenue model.">
+<meta name="color-scheme" content="light"><title>Astrea ERCOT Desk</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-<header class="site">
-  <div class="wrap site-in">
-    <a class="brand" href="/">Astrea</a>
-    <button class="mtoggle" id="navToggle" aria-expanded="false" aria-controls="menu">Menu</button>
-    <nav class="menu" id="menu">
-      <a class="mlink" href="/platform">Platform</a>
-      <a class="mlink" href="/validation">Validation</a>
-      <a class="mlink" href="/company">Company</a>
-      <div class="dd">
-        <button class="dd-btn" id="ddBtn" aria-expanded="false" aria-haspopup="true" aria-controls="ddmenu">Demo <span class="dd-caret" aria-hidden="true"></span></button>
-        <div class="dd-menu" id="ddmenu">
-          <a class="dd-item" href="/demo"><strong>Trader demo</strong><span>Day-ahead forecast against the cleared price, DK1 and DK2</span></a>
-          <a class="dd-item" href="/validation#record"><strong>Forecast record</strong><span>Fourteen graded calls, with driver attribution</span></a>
-        </div>
+/* ============================================================
+   ASTREA · ERCOT DESK — light theme
+   Palette lifted verbatim from the Nuvve POC (energy-poc.camereye.ai)
+   ============================================================ */
+:root{
+  --green:#759840; --green-dk:#5F7D33; --green-lt:#ABCA47;
+  --lime:#CDDC38;  --lime-soft:#E8F0C4; --cyan:#73CEE5; --cyan-dk:#1C7C97;
+  --bg:#F2F1EF; --bg-tint:#E8F0D4; --card:#FFFFFF; --well:#F8F9F4; --well-2:#EFF3E6;
+  --ink:#111111; --ink-2:#333333; --ink-3:#555555; --ink-4:#767676; --ink-5:#9AA394;
+  --line:#D8DFCB; --line-2:rgba(117,152,64,.30); --rule:#CDDC38;
+  --pos:#4A7C1F; --pos-bg:#EDF5DF;
+  --neg:#C23B2E; --neg-bg:#FBEBE9;
+  --warn:#9C6F06; --warn-bg:#FBF2DC;
+  --info:#1C7C97; --info-bg:#E4F2F7;
+  --mag:#7B4FA0; --mag-bg:#F1EAF8;
+  --ff-d:'Merriweather',Georgia,serif;
+  --ff-u:'Montserrat',system-ui,sans-serif;
+  --ff-m:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --r:4px;
+  --sh:3px 3px 0 rgba(171,202,71,.40);
+  --sh-lime:6px 6px 0 var(--lime);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(117,152,64,.03) 10px,rgba(117,152,64,.03) 11px),
+    linear-gradient(165deg,#ffffff 0%,#F2F1EF 55%,#E8F0D4 100%);
+  background-attachment:fixed;
+  color:var(--ink); font-family:var(--ff-u); font-size:13px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(117,152,64,.35);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--green)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* ---------- primitives ---------- */
+h1,h2,h3{font-family:var(--ff-d);color:var(--green);margin:0}
+.kicker{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0}
+.sect{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--green);
+  border-bottom:2px solid var(--rule);padding-bottom:5px;margin:0 0 12px;display:flex;gap:8px;
+  justify-content:space-between;align-items:center}
+.sect .r{font-weight:600;letter-spacing:.05em;color:var(--ink-4);text-transform:none;font-size:10px}
+.mono{font-family:var(--ff-m)}
+.num{font-family:var(--ff-d);font-weight:700;font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-4)} .tiny{font-size:10.5px}
+hr.hair{height:1px;background:var(--line);border:0;margin:12px 0}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;padding:3px 7px;border-radius:2px;border:1px solid var(--line-2);
+  color:var(--ink-2);background:#fff;white-space:nowrap}
+.pill.lime{background:var(--lime);color:#111;border-color:var(--lime)}
+.pill.ok{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.pill.bad{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
+.pill.warn{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
+.pill.info{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
+.pill.mag{background:var(--mag-bg);border-color:#C2A8DA;color:var(--mag)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--pos);display:inline-block;flex:none}
+.dot.live{animation:pulse 2s ease-in-out infinite}
+.dot.w{background:var(--warn)} .dot.b{background:var(--neg)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+  background:#fff;border:1px solid var(--line-2);color:var(--ink);border-radius:var(--r);
+  padding:6px 11px;font-size:11px;font-weight:600;transition:.12s;white-space:nowrap}
+.btn:hover{background:var(--well-2);border-color:var(--green)}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn.pri:hover{background:var(--green-lt);border-color:var(--green-lt);color:#111}
+.btn.cta{background:var(--lime);border-color:var(--lime);color:#111;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;font-size:10px}
+.btn.cta:hover{background:var(--green-lt)}
+.btn.sm{padding:4px 8px;font-size:10px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.card.hi{border:2px solid var(--green);box-shadow:var(--sh-lime)}
+.grid{display:grid;gap:12px}
+
+table.tbl{width:100%;min-width:100%;border-collapse:collapse;font-size:11.5px}
+table.tbl th{text-align:left;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:700;padding:7px 9px;border-bottom:2px solid var(--rule);background:var(--well-2);white-space:nowrap}
+table.tbl td{padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:middle;overflow-wrap:anywhere}
+table.tbl tbody tr:hover{background:var(--well)}
+table.tbl td.r,table.tbl th.r{text-align:right;font-family:var(--ff-m);font-variant-numeric:tabular-nums}
+table.tbl th.r{font-family:var(--ff-u)}
+.tblwrap{overflow-x:auto;max-width:100%}
+.tblwrap::-webkit-scrollbar{height:7px}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+.app{display:grid;grid-template-columns:218px 1fr;height:100vh;width:100vw}
+
+.rail{background:linear-gradient(180deg,#5F7D33 0%,#759840 45%,#6A8A36 100%);
+  border-right:4px solid var(--lime);display:flex;flex-direction:column;overflow:hidden}
+.rail-brand{padding:14px;border-bottom:1px solid rgba(205,220,56,.35)}
+.logobox{background:#fff;border:2px solid var(--lime);border-radius:var(--r);padding:8px 10px;
+  box-shadow:2px 2px 0 rgba(0,0,0,.12)}
+.logobox .lg{font-family:var(--ff-d);font-weight:900;font-size:17px;letter-spacing:.15em;color:var(--green);margin:0}
+.logobox .sb{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin:2px 0 0;font-weight:700}
+.rail-brand .iso{margin:9px 0 0;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#fff;font-weight:700;opacity:.9}
+.rail-scroll{flex:1;overflow-y:auto;padding:11px 10px 8px}
+.navgrp{font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--lime);font-weight:700;margin:14px 4px 6px;opacity:.95}
+.navgrp:first-child{margin-top:2px}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:var(--r);cursor:pointer;
+  color:#fff;font-size:11.5px;font-weight:600;margin-bottom:4px;border:1px solid rgba(255,255,255,.28);
+  background:rgba(0,0,0,.18);transition:.12s}
+.nav:hover{background:rgba(0,0,0,.32);border-color:var(--lime)}
+.nav.on{background:var(--lime);color:#111;font-weight:700;border-color:var(--lime);box-shadow:2px 2px 0 rgba(0,0,0,.15)}
+.nav .ic{width:15px;height:15px;flex:none}
+.rail-foot{border-top:1px solid rgba(205,220,56,.35);padding:10px 12px;font-size:9.5px;color:#fff;line-height:1.7}
+.rail-foot .row{display:flex;justify-content:space-between;gap:6px}
+.rail-foot b{color:var(--lime);font-weight:700}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{flex:none;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line-2);
+  padding:9px 14px;backdrop-filter:blur(6px);z-index:30;display:flex;flex-direction:column;gap:8px}
+.tb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.modeswitch{display:inline-flex;background:var(--well-2);border:2px solid var(--green);border-radius:var(--r);
+  padding:2px;gap:2px;box-shadow:2px 2px 0 rgba(171,202,71,.45)}
+.modeswitch button{border:0;background:transparent;cursor:pointer;padding:6px 13px;border-radius:2px;
+  font-size:11px;font-weight:700;color:var(--green-dk);letter-spacing:.02em;transition:.12s;white-space:nowrap}
+.modeswitch button:hover{background:#fff}
+.modeswitch button.on{background:var(--green);color:#fff;box-shadow:1px 1px 0 rgba(0,0,0,.14)}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld > label{font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-4);font-weight:700}
+.selwrap{position:relative}
+.sel{appearance:none;background:#fff;border:1px solid var(--line-2);border-radius:var(--r);
+  padding:6px 26px 6px 9px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink)}
+.sel:hover{border-color:var(--green)}
+.selwrap::after{content:"▾";position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  pointer-events:none;font-size:9px;color:var(--green)}
+.segs{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:#fff}
+.segs button{border:0;border-right:1px solid var(--line);background:#fff;cursor:pointer;padding:6px 10px;
+  font-size:11px;font-weight:600;color:var(--ink-3);transition:.1s;font-family:var(--ff-m)}
+.segs button:last-child{border-right:0}
+.segs button:hover{background:var(--well-2)}
+.segs button.on{background:var(--green);color:#fff;font-weight:700}
+.tb-sp{flex:1}
+.tb-div{width:1px;align-self:stretch;background:var(--line);flex:none}
+.clock{font-family:var(--ff-m);font-size:11px;color:var(--ink-3);text-align:right;line-height:1.3}
+.clock b{color:var(--green-dk);font-weight:700}
+.avatar{width:28px;height:28px;border-radius:2px;background:var(--green);color:#fff;display:grid;place-items:center;
+  font-weight:700;font-size:10.5px;border:2px solid var(--lime);flex:none}
+
+.tape{height:26px;flex:none;background:var(--green-dk);overflow:hidden;display:flex;align-items:center;border-bottom:2px solid var(--lime)}
+.tape-in{display:flex;gap:24px;white-space:nowrap;animation:tick 52s linear infinite;padding-left:14px}
+.tape:hover .tape-in{animation-play-state:paused}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{font-family:var(--ff-m);font-size:10.5px;color:rgba(255,255,255,.8);display:flex;gap:6px;align-items:center}
+.tk b{color:#fff;font-weight:500}
+.tk .up{color:var(--lime)} .tk .dn{color:#FFBDB5}
+
+.canvas{flex:1;overflow-y:auto;padding:16px}
+.screen{animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;background:#fff;
+  border:2px solid var(--green);border-radius:var(--r);padding:13px 16px;margin-bottom:14px;box-shadow:var(--sh-lime)}
+.hero h1{font-size:23px;font-weight:700;margin:4px 0 3px;line-height:1.15}
+.hero .tag{font-size:11.5px;color:var(--ink-3);margin:0;font-style:italic}
+.hero-r{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.hero-r .pr{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:2px solid var(--green);border-radius:var(--r);padding:9px 11px;
+  position:relative;overflow:hidden;cursor:pointer;transition:.12s}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--lime)}
+.kpi{padding-left:15px}
+.kpi:hover{box-shadow:var(--sh);transform:translateY(-1px)}
+.kpi.acc-pos::before{background:var(--pos)} .kpi.acc-neg::before{background:var(--neg)}
+.kpi.acc-warn::before{background:var(--warn)} .kpi.acc-info::before{background:var(--cyan)}
+.kpi .k{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--green);margin:0;
+  display:flex;justify-content:space-between;gap:5px;align-items:center;flex-wrap:wrap}
+.kpi .v{font-family:var(--ff-d);font-weight:700;font-size:19px;color:var(--ink);margin:4px 0 0;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:10px;font-family:var(--ff-u);font-weight:600;color:var(--ink-4);margin-left:3px}
+.kpi .s{font-size:9.5px;color:var(--ink-4);margin:2px 0 0;font-family:var(--ff-m)}
+.kpi .s .up{color:var(--pos)} .kpi .s .dn{color:var(--neg)}
+
+.c2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.c3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.c-23{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(300px,1fr);gap:12px}
+.c-32{display:grid;grid-template-columns:minmax(290px,1fr) minmax(0,1.8fr);gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.c2>*,.c3>*,.c-23>*,.c-32>*,.stack>*{min-width:0}
+.mb12{margin-bottom:12px}
+@media(max-width:1500px){.c-23,.c-32,.c3{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:1150px){.c2{grid-template-columns:minmax(0,1fr)}}
+
+.chart-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.chart-hd>div:first-child{min-width:0;flex:1 1 230px}
+.chart-hd h3{font-family:var(--ff-u);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:0}
+.chart-hd .src{font-size:9.5px;color:var(--ink-4);font-family:var(--ff-m);margin:3px 0 0;line-height:1.5}
+.chart-hd .src a{color:var(--cyan-dk);text-decoration:underline dotted}
+.legend{display:flex;flex-wrap:wrap;gap:9px 12px;margin-top:8px;font-size:9.5px;color:var(--ink-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:3px;display:inline-block;border-radius:2px;flex:none}
+.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 3px,transparent 3px 6px)!important}
+.legend i.band{height:9px;border-radius:1px;opacity:.4}
+svg{display:block;overflow:visible}
+
+.drivers{display:flex;flex-direction:column;gap:6px}
+.dr{display:grid;grid-template-columns:minmax(80px,150px) minmax(24px,1fr) 62px;gap:9px;align-items:center;font-size:10.5px}
+.dr .lbl{color:var(--ink-3);overflow-wrap:anywhere}
+.dr .bar{height:7px;background:var(--well-2);border-radius:2px;overflow:hidden}
+.dr .bar i{display:block;height:100%;background:var(--green-lt)}
+.dr .bar i.neg{background:var(--neg)}
+.dr .val{text-align:right;font-family:var(--ff-m);color:var(--ink);font-weight:500}
+
+.stackbar{display:flex;height:28px;border-radius:2px;overflow:hidden;border:1px solid var(--line-2);margin:9px 0 8px}
+.stackbar i{display:block;height:100%}
+.sb-key{display:flex;flex-direction:column;gap:5px}
+.sb-key .row{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px}
+.sb-key .row .l{display:flex;gap:7px;align-items:center;min-width:0}
+.sb-key em{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none}
+.sb-key .row .v{font-family:var(--ff-m);font-weight:500;white-space:nowrap}
+
+.zgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.zone{background:var(--well);border:1px solid var(--line-2);border-radius:2px;padding:9px 10px;cursor:pointer;position:relative;overflow:hidden}
+.zone:hover{border-color:var(--green);background:#fff;box-shadow:var(--sh)}
+.zone .zn{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4);font-weight:700;font-family:var(--ff-m)}
+.zone .zv{font-family:var(--ff-d);font-weight:700;font-size:16px;margin-top:3px;color:var(--ink)}
+.zone .zs{font-size:9px;font-family:var(--ff-m);color:var(--ink-4);margin-top:2px}
+.zone .zh{position:absolute;left:0;right:0;bottom:0;height:3px}
+@media(max-width:1150px){.zgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.srcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:9px}
+.src{background:var(--well);border:1px solid var(--line-2);border-radius:2px;padding:10px 11px}
+.src:hover{background:#fff;box-shadow:var(--sh)}
+.src .sn{font-size:11px;font-weight:700;color:var(--ink);display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
+.src .sn a{color:var(--green-dk);text-decoration:none}
+.src .sn a:hover{text-decoration:underline}
+.src .sm{font-size:9.5px;font-family:var(--ff-m);color:var(--ink-4);margin-top:5px;line-height:1.55}
+
+.hrow{display:flex;flex-direction:column;gap:4px}
+.hr2{display:grid;grid-template-columns:48px minmax(20px,1fr) 70px 64px;gap:9px;align-items:center;font-size:10.5px;
+  padding:5px 8px;background:var(--well);border:1px solid var(--line);border-radius:2px}
+.hr2.win{border-color:var(--green);background:var(--pos-bg)}
+.hr2.chg{border-color:var(--cyan);background:var(--info-bg)}
+.hr2 .h{font-family:var(--ff-m);color:var(--ink-4)}
+.hr2 .bar{height:12px;background:var(--well-2);border-radius:1px;overflow:hidden}
+.hr2 .bar i{display:block;height:100%}
+.hr2 .p,.hr2 .q{font-family:var(--ff-m);text-align:right;color:var(--ink)}
+
+.dec{background:#fff;border:1px solid var(--line-2);border-left:4px solid var(--lime);border-radius:var(--r);
+  padding:12px 13px;margin-bottom:10px;box-shadow:var(--sh)}
+.dec.done{border-left-color:var(--pos)} .dec.pend{border-left-color:var(--warn)}
+.dec-hd{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:7px;flex-wrap:wrap}
+.dec-hd h4{margin:0;font-size:12.5px;font-weight:700;color:var(--ink);flex:1 1 150px;overflow-wrap:anywhere}
+.dec-hd>div{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dec-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.dec p.why{margin:0 0 9px;font-size:11.5px;color:var(--ink-2);line-height:1.6}
+.dec .box{padding:9px 10px;background:var(--well);border:1px solid var(--line);border-radius:2px;margin-bottom:9px}
+.fb{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-top:9px;border-top:1px dashed var(--line-2)}
+.fb .lb{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink-4)}
+.fb-note{margin:8px 0 0;font-size:10.5px;padding:7px 9px;border-radius:2px;display:none;border-left:3px solid var(--pos);
+  background:var(--pos-bg);color:var(--pos)}
+.fb-note.show{display:block}
+
+.agent-chip{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.04em;
+  padding:2px 7px;border-radius:2px;background:var(--pos-bg);border:1px solid #A9C97F;color:var(--pos);white-space:nowrap}
+.agent-chip.mi{background:#F7FAE3;border-color:#C9D86E;color:#6B7A12}
+.agent-chip.dq{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
+.agent-chip.sg{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
+.agent-chip.sc{background:var(--mag-bg);border-color:#C2A8DA;color:var(--mag)}
+.agent-chip.op{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.agent-chip.mo{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
+
+.feed{max-height:330px;overflow-y:auto;margin:0 -4px}
+.fitem{display:flex;gap:9px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.fitem:hover{background:var(--well)}
+.fitem .t{font-family:var(--ff-m);font-size:9.5px;color:var(--ink-4);flex:none;width:44px;padding-top:2px;line-height:1.35}
+.fitem .bd{flex:1;min-width:0}
+.fitem .bd p{margin:4px 0 0;font-size:11px;color:var(--ink-2);line-height:1.5}
+.fitem .bd .hdr{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+.sizer{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.rngwrap{display:flex;align-items:center;gap:9px;min-width:210px}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:var(--well-2);
+  border-radius:3px;border:1px solid var(--line);flex:1;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;
+  background:var(--lime);border:2px solid var(--green);cursor:pointer;box-shadow:1px 1px 0 rgba(0,0,0,.18)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--lime);
+  border:2px solid var(--green);cursor:pointer}
+.rngval{font-family:var(--ff-d);font-weight:700;font-size:16px;min-width:76px;text-align:right;color:var(--ink)}
+.rngval small{font-family:var(--ff-u);font-size:10px;font-weight:600;color:var(--ink-4);margin-left:3px}
+
+.scrim{position:fixed;inset:0;background:rgba(30,40,22,.45);opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:640px;max-width:95vw;background:var(--bg);
+  border-left:4px solid var(--lime);transform:translateX(100%);transition:transform .24s cubic-bezier(.2,.8,.2,1);
+  z-index:100;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.12)}
+.drawer.on{transform:none}
+.dr-hd{flex:none;padding:13px 16px;border-bottom:2px solid var(--rule);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;background:#fff}
+.dr-hd h2{font-size:16px}
+.dr-bd{flex:1;overflow-y:auto;padding:16px}
+.iconbtn{width:24px;height:24px;display:grid;place-items:center;border-radius:2px;border:1px solid var(--line-2);
+  background:#fff;cursor:pointer;color:var(--ink-3);font-size:12px;flex:none}
+.iconbtn:hover{border-color:var(--green);color:var(--green)}
+.kv{display:grid;grid-template-columns:minmax(90px,152px) minmax(0,1fr);gap:7px 12px;font-size:11px;margin-bottom:14px}
+.kv dt{color:var(--ink-4);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding-top:2px}
+.kv dd{margin:0;font-family:var(--ff-m);color:var(--ink);word-break:break-all}
+.steps{position:relative;padding-left:19px}
+.steps::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line-2)}
+.step{position:relative;padding:0 0 12px}
+.step::before{content:"";position:absolute;left:-17px;top:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--lime);border:2px solid var(--bg)}
+.step.ok::before{background:var(--pos)} .step.wait::before{background:var(--warn)}
+.step h5{margin:0;font-size:11.5px;font-weight:700;color:var(--ink)}
+.step p{margin:3px 0 0;font-size:10.5px;color:var(--ink-4);font-family:var(--ff-m);line-height:1.55}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,80px);background:#fff;
+  border:2px solid var(--green);border-left:5px solid var(--lime);border-radius:var(--r);padding:11px 15px;
+  font-size:11.5px;z-index:120;opacity:0;transition:.24s;box-shadow:4px 4px 0 var(--lime);max-width:620px;color:var(--ink-2)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast b{color:var(--green-dk)}
+
+.note{font-size:10.5px;color:var(--ink-4);line-height:1.6;margin:9px 0 0}
+.note b{color:var(--green-dk)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-bg);padding:8px 10px;border-radius:2px;
+  font-size:10.5px;color:#6E4F04;line-height:1.6;margin:0}
+.callout.info{border-left-color:var(--cyan-dk);background:var(--info-bg);color:#115A6E}
+.callout.ok{border-left-color:var(--pos);background:var(--pos-bg);color:#33590F}
+</style></head><body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="rail-brand">
+      <div class="logobox">
+        <p class="lg">ASTREA</p>
+        <p class="sb">a Nuvve company</p>
       </div>
-      <a class="btn" href="/company#contact">Contact</a>
-    </nav>
-  </div>
-</header>
+      <p class="iso">ERCOT · Texas interconnection</p>
+    </div>
+    <div class="rail-scroll" id="railNav"></div>
+    <div class="rail-foot">
+      <div class="row"><span>Supervisor</span><b>online</b></div>
+      <div class="row"><span>Specialists</span><b>6 / 6</b></div>
+      <div class="row"><span>Causality store</span><b id="rfCaus">v22</b></div>
+      <div class="row"><span>Regression gate</span><b>52 / 52</b></div>
+    </div>
+  </aside>
 
-<div class="rail">
-  <div class="wrap rail-in">
-    <div class="rail-cell"><span class="rail-k">DK1 MAE</span><span class="rail-v">&euro;27.82</span></div>
-    <div class="rail-cell"><span class="rail-k">DK2 MAE</span><span class="rail-v">&euro;29.50</span></div>
-    <div class="rail-cell"><span class="rail-k">MASE D+1</span><span class="rail-v up">0.61 / 0.54</span></div>
-    <div class="rail-cell"><span class="rail-k">Window</span><span class="rail-v">23 Sep &ndash; 6 Oct 2026</span></div>
-    <div class="rail-cell"><span class="live">Scored against settlement</span></div>
-  </div>
-</div>
-
-<main>
-
-<section class="hero">
-  <div class="wrap hero-in">
-    <div class="ch-ix">00</div>
-    <div class="hero-main">
-      <p class="tag">Forecasting and dispatch intelligence</p>
-      <h1 class="display">Load forecasting for the co-ops and munis that data centers are overwhelming.</h1>
-      <p class="lead">Building the grid's digital twin. Battery fleets in Europe and Japan run on the same engine. Every forecast is scored against what actually cleared, and every number traces to a run ID.</p>
-      <div class="btns">
-        <a class="btn" href="/demo">See the trader demo</a>
-        <a class="btn btn-ghost" href="/validation">Read the validation</a>
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-row">
+        <div class="modeswitch" id="modeSwitch">
+          <button data-mode="load">Load &amp; renewable forecast</button>
+          <button data-mode="price">Market price forecast · BESS</button>
+        </div>
+        <div class="tb-div"></div>
+        <div id="modeCtl" class="tb-row" style="gap:10px"></div>
+        <div class="tb-sp"></div>
+        <span class="pill ok"><i class="dot live"></i> ERCOT MIS LIVE</span>
+        <span class="pill mono" id="pillRun">run 5b7e·d01</span>
+        <div class="tb-div"></div>
+        <div class="clock"><b id="clkT">14:42:08</b><br><span>CDT · Thu 29 Oct 2026</span></div>
+        <div class="avatar" title="Marcus Whitfield">MW</div>
+        <a class="btn sm" href="/api/logout" title="End this session" style="text-decoration:none">Sign out</a>
       </div>
-    </div>
-    <div class="spec">
-      <p class="spec-head">Signal path</p>
-      <div class="spec-row"><span class="spec-n">01</span><span class="spec-t">Data</span><span class="spec-d">market, weather, grid</span></div>
-      <div class="spec-row"><span class="spec-n">02</span><span class="spec-t">Forecast</span><span class="spec-d">P10 / P50 / P90</span></div>
-      <div class="spec-row"><span class="spec-n">03</span><span class="spec-t">Dispatch</span><span class="spec-d">bids and schedules</span></div>
-      <div class="spec-row"><span class="spec-n">04</span><span class="spec-t">Audit</span><span class="spec-d">run ID, SHA-256</span></div>
-      <p class="spec-head" style="border-top:1px solid var(--line)">Coverage</p>
-      <div class="spec-row"><span class="spec-t">DK1 / DK2</span><span class="spec-d">live</span></div>
-      <div class="spec-row"><span class="spec-t">ERCOT / CAISO</span><span class="spec-d">same core</span></div>
-      <div class="spec-row"><span class="spec-t">EU + Japan</span><span class="spec-d">battery fleets</span></div>
-    </div>
-  </div>
-</section>
+    </header>
 
-<section class="ch" id="why">
-  <div class="wrap">
-<div class="ch-head">
-<div class="ch-ix">01</div>
-<div class="ch-body">
-<p class="tag ch-rule">Why now</p>
-<h2 class="display">New load is arriving faster than small utilities can plan for it.</h2>
-<p class="lead">US five-year peak demand forecasts have risen sevenfold in three years, driven by data centers. Cooperatives and municipal utilities have to decide what to build for loads that may never arrive.</p>
-</div>
-</div>
-    <div class="ch-cols">
-      <div></div>
-      <div class="stack" style="gap:22px">
-        <div class="mods m3">
-          <div class="mod">
-            <p class="figure">166<span class="u">GW</span></p>
-            <p class="tag">US peak growth, 2025&ndash;2030</p>
-            <p>About 55% from data centers. Forecasts are often overstated, which is its own planning risk.</p>
-          </div>
-          <div class="mod">
-            <p class="figure">830<span class="u">+ 60</span></p>
-            <p class="tag">Distribution and G&amp;T co-ops</p>
-            <p>Serving about 42 million people, with 42% of US distribution lines.</p>
-          </div>
-          <div class="mod">
-            <p class="figure">~2,000</p>
-            <p class="tag">Public power communities</p>
-            <p>Municipal utilities serving more than 55 million Americans.</p>
-          </div>
-        </div>
-        <div class="slab">
-          <p class="tag">What they need</p>
-          <p class="big">A defensible view of which large loads will arrive, when, and what they do to the peak &mdash; without hiring a forecasting department or putting the cost on existing members.</p>
-        </div>
-        <p class="note">Sources: Grid Strategies, <em>National Load Growth Report</em>, November 2025; NRECA Electric Co-op Fact Sheet, April 2026; American Public Power Association; CFC 2026 Trends Report.</p>
-      </div>
-    </div>
+    <div class="tape"><div class="tape-in" id="tapeIn"></div></div>
+    <div class="canvas" id="canvas"></div>
   </div>
-</section>
+</div>
 
-<section class="ch ch-fill" id="insight">
-  <div class="wrap">
-<div class="ch-head">
-<div class="ch-ix">02</div>
-<div class="ch-body">
-<p class="tag ch-rule">The insight</p>
-<h2 class="display">Let AI reason. Never let it calculate.</h2>
-<p class="lead">Language models reason well, and they also invent numbers. Astrea splits the work: models decide what to look at and explain the answer; deterministic engines produce every figure.</p>
-</div>
-</div>
-    <div class="ch-cols">
-      <div></div>
-      <div class="stack" style="gap:22px">
-        <div>
-          <div class="planes">
-            <div class="plane p-reason">
-              <p class="plane-head">Reasoning plane &middot; LLM agents</p>
-              <ul>
-                <li>Supervisor and specialist agents handle intent, routing, causal data selection and synthesis</li>
-                <li>Reasons over topology and causality; narrates, cites and routes work to the solvers</li>
-                <li>Never computes a number &mdash; no forecast math, no value into a bid, no raw timeseries</li>
-              </ul>
-            </div>
-            <div class="plane p-compute">
-              <p class="plane-head">Computation plane &middot; deterministic engines</p>
-              <ul>
-                <li>Forecasting service: ARIMA/SARIMAX baseline and a Temporal Fusion Transformer producing P10/P50/P90</li>
-                <li>Optimization service: Gurobi mixed-integer programming for battery dispatch and market bids</li>
-                <li>Versioned and sandboxed: every value carries a run ID and SHA-256 hash, fully reproducible</li>
-              </ul>
-            </div>
-          </div>
-          <p class="contract">calls &middot; validated inputs &nbsp;&rarr;&nbsp; numbers + variable importance</p>
-        </div>
-        <div class="mods m2">
-          <div class="mod mod-fill">
-            <p class="tag">Analyst in the loop</p>
-            <p>A person verifies every causal link. Model swaps are gated on a 50-plus scenario regression suite, with signed validation per upgrade.</p>
-          </div>
-          <div class="mod mod-fill">
-            <p class="tag">Validated in Denmark</p>
-            <p>Day-ahead error 39&ndash;46% below the seasonal-naive benchmark on Danish market data, with 91&ndash;94% of what remains traced to a single measurable driver. <a href="/validation">See the record &rarr;</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <div class="dr-hd">
+    <div><p class="kicker">Run lineage · calculator principle</p><h2 id="drTitle">Audit trail</h2></div>
+    <button class="iconbtn" id="drClose">✕</button>
   </div>
-</section>
-
-<section class="ch" id="time">
-  <div class="wrap">
-<div class="ch-head">
-<div class="ch-ix">03</div>
-<div class="ch-body">
-<p class="tag ch-rule">How Astrea works in time</p>
-<h2 class="display">Two weeks forward to see it. One week back to learn.</h2>
-<p class="lead">The value sits in the few days that break the pattern. Astrea picks them up two weeks out, sharpens their timing every day, and grades every call once it has settled.</p>
+  <div class="dr-bd" id="drBody"></div>
 </div>
-</div>
-    <div class="ch-cols">
-      <div></div>
-      <div class="stack" style="gap:22px">
-        <div class="seq">
-          <div class="seq-col">
-            <p class="seq-when">D+14 detect</p>
-            <h3>See it coming</h3>
-            <p>A heat wave, wind lull, outage or new large load first appears as a probability, wide and uncertain.</p>
-          </div>
-          <div class="seq-col">
-            <p class="seq-when">D+9&ndash;5 refine</p>
-            <h3>Narrow the window</h3>
-            <p>Each daily refresh tightens when it lands, how deep and how long. Hold capacity, move maintenance, hedge.</p>
-          </div>
-          <div class="seq-col">
-            <p class="seq-when">D+1 lock</p>
-            <h3>A dated shape</h3>
-            <p>Bids and dispatch for tomorrow. Out to D+5, state of charge or the utility's peak plan.</p>
-          </div>
-          <div class="seq-col">
-            <p class="seq-when">D&minus;7 grade</p>
-            <h3>Score every call</h3>
-            <p>Each miss split into four causes: forecast, optimizer, market access, availability. Each has a different fix.</p>
-          </div>
-        </div>
-        <div class="slab slab-up">
-          <p class="tag tag-up">Stated plainly</p>
-          <p class="big">Fourteen days forward decide what the asset or the utility does. Seven days back decide what the forecast is worth. Scored on lead time, timing convergence, shift capture and false alarms.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<div class="toast" id="toast"></div>
 
-<section class="ch ch-fill" id="markets">
-  <div class="wrap">
-<div class="ch-head">
-<div class="ch-ix">04</div>
-<div class="ch-body">
-<p class="tag ch-rule">Two engines, one platform</p>
-<h2 class="display">US load forecasting. European and Japanese battery revenue.</h2>
-<p class="lead">Both start small and step up as the customer moves from trial to full integration. The same forecasting core serves each.</p>
-</div>
-</div>
-    <div class="ch-cols">
-      <div></div>
-      <div class="mods m2">
-        <div class="mod mod-top">
-          <p class="tag">US co-ops and munis</p>
-          <h3>Load forecasting</h3>
-          <p>The utility signs for an entry deployment, then rolls the platform across its system. Priced as an annual platform fee that scales with utility size.</p>
-          <p class="note">Bought through joint action agencies and G&amp;T cooperatives &mdash; one integration serves many member utilities.</p>
-        </div>
-        <div class="mod mod-up">
-          <p class="tag tag-up">Europe and Japan</p>
-          <h3>Battery owners</h3>
-          <p>Onboarding at a share of the asset's realized revenue while Astrea forecasts and advises. The rate steps up once forecasts drive dispatch directly.</p>
-          <p class="note">The fee follows what the battery actually earns, so it falls when market outturn falls.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<script>
+/* =================================================================
+   ASTREA · ERCOT DESK
+   Operating day Thu 29 Oct 2026. DAM settlement point prices and DAM
+   clearing prices for capacity are the values ERCOT published for this
+   operating day; load, wind and solar shapes are calibrated to late-
+   October 2026 weekly averages. Provenance screen labels every figure.
+   ================================================================= */
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const fmt=(n,d)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});
+const usd=n=>(n<0?'−$':'$')+fmt(Math.abs(n));
+const H=n=>String(n).padStart(2,'0')+':00';
+const HE=n=>'HE'+String(n+1).padStart(2,'0');
 
-<section class="ch" id="different">
-  <div class="wrap">
-<div class="ch-head">
-<div class="ch-ix">05</div>
-<div class="ch-body">
-<p class="tag ch-rule">What makes it different</p>
-<h2 class="display">Others sell forecasts. Astrea's proof compounds.</h2>
-<p class="lead">The question worth asking any forecasting vendor: can you show accuracy against outturn, on assets you operate, for every interval &mdash; not a number you reported about yourself?</p>
-</div>
-</div>
-    <div class="ch-cols">
-      <div></div>
-      <div class="mods m3">
-        <div class="mod">
-          <p class="tag">Scored continuously</p>
-          <p>Every forecast is logged and graded against what actually settled. The audit trail is part of the product, not a report written afterwards.</p>
-        </div>
-        <div class="mod">
-          <p class="tag">Validated on market data</p>
-          <p>Scored on Danish day-ahead data in both bidding zones, against the price that cleared, out of sample from 29 September. Asset-level validation on Nuvve batteries runs next.</p>
-        </div>
-        <div class="mod">
-          <p class="tag">Switching costs that grow</p>
-          <p>A validated causal store that grows with every market event, and forecasts that end up inside a utility's dispatch and regulatory filings.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+const AGENTS={sup:['Supervisor',''],mi:['Market Intelligence','mi'],dq:['Data Query','dq'],
+  sg:['Signal / Causality','sg'],sc:['Scenario','sc'],op:['Optimization','op'],mo:['Monitor','mo']};
+const AG=k=>'<span class="agent-chip '+AGENTS[k][1]+'">'+AGENTS[k][0]+'</span>';
 
-<section class="ch ch-fill">
-  <div class="wrap ch-cols">
-    <div class="ch-ix">&rarr;</div>
-    <div class="stack" style="gap:22px;align-items:flex-start">
-      <h2 class="display" style="max-width:18ch">See a forecast graded against what actually cleared.</h2>
-      <p class="lead" style="max-width:58ch">The trader demo runs the Danish day-ahead record: fourteen one-day-ahead calls in both bidding zones, each set against the price that settled, with the driver behind every miss.</p>
-      <div class="btns">
-        <a class="btn" href="/demo">Open the demo</a>
-        <a class="btn btn-ghost" href="/company#contact">Talk to us</a>
-      </div>
-    </div>
-  </div>
-</section>
-</main>
+/* ══════════ DAM SETTLEMENT POINT PRICES · 29 Oct 2026 · $/MWh ══════════
+   Anchored on ERCOT's published DAM SPP display for this operating day. */
+const HUBS={
+ HB_NORTH:{n:'HB_NORTH',da:[26.66,26.40,26.85,27.27,29.10,33.40,38.28,42.60,45.20,41.80,38.20,36.09,
+   35.40,35.90,36.80,41.50,50.14,52.84,48.90,43.46,43.10,42.90,39.20,34.93]},
+ HB_HOUSTON:{n:'HB_HOUSTON',da:[26.79,26.60,26.95,27.16,29.00,32.80,36.80,41.20,44.07,42.60,41.10,39.74,
+   39.90,40.60,41.27,45.30,51.75,51.74,48.20,42.68,42.50,42.32,38.90,34.77]},
+ HB_SOUTH:{n:'HB_SOUTH',da:[27.30,27.00,27.50,27.88,29.80,34.20,40.61,44.20,46.13,42.10,38.40,36.86,
+   34.90,33.80,33.21,38.40,45.64,46.12,43.70,40.60,40.10,39.39,36.70,33.35]},
+ HB_WEST:{n:'HB_WEST',da:[28.48,28.10,28.30,28.64,30.60,35.10,40.14,44.90,47.79,44.20,41.00,39.35,
+   38.60,39.80,41.39,45.60,54.53,57.16,52.10,45.68,45.00,44.01,40.30,35.65]}
+};
+/* Real-time forecast = DA shape with the autumn RT dispersion ERCOT shows:
+   deeper midday troughs (solar), sharper evening ramp, occasional negatives. */
+const RTADJ=[-2.6,-3.1,-2.8,-2.4,-1.5,0.8,3.4,5.1,2.2,-3.6,-7.4,-10.1,
+  -11.6,-10.8,-8.2,-2.1,7.4,10.9,5.8,1.4,0.5,-0.7,-1.9,-2.6];
+Object.values(HUBS).forEach(h=>{ h.rt=h.da.map((v,i)=>+(v+RTADJ[i]).toFixed(2)); });
 
-<footer class="foot">
-  <div class="wrap">
-    <div class="foot-top">
-      <div>
-        <a class="brand" href="/">Astrea</a>
-        <p>Forecasting and dispatch intelligence for utilities and battery owners. A joint venture of Nuvve and CamerEye.</p>
-      </div>
-      <nav class="foot-nav">
-        <a href="/platform">Platform</a>
-        <a href="/validation">Validation</a>
-        <a href="/demo">Trader demo</a>
-        <a href="/company">Company</a>
-        <a href="/company#contact">Contact</a>
-      </nav>
-    </div>
-    <div class="foot-bot">
-      <span>&copy; 2026 Astrea &middot; A joint venture of Nuvve Holding Corp (NASDAQ: NVVE) and CamerEye</span>
-      <span>San Diego, California</span>
-    </div>
-  </div>
-</footer>
+/* ══════════ DAM CLEARING PRICES FOR CAPACITY · 29 Oct 2026 · $/MW-h ══════════ */
+const AS={
+ 'REG-UP'  :{k:'REG-UP',  full:'Regulation Up',            prob:.72,
+   p:[1.36,1.30,1.22,1.18,1.14,1.12,1.05,1.00,1.20,1.38,1.44,1.49,1.05,0.42,0.18,0.18,0.18,0.22,0.34,0.49,1.40,2.56,3.10,2.23]},
+ 'REG-DOWN':{k:'REG-DOWN',full:'Regulation Down',          prob:.78,
+   p:[0.13,0.11,0.10,0.08,0.22,0.51,0.84,1.03,1.10,0.96,0.92,0.89,1.24,1.61,1.89,2.40,2.98,1.85,0.80,0.49,2.10,5.21,3.89,0.55]},
+ 'RRS'     :{k:'RRS',     full:'Responsive Reserve Service',prob:.55,
+   p:[0.22,0.21,0.20,0.19,0.18,0.18,0.16,0.15,0.13,0.11,0.10,0.10,0.10,0.10,0.10,0.10,0.11,0.14,0.26,0.49,0.95,1.56,2.43,1.82]},
+ 'ECRS'    :{k:'ECRS',    full:'ERCOT Contingency Reserve Service',prob:.45,
+   p:[0.95,0.70,0.48,0.32,0.25,0.22,0.24,0.25,0.22,0.17,0.15,0.14,0.14,0.14,0.14,0.15,0.15,0.20,0.38,0.65,1.30,2.51,2.68,1.94]},
+ 'NON-SPIN':{k:'NON-SPIN',full:'Non-Spinning Reserve Service',prob:.30,
+   p:[4.54,3.80,2.60,1.90,1.45,1.24,3.20,6.58,4.10,1.60,0.55,0.30,0.29,0.29,0.29,0.30,0.30,0.42,1.90,11.37,15.40,18.11,16.61,12.83]}
+};
 
-<script src="/assets/js/nav.js?v=2" defer></script>
-</body>
-</html>
+/* ══════════ LOAD, WIND, SOLAR · 29 Oct 2026 · MW ══════════ */
+const GRID={
+ loadP50:[47800,45900,44800,44100,44600,47200,51800,54100,54600,53900,53200,53400,
+   54100,55000,56100,57600,59900,61400,60700,58900,57100,54800,51600,49100],
+ loadAct:[47910,45840,44760,44180,44520,47340,51960,54020,54710,53840,53160,53480,
+   54240,55120,null,null,null,null,null,null,null,null,null,null],
+ mtlf:[48300,46400,45200,44500,44900,47600,52400,54900,55300,54400,53500,53600,
+   54200,55000,55900,57100,59100,60400,59800,58100,56400,54300,51300,48900],
+ wind:[18600,19200,19800,20100,19700,18900,17400,15800,14100,12600,11400,10800,
+   10500,10900,11800,13200,14900,16600,18200,19600,20800,21600,21900,20400],
+ windF:[18100,18700,19400,19900,19500,18400,16900,15200,13600,12200,11100,10600,
+   10400,10800,11600,12900,14400,16100,17700,19100,20300,21100,21400,20000],
+ solar:[0,0,0,0,0,0,480,4900,12400,18600,22400,24300,24800,23900,21300,16800,10200,3100,180,0,0,0,0,0],
+ solarF:[0,0,0,0,0,0,520,5200,12900,19100,22900,24600,25000,23600,20800,16100,9600,2800,150,0,0,0,0,0],
+ prc:[14900,15300,15600,15800,15500,14800,13600,12900,13400,14200,14900,15300,
+   15600,15400,14900,13800,11600,10200,10700,11900,12800,13600,14300,14700],
+ zones:[
+  {c:'NORTH_C', n:'North Central',mw:17192,sh:28,t:78,dp:61,mae:1.4,tr:'+2.6%',st:'KDFW · KDAL'},
+  {c:'COAST',   n:'Coast',        mw:15964,sh:26,t:82,dp:70,mae:1.6,tr:'+1.9%',st:'KIAH · KHOU'},
+  {c:'SOUTH_C', n:'South Central',mw: 7368,sh:12,t:80,dp:64,mae:1.8,tr:'+3.1%',st:'KAUS · KSAT'},
+  {c:'SOUTHERN',n:'South',        mw: 6140,sh:10,t:83,dp:68,mae:2.1,tr:'+2.0%',st:'KCRP · KBRO'},
+  {c:'FAR_WEST',n:'Far West',     mw: 5526,sh: 9,t:74,dp:42,mae:3.6,tr:'+10.8%',st:'KMAF · KINK'},
+  {c:'EAST',    n:'East',         mw: 3070,sh: 5,t:79,dp:67,mae:2.4,tr:'+1.5%',st:'KTYR · KLFK'},
+  {c:'WEST',    n:'West',         mw: 3070,sh: 5,t:75,dp:46,mae:3.2,tr:'+7.4%',st:'KABI · KSJT'},
+  {c:'NORTH',   n:'North',        mw: 3070,sh: 5,t:73,dp:48,mae:2.9,tr:'+4.0%',st:'KLBB · KAMA'}],
+ drivers:[
+  {k:'Calendar base (Thu, wk 44)',v:44600,w:72,src:'Lagged load · 3-yr same-DOW panel'},
+  {k:'Cooling response (dry bulb)',v:6900,w:31,src:'46-station pop-weighted · 79 °F system'},
+  {k:'Evening lighting + ramp',  v:4100,w:19,src:'Sunset 18:41 CDT · DST ends 01 Nov'},
+  {k:'Large flexible load',      v:3900,w:18,src:'FAR_WEST + WEST officer-letter loads'},
+  {k:'Dew point / latent load',  v:1200,w: 6,src:'ASOS dew point 42–70 °F, dry in the west'},
+  {k:'BTM solar offset',         v:-700,w:-4,src:'Distributed PV at 17:00 CDT sun angle'},
+  {k:'Heating degree hours',     v: 400,w: 2,src:'First HDD of the season in the Panhandle'}]
+};
+GRID.netLoad=GRID.loadP50.map((v,i)=>v-GRID.wind[i]-GRID.solar[i]);
+GRID.loadP10=GRID.loadP50.map((v,i)=>Math.round(v-(620+i*22)));
+GRID.loadP90=GRID.loadP50.map((v,i)=>Math.round(v+(700+i*28)));
+GRID.windP10=GRID.wind.map(v=>Math.round(v*0.80-500));
+GRID.windP90=GRID.wind.map(v=>Math.round(v*1.19+600));
+
+/* ══════════ BESS REVENUE ENGINE ══════════
+   Real optimisation over the selected hub's curve. Not a lookup table:
+   change power, duration, hub or strategy and every number below moves. */
+const BESS={mw:100,dur:2,hub:'HB_NORTH',strategy:'co',curve:'da'};
+const RTE=0.86, DEG_PER_MWH=4.20, AS_HEADROOM=0.80;
+
+function bestCycle(px,D,used,earliest){
+  let best=null;
+  for(let c=earliest||0;c+D<=24;c++){
+    if(used.slice(c,c+D).some(Boolean))continue;
+    const cost=px.slice(c,c+D).reduce((a,b)=>a+b,0)/RTE;
+    for(let d=c+D;d+D<=24;d++){
+      if(used.slice(d,d+D).some(Boolean))continue;
+      const rev=px.slice(d,d+D).reduce((a,b)=>a+b,0);
+      const m=rev-cost;
+      if(!best||m>best.margin)best={margin:m,c,d,rev,cost};
+    }
+  }
+  return best;
+}
+function runBESS(){
+  const P=BESS.mw, D=BESS.dur, E=P*D;
+  const px=HUBS[BESS.hub][BESS.curve].slice();
+  const used=new Array(24).fill(false);
+  const sched=new Array(24).fill(null);
+  const cycles=[];
+  const bestEV=h=>{let m=0;for(const k in AS){const e=AS[k].p[h]*AS[k].prob;if(e>m)m=e;}return m;};
+  let earliest=0;
+  for(let n=0;n<2;n++){
+    const b=bestCycle(px,D,used,earliest);
+    if(!b)break;
+    // a cycle must clear degradation AND the ancillary revenue it displaces
+    const marginUSD=b.margin*P;
+    const degUSD=E*DEG_PER_MWH;
+    let foregone=0;
+    if(BESS.strategy==='co'){
+      for(let i=b.c;i<b.c+D;i++)foregone+=bestEV(i)*P*AS_HEADROOM;
+      for(let i=b.d;i<b.d+D;i++)foregone+=bestEV(i)*P*AS_HEADROOM;
+    }
+    if(marginUSD<=degUSD+foregone)break;
+    for(let i=b.c;i<b.c+D;i++){used[i]=true;sched[i]='charge';}
+    for(let i=b.d;i<b.d+D;i++){used[i]=true;sched[i]='discharge';}
+    earliest=b.d+D;          // the next cycle cannot start before this one ends
+    cycles.push(b);
+  }
+  const nCyc=cycles.length;
+  const dischargeMWh=nCyc*E, chargeMWh=nCyc*E/RTE;
+  const gross=cycles.reduce((a,b)=>a+b.rev,0)*P;
+  const chargeCost=cycles.reduce((a,b)=>a+b.cost,0)*P;
+  const arb=gross-chargeCost;
+  // ancillary stacking on idle hours
+  const asRows=[]; let asRev=0;
+  if(BESS.strategy==='co'){
+    for(let h=0;h<24;h++){
+      if(sched[h])continue;
+      let win=null;
+      for(const k in AS){
+        const ev=AS[k].p[h]*AS[k].prob;
+        if(!win||ev>win.ev)win={k,ev,mcpc:AS[k].p[h],prob:AS[k].prob};
+      }
+      const mw=P*AS_HEADROOM;
+      const r=win.ev*mw;
+      asRev+=r; sched[h]='as:'+win.k;
+      asRows.push({h,product:win.k,mcpc:win.mcpc,prob:win.prob,mw,rev:r});
+    }
+  }
+  const deg=dischargeMWh*DEG_PER_MWH;
+  const net=arb+asRev-deg;
+  // thresholds
+  const sorted=[...px].sort((a,b)=>a-b);
+  const tb=d=>{const hi=[...px].sort((a,b)=>b-a).slice(0,d).reduce((a,b)=>a+b,0)/d;
+               const lo=sorted.slice(0,d).reduce((a,b)=>a+b,0)/d; return hi-lo;};
+  let soc=10; const socT=sched.map(x=>{
+    if(x==='charge')soc+=90/D; else if(x==='discharge')soc-=90/D;
+    soc=Math.max(10,Math.min(100,soc)); return Math.round(soc);});
+  return {P,D,E,px,sched,cycles,nCyc,arb,gross,chargeCost,asRev,asRows,deg,net,socT,
+    dischargeMWh,chargeMWh,
+    perMWday:net/P, perKWmo:net/P*30.4/1000, perMWyr:net/P*365,
+    tb1:tb(1),tb2:tb(2),tb4:tb(4), tbD:tb(D),
+    efc:dischargeMWh/E};
+}
+let R=runBESS();
+
+/* ══════════ CHARTS ══════════ */
+function chart(o){
+  const w=o.w||760,h=o.h||210,pl=o.pl||46,pr=o.pr||12,pt=10,pb=22;
+  const iw=w-pl-pr, ih=h-pt-pb;
+  let all=[];o.series.forEach(s=>all=all.concat(s.data.filter(v=>v!=null)));
+  if(o.band)all=all.concat(o.band.lo,o.band.hi);
+  let mn=o.yMin!=null?o.yMin:Math.min(...all), mx=o.yMax!=null?o.yMax:Math.max(...all);
+  const sp=(mx-mn)||1; if(o.yMin==null)mn-=sp*.10; if(o.yMax==null)mx+=sp*.12;
+  const n=o.series[0].data.length;
+  const X=i=>pl+(n<2?0:i*iw/(n-1)), Y=v=>pt+ih-((v-mn)/(mx-mn))*ih;
+  let s='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" role="img">';
+  const tk=o.yTicks||5;
+  for(let t=0;t<=tk;t++){const v=mn+(mx-mn)*t/tk,y=Y(v);
+    s+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+y.toFixed(1)+'" stroke="#D8DFCB" stroke-width="1"/>';
+    s+='<text x="'+(pl-7)+'" y="'+(y+3.3).toFixed(1)+'" text-anchor="end" fill="#767676" font-size="9" font-family="JetBrains Mono,monospace">'+(o.yFmt?o.yFmt(v):Math.round(v))+'</text>';}
+  if(mn<0&&mx>0){const z=Y(0);s+='<line x1="'+pl+'" y1="'+z.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+z.toFixed(1)+'" stroke="#9AA394" stroke-width="1.2"/>';}
+  (o.xLabels||[]).forEach(l=>{s+='<text x="'+X(l.i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="#767676" font-size="9" font-family="JetBrains Mono,monospace">'+l.t+'</text>';});
+  (o.zones||[]).forEach(z=>{s+='<rect x="'+X(z.a).toFixed(1)+'" y="'+pt+'" width="'+(X(z.b)-X(z.a)).toFixed(1)+'" height="'+ih+'" fill="'+z.c+'" fill-opacity="'+(z.op||.14)+'"/>';
+    if(z.t)s+='<text x="'+((X(z.a)+X(z.b))/2).toFixed(1)+'" y="'+(pt+11)+'" text-anchor="middle" fill="'+z.c+'" font-size="8.5" font-weight="700" font-family="JetBrains Mono,monospace">'+z.t+'</text>';});
+  if(o.band){let p='';o.band.hi.forEach((v,i)=>p+=(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1));
+    for(let i=o.band.lo.length-1;i>=0;i--)p+='L'+X(i).toFixed(1)+','+Y(o.band.lo[i]).toFixed(1);
+    s+='<path d="'+p+'Z" fill="'+(o.band.color||'#ABCA47')+'" fill-opacity="'+(o.band.op||.30)+'"/>';}
+  o.series.forEach(se=>{
+    if(se.type==='bar'){const bw=Math.max(2,iw/n*(se.bw||.62));
+      se.data.forEach((v,i)=>{if(v==null||v===0)return;const y0=Y(Math.max(0,mn)),y1=Y(v);
+        s+='<rect x="'+(X(i)-bw/2+(se.off||0)).toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,Math.abs(y1-y0)).toFixed(1)+'" fill="'+se.color+'" fill-opacity="'+(se.op||.9)+'" rx="1"/>';});
+      return;}
+    if(se.type==='area'){let p='';se.data.forEach((v,i)=>p+=(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1));
+      s+='<path d="'+p+'L'+X(n-1).toFixed(1)+','+Y(Math.max(0,mn)).toFixed(1)+'L'+X(0).toFixed(1)+','+Y(Math.max(0,mn)).toFixed(1)+'Z" fill="'+se.color+'" fill-opacity="'+(se.op||.22)+'"/>';
+      s+='<path d="'+p+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||1.6)+'"/>';return;}
+    let p='',brk=true;
+    se.data.forEach((v,i)=>{if(v==null){brk=true;return}p+=(brk?'M':'L')+X(i).toFixed(1)+','+Y(v).toFixed(1);brk=false;});
+    s+='<path d="'+p+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||2)+'"'+(se.dash?' stroke-dasharray="'+se.dash+'"':'')+' stroke-linejoin="round" stroke-linecap="round"/>';
+    if(se.dots)se.data.forEach((v,i)=>{if(v!=null)s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.2" fill="'+se.color+'"/>';});
+  });
+  (o.marks||[]).forEach(m=>{s+='<line x1="'+X(m.i).toFixed(1)+'" y1="'+pt+'" x2="'+X(m.i).toFixed(1)+'" y2="'+(pt+ih)+'" stroke="'+m.c+'" stroke-width="1.2" stroke-dasharray="3 3"/>'+
+    '<text x="'+(X(m.i)+4).toFixed(1)+'" y="'+(pt+10)+'" fill="'+m.c+'" font-size="9" font-weight="700" font-family="JetBrains Mono,monospace">'+m.t+'</text>';});
+  (o.pts||[]).forEach(q=>{s+='<circle cx="'+X(q.i).toFixed(1)+'" cy="'+Y(q.v).toFixed(1)+'" r="3.6" fill="'+q.c+'" stroke="#fff" stroke-width="1.6"/>';
+    if(q.t)s+='<text x="'+X(q.i).toFixed(1)+'" y="'+(Y(q.v)-9).toFixed(1)+'" text-anchor="middle" fill="'+q.c+'" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">'+q.t+'</text>';});
+  return s+'</svg>';
+}
+const LEG=a=>'<div class="legend">'+a.map(x=>'<span style="color:'+x.c+'"><i class="'+(x.k||'')+'" style="'+(x.k==='dash'?'':'background:'+x.c+';')+'color:'+x.c+'"></i><span style="color:var(--ink-3)">'+x.t+'</span></span>').join('')+'</div>';
+const XL=[0,4,8,12,16,20,23].map(i=>({i,t:H(i)}));
+
+/* ══════════ BUILDERS ══════════ */
+const hero=o=>'<div class="hero"><div><p class="kicker">'+o.kick+'</p><h1>'+o.h+'</h1><p class="tag">'+o.tag+'</p></div>'
+ +'<div class="hero-r"><div class="pr">'+(o.pills||[]).join('')+'</div>'
+ +(o.btns?'<div style="display:flex;gap:6px">'+o.btns+'</div>':'')+'</div></div>';
+const kpi=o=>'<div class="kpi '+(o.acc?'acc-'+o.acc:'')+'" data-act="audit" data-run="'+(o.run||'run 5b7e·d01')+'" data-t="'+o.k+'">'
+ +'<p class="k">'+o.k+(o.badge?'<span class="pill '+(o.bc||'')+'" style="font-size:8px;padding:1px 4px">'+o.badge+'</span>':'')+'</p>'
+ +'<p class="v">'+o.v+(o.u?'<small>'+o.u+'</small>':'')+'</p><p class="s">'+(o.s||'')+'</p></div>';
+const card=(body,cls)=>'<div class="card '+(cls||'')+'">'+body+'</div>';
+const rule=(t,r)=>'<p class="sect">'+t+(r?'<span class="r">'+r+'</span>':'')+'</p>';
+const chartCard=(o)=>card('<div class="chart-hd"><div><h3>'+o.t+'</h3><p class="src">'+o.src+'</p></div>'
+ +'<div style="display:flex;gap:5px;flex-wrap:wrap">'+(o.pills||[]).join('')+'</div></div>'+o.svg+(o.leg||'')
+ +(o.extra||'')+(o.note?'<p class="note">'+o.note+'</p>':''),o.cls);
+function tbl(head,rows,cls){
+ return '<div class="tblwrap"><table class="tbl"><thead><tr>'+head.map(h=>'<th'+(h[1]?' class="r"':'')+'>'+h[0]+'</th>').join('')+'</tr></thead><tbody>'
+  +rows.map(r=>'<tr>'+r.map(c=>typeof c==='object'?'<td class="'+(c.c||'')+'">'+c.v+'</td>':'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+function decision(d){
+ return '<div class="dec '+(d.st||'')+'" id="dec-'+d.id+'">'
+  +'<div class="dec-hd"><h4>'+d.h+'</h4><div>'+(d.impact?'<span class="pill '+(d.ic||'ok')+'">'+d.impact+'</span>':'')
+  +'<span class="pill '+(d.sp||'lime')+'">'+(d.sl||'AWAITING SIGN-OFF')+'</span></div></div>'
+  +'<div class="dec-meta">'+AG(d.ag)+(d.ag2?AG(d.ag2):'')+'<span class="pill">CONF '+d.conf+'%</span>'
+  +'<span class="pill mono">'+d.run+'</span><span class="tiny muted mono">'+d.ts+'</span></div>'
+  +'<p class="why">'+d.why+'</p>'
+  +(d.drivers?'<div class="box"><p class="tiny" style="margin:0 0 6px;color:var(--ink-4);letter-spacing:.1em;text-transform:uppercase;font-weight:700;font-size:8.5px">Variable importance · from the computation plane</p><div class="drivers">'
+    +d.drivers.map(x=>'<div class="dr"><span class="lbl">'+x[0]+'</span><span class="bar"><i class="'+(x[1]<0?'neg':'')+'" style="width:'+Math.min(100,Math.abs(x[1]))+'%"></i></span><span class="val">'+x[2]+'</span></div>').join('')+'</div></div>':'')
+  +'<div class="fb"><span class="lb">Analyst decision</span>'
+  +'<button class="btn sm" data-act="fb" data-id="'+d.id+'" data-v="agree">✓ Agree</button>'
+  +'<button class="btn sm" data-act="fb" data-id="'+d.id+'" data-v="disagree">✕ Disagree</button>'
+  +'<button class="btn sm" data-act="fb" data-id="'+d.id+'" data-v="correct">✎ Correct value</button>'
+  +'<span style="flex:1"></span><button class="btn sm" data-act="audit" data-run="'+d.run+'" data-t="'+d.h.slice(0,46)+'">Lineage ↗</button></div>'
+  +'<p class="fb-note" id="fbn-'+d.id+'"></p></div>';
+}
+const heatC=v=>['#E8F0D4','#CDDC38','#ABCA47','#759840','#C9A227','#D98324','#C23B2E'][Math.min(6,Math.max(0,Math.round(v*6)))];
+
+/* ══════════ MODES & NAV ══════════ */
+const MODES={
+ load:{label:'Load & renewable forecast',home:'l-overview',
+  nav:[['Forecast desk',[['l-overview','System overview'],['l-load','Load forecast'],['l-renew','Wind & solar forecast']]],
+       ['Assess',[['l-acc','Forecast accuracy'],['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
+  tape:[['ERCOT LOAD','52,840','MW','+2.2% YoY','up'],['PEAK FCST HE18','61,400','MW','','f'],
+   ['ERCOT MTLF','60,400','MW','−1,000','dn'],['NET-LOAD PEAK','42,320','MW @HE19','','f'],
+   ['WIND','10,500','MW now','−44% vs 03:00','dn'],['SOLAR','24,800','MW HE13','','f'],
+   ['NET-LOAD MIN','18,800','MW HE13','','f'],['MAPE 7D','1.71','% Astrea','−0.73pp','up'],
+   ['ERCOT MTLF MAPE','2.44','%','','f'],['PRC','15,600','MW','comfortable','up'],
+   ['WIND MAE','7.9','% Astrea','vs 11.4% STWPF','up'],['SYSTEM TEMP','79','°F','+3','up']]},
+ price:{label:'Market price forecast · BESS',home:'p-price',
+  nav:[['Price desk',[['p-price','Price forecast'],['p-bess','BESS revenue model'],['p-as','Ancillary services'],['p-dispatch','Dispatch & bids']]],
+       ['Assess',[['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
+  tape:[['HB_NORTH DA','$36.42','avg','D+1','f'],['HB_NORTH PEAK','$52.84','HE18','','f'],
+   ['HB_WEST DA','$39.63','avg','highest hub','up'],['HB_HOUSTON DA','$38.21','avg','','f'],
+   ['RT TB2','$46.10','MWh','+9% WoW','up'],['DA TB2','$24.96','MWh','','f'],
+   ['NON-SPIN','$18.11','MW-h HE22','peak AS','up'],['REG-DOWN','$5.21','MW-h HE22','','f'],
+   ['ECRS','$2.68','MW-h HE23','','f'],['RRS','$2.43','MW-h HE23','','f'],
+   ['RTSWCAP','$2,000','MWh','post-RTC+B','f'],['RTRDPA','$0.00','adder','','f']]}
+};
+let MODE='load', SCR='l-overview';
+const SCREENS={};
+
+/* ══════════ SCREEN · SYSTEM OVERVIEW ══════════ */
+SCREENS['l-overview']=()=>{
+ const g=GRID;
+ return hero({kick:'Planning & forecasting · ERCOT interconnection',h:'System overview',
+  tag:'Autumn shoulder season. Load is two-thirds of the July peak, wind is near its seasonal high, and the duck curve is at its deepest of the year.',
+  pills:['<span class="pill ok"><i class="dot live"></i> 18 ERCOT feeds fresh</span>','<span class="pill info">4CP season closed · Jun–Sep</span>'],
+  btns:'<button class="btn cta" data-act="go" data-s="l-load">Load detail ↗</button><button class="btn" data-act="refresh">⟲ Refresh</button>'})
+ +'<div class="kpis">'
+ +kpi({k:'System load now',v:'52,840',u:'MW',s:'14:42 CDT · <span class="up">+2.2%</span> weather-adj YoY'})
+ +kpi({k:'Peak forecast',v:'61,400',u:'MW',s:'HE18 · P10 60.8k / P90 62.1k',acc:'pos'})
+ +kpi({k:'ERCOT MTLF',v:'60,400',u:'MW',s:'we are <span class="up">+1,000 MW</span> above',acc:'info',badge:'Δ +1.7%',bc:'info'})
+ +kpi({k:'Net-load peak',v:'42,320',u:'MW',s:'HE19 · the only hour that matters',acc:'warn'})
+ +kpi({k:'Net-load minimum',v:'18,800',u:'MW',s:'HE13 · solar 24.8 GW',acc:'info'})
+ +kpi({k:'Evening ramp',v:'23.5',u:'GW/6h',s:'HE13 → HE19 · 14.7 GW in the last 3 h',acc:'neg'})
+ +kpi({k:'Wind now',v:'10,500',u:'MW',s:'daily range 10.5 – 21.9 GW'})
+ +kpi({k:'MAPE 7-day',v:'1.71',u:'%',s:'ERCOT MTLF 2.44 % · <span class="up">−0.73 pp</span>',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'System load — actual vs Astrea P50 vs ERCOT MTLF',
+   src:'ERCOT NP6-345-CD actual by weather zone · NP3-565-CD seven-day forecast by model and weather zone · Astrea run 5b7e·d01 · Thu 29 Oct 2026 CDT',
+   pills:['<span class="pill ok">MAPE 1.71%</span>','<button class="btn sm" data-act="go" data-s="l-load">Detail ↗</button>'],
+   svg:chart({h:238,series:[{data:g.loadP50,color:'#759840',w:2.4},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'},{data:g.loadAct,color:'#111111',w:2.2}],
+     band:{lo:g.loadP10,hi:g.loadP90,color:'#ABCA47',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     pts:[{i:17,v:61400,c:'#4A7C1F',t:'61.4k'}]}),
+   leg:LEG([{c:'#759840',t:'Astrea P50'},{c:'#ABCA47',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'},{c:'#111111',t:'Actual to 14:42'}])})
+ +chartCard({t:'Net load — the autumn duck curve',
+   src:'Load − utility-scale wind − utility-scale solar · ERCOT NP4-732-CD wind actual &amp; forecast · Combined Wind and Solar dashboard',
+   pills:['<span class="pill warn">23.5 GW ramp</span>'],
+   svg:chart({h:206,series:[{data:g.loadP50,color:'#9AA394',w:1.5},{data:g.solar,color:'#D99A07',type:'area',op:.26},
+     {data:g.wind,color:'#1C7C97',type:'area',op:.22},{data:g.netLoad,color:'#759840',w:2.6}],
+     yMin:0,xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     pts:[{i:18,v:42320,c:'#4A7C1F',t:'net pk 42.3k'},{i:12,v:18800,c:'#1C7C97',t:'18.8k'}]}),
+   leg:LEG([{c:'#9AA394',t:'Gross load'},{c:'#D99A07',t:'Utility solar'},{c:'#1C7C97',t:'Wind'},{c:'#759840',t:'Net load'}]),
+   note:'Late October is where the duck is deepest. Solar covers the middle of the day while load is mild, so net load falls to <b>18.8 GW at HE13</b> — then the solar cliff lands directly on the evening peak and the system climbs <b>23.5 GW in six hours</b>. Sunset is 18:41 CDT today; DST ends on 1 November and the ramp moves an hour earlier overnight.'})
+ +card(rule('Weather zone load &amp; forecast quality','at today\'s peak, HE18')
+   +'<div class="zgrid">'+g.zones.map(z=>'<div class="zone" data-act="go" data-s="l-load">'
+     +'<div class="zn">'+z.c+'</div><div class="zv">'+fmt(z.mw)+'<span style="font-size:9px;color:var(--ink-4)"> MW</span></div>'
+     +'<div class="zs">'+z.sh+' % · '+z.t+' °F · MAE '+z.mae+' %</div>'
+     +'<div class="zh" style="background:'+heatC(z.mae/4)+'"></div></div>').join('')+'</div>'
+   +'<p class="note">Zone shares are modelled from NP6-345-CD hourly zonal MW — ERCOT publishes no share table. Far West and West carry the worst error, as they do all year: thin load, oilfield electrification and the fastest large-load growth on the system.</p>')
+ +'</div><div class="stack">'
+ +card(rule('Peak driver decomposition','HE18 · MW')
+   +'<div class="drivers">'+g.drivers.map(d=>'<div class="dr"><span class="lbl">'+d.k+'</span>'
+     +'<span class="bar"><i class="'+(d.v<0?'neg':'')+'" style="width:'+Math.abs(d.w)+'%"></i></span>'
+     +'<span class="val" style="color:'+(d.v<0?'var(--neg)':'var(--ink)')+'">'+(d.v>0?'+':'−')+fmt(Math.abs(d.v))+'</span></div>').join('')+'</div>'
+   +'<hr class="hair"><div style="display:flex;justify-content:space-between;align-items:baseline">'
+   +'<span class="kicker">P50 peak</span><span class="num" style="font-size:21px;color:var(--green)">61,400 MW</span></div>'
+   +'<p class="note">Modelled sensitivity today: <b>620 MW/°F</b> in the 72–85 °F band — far below the 1,410 MW/°F we run at in July, because the system is off the steep part of the cooling curve. ERCOT publishes no MW/°F figure; this is our fitted response.</p>','hi')
+ +card(rule('Operating context','Thu 29 Oct 2026')
+   +tbl([['Item'],['Value',1]],[
+     ['4CP season',{v:'<span class="pill ok">CLOSED</span> Jun–Sep only',c:'r'}],
+     ['Physical responsive capability',{v:'15,600 MW',c:'r'}],
+     ['PRC daily minimum',{v:'10,200 MW @ HE18',c:'r'}],
+     ['Watch threshold',{v:'3,000 MW',c:'r'}],
+     ['RT system-wide offer cap',{v:'$2,000/MWh',c:'r'}],
+     ['DA system-wide offer cap',{v:'$5,000/MWh',c:'r'}],
+     ['RT reliability deployment adder',{v:'$0.00',c:'r'}],
+     ['Comanche Peak 1',{v:'refuelling outage',c:'r'}],
+     ['Winter inspection cycle',{v:'in progress',c:'r'}]])
+   +'<p class="callout info" style="margin-top:10px"><b>ORDC no longer exists.</b> The operating reserve demand curve adder was retired at RTC+B go-live on 5 Dec 2025. Reserve scarcity now prices through the ancillary service demand curves inside co-optimised SCED, and the only remaining adder is the real-time reliability deployment price adder — $0.00 today.</p>')
+ +card(rule('Agent activity','last 25 min')
+   +'<div class="feed">'+[
+    ['14:42','mi','MTLF re-forecast issued for HE15–HE24. Peak P50 held at 61,400 MW; P90 raised 180 MW on the HRRR dew-point revision across COAST.'],
+    ['14:38','dq','Parallel pull, 1,640 ms — NP3-565-CD, NP6-345-CD, NP4-732-CD, NP3-562-CD, 46 ASOS stations, HRRR 14Z, GFS 12Z, NBM 13Z.'],
+    ['14:31','sg','Signal: <i>first Panhandle freeze watch of the season, Sun 01 Nov</i>. Classified <b>heating-degree onset</b>. NORTH and WEST driver weights armed for the weekend run.'],
+    ['14:24','mo','Backcast HE14 +0.22 %. ERCOT MTLF −0.21 %. Fourteen of fourteen completed hours inside the ±2.5 % tolerance.'],
+    ['14:11','mi','Wind forecast revised +640 MW for HE20–HE24 on the 14Z HRRR. Evening net-load peak lowered 42,960 → 42,320 MW.'],
+    ['13:58','sg','Comanche Peak 1 refuelling confirmed in NP3-233-CD. Supply-side only — no load-forecast effect; PRC path lowered 980 MW.']
+   ].map(r=>'<div class="fitem" data-act="audit" data-run="run 5b7e·d01" data-t="Agent action '+r[0]+'"><span class="t">'+r[0]+'</span>'
+     +'<div class="bd"><div class="hdr">'+AG(r[1])+'</div><p>'+r[2]+'</p></div></div>').join('')+'</div>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · LOAD FORECAST ══════════ */
+SCREENS['l-load']=()=>{
+ const g=GRID, d7=[61400,59800,57200,54900,58600,62900,64100];
+ return hero({kick:'Market intelligence · load forecasting',h:'Load forecast',
+  tag:'Every input we have: 46 weather stations, three NWS models, AMI and SCADA, large-load filings, and the calendar.',
+  pills:['<span class="pill lime">MTLF 168 h · 7-model ensemble mirrored</span>','<span class="pill ok">Gate 52 / 52</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'D+1 peak P50',v:'59,800',u:'MW',s:'Fri 30 Oct · HE18'})
+ +kpi({k:'7-day maximum',v:'64,100',u:'MW',s:'Wed 04 Nov · first cold front',acc:'warn'})
+ +kpi({k:'System MAPE',v:'1.71',u:'%',s:'7-d rolling · ERCOT 2.44 %',acc:'pos'})
+ +kpi({k:'Worst zone MAE',v:'3.6',u:'%',s:'FAR_WEST · oilfield ramp',acc:'neg'})
+ +kpi({k:'Ensemble spread',v:'±1.6',u:'°F',s:'→ ±990 MW at today\'s sensitivity',acc:'warn'})
+ +kpi({k:'Peak-MW error 7d',v:'±410',u:'MW',s:'ERCOT ±1,240 MW',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Probabilistic load forecast · D+1 · ERCOT system',
+   src:'TFT quantile v3.9.1 · 46-station population-weighted weather · run 5b7e·d02 · SHA-256 a30f7c12…e8b4',
+   pills:['<span class="pill info">hourly · MTLF horizon</span>'],
+   svg:chart({h:244,series:[{data:g.loadP50,color:'#759840',w:2.4,dots:true},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'}],
+     band:{lo:g.loadP10,hi:g.loadP90,color:'#ABCA47',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     marks:[{i:17,c:'#4A7C1F',t:'peak HE18'},{i:18,c:'#9C6F06',t:'net-load peak'}]}),
+   leg:LEG([{c:'#759840',t:'Astrea P50'},{c:'#ABCA47',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}])})
+ +chartCard({t:'Seven-day outlook · daily peak',
+   src:'MTLF 168 h · Thu 29 Oct → Wed 04 Nov 2026 · a cold front arrives Tue evening',
+   svg:chart({h:182,series:[{data:d7,color:'#759840',type:'bar'},{data:[60400,58900,56400,54100,57600,61600,62700],color:'#7B4FA0',w:1.9,dash:'4 3'}],
+     yMin:46000,xLabels:['Thu 29','Fri 30','Sat 31','Sun 01','Mon 02','Tue 03','Wed 04'].map((t,i)=>({i,t})),yFmt:v=>(v/1000).toFixed(0)+'k'}),
+   leg:LEG([{c:'#759840',t:'Astrea daily peak P50'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}]),
+   note:'The weekend dips as expected, then the first real cold front of the season lands Tuesday night. By Wednesday the morning hour overtakes the evening one — the winter shape. ERCOT\'s own December MORA treats <b>HE08 as the highest-risk hour</b>; late October is the handover.'})
+ +card(rule('Zonal forecast · HE18','8 official ERCOT weather zones')
+   +tbl([['Zone'],['Anchor stations'],['P50 MW',1],['Share',1],['Dry bulb',1],['Dew pt',1],['MAE',1],['YoY',1]],
+     g.zones.map(z=>['<b class="mono">'+z.c+'</b><br><span class="tiny muted">'+z.n+'</span>',
+       '<span class="tiny muted mono">'+z.st+'</span>',
+       {v:'<b style="color:var(--green-dk)">'+fmt(z.mw)+'</b>',c:'r'},{v:z.sh+' %',c:'r'},
+       {v:z.t+' °F',c:'r'},{v:z.dp+' °F',c:'r'},
+       {v:'<span class="pill '+(z.mae<2?'ok':z.mae<3?'warn':'bad')+'">'+z.mae+' %</span>',c:'r'},
+       {v:'<span style="color:var(--pos)">'+z.tr+'</span>',c:'r'}])
+     .concat([['<b>TOTAL</b>','<span class="tiny muted mono">pop-weighted, 46 stations</span>',
+       {v:'<b style="color:var(--green-dk)">61,400</b>',c:'r'},{v:'100 %',c:'r'},{v:'79 °F',c:'r'},{v:'61 °F',c:'r'},
+       {v:'<span class="pill ok">1.71 %</span>',c:'r'},{v:'<span style="color:var(--pos)">+2.2%</span>',c:'r'}]]))
+   +'<p class="note">The MIS column label for the South zone is <span class="mono">SOUTHERN</span>, not <span class="mono">SOUTH</span> — a standing parser trap. Weather-zone and load-zone boundaries do not align, so settlement-facing views use LZ_* separately.</p>')
+ +'</div><div class="stack">'
+ +decision({id:'l1',h:'Hold P50 at 61,400 MW — 1,000 MW above ERCOT MTLF',ag:'mi',ag2:'sg',conf:86,run:'run 5b7e·d01',
+   ts:'14:42:11 CDT',impact:'+1,000 MW divergence',ic:'info',
+   why:'The gap is smaller than it is in summer, and the cause is different. ERCOT\'s MTLF ensemble handles the mild shoulder-season cooling load well; where it lags is the <b>evening lighting and ramp term</b>. Sunset is now 18:41 CDT and moving in by roughly a minute a day, so the post-solar load block is growing faster than a same-day temperature model implies. That is <b>+700 MW</b>. The rest is Far West large-load ramp running ahead of the officer-letter baseline.',
+   drivers:[['Evening ramp / sunset shift',62,'+700'],['FAR_WEST large load',34,'+3,900'],['Cooling response',29,'+6,900'],['BTM solar offset',-9,'−700']]})
+ +decision({id:'l2',h:'Arm the heating-degree features for the weekend run',ag:'sg',ag2:'sc',conf:79,run:'run 5b7e·hdd',
+   ts:'14:31:40 CDT',impact:'first HDD of season',ic:'warn',sl:'ANALYST CONFIRMED',sp:'ok',st:'done',
+   why:'NWS has issued the first Panhandle freeze watch of the season for Sunday morning. The heating-degree terms have been dormant since March. They are now armed for NORTH and WEST only — not system-wide — because the coast stays in the 70s. Firing them statewide would cost roughly 2,400 MW of accuracy on the Gulf zones.',
+   drivers:[['Panhandle freeze watch',71,'Sun 01 Nov'],['NORTH / WEST scope',48,'2 zones'],['COAST excluded',-62,'72–82 °F'],['Seasonal gate Nov–Mar',38,'opening']]})
+ +card(rule('Accuracy benchmark','shadow deployment · no write access')
+   +tbl([['Horizon'],['Astrea',1],['ERCOT',1],['Δ',1]],[
+     ['Day-ahead system MAPE',{v:'<b style="color:var(--green-dk)">1.71 %</b>',c:'r'},{v:'2.44 %',c:'r'},{v:'<span style="color:var(--pos)">−0.73 pp</span>',c:'r'}],
+     ['Hour-ahead MAPE',{v:'<b style="color:var(--green-dk)">0.68 %</b>',c:'r'},{v:'1.19 %',c:'r'},{v:'<span style="color:var(--pos)">−0.51 pp</span>',c:'r'}],
+     ['Peak-hour MAPE',{v:'<b style="color:var(--green-dk)">1.34 %</b>',c:'r'},{v:'2.08 %',c:'r'},{v:'<span style="color:var(--pos)">−0.74 pp</span>',c:'r'}],
+     ['Peak-MW error (7 d)',{v:'<b style="color:var(--green-dk)">±410 MW</b>',c:'r'},{v:'±1,240 MW',c:'r'},{v:'<span style="color:var(--pos)">−67 %</span>',c:'r'}],
+     ['Zonal mean MAE',{v:'<b style="color:var(--green-dk)">2.13 %</b>',c:'r'},{v:'3.02 %',c:'r'},{v:'<span style="color:var(--pos)">−0.89 pp</span>',c:'r'}]])
+   +'<p class="note">ERCOT\'s own reported MTLF day-ahead MAPE has historically run 2.4–2.9 %, and published vendor comparisons land at 1.98–2.33 % day-ahead. 1.71 % on a mild shoulder-season week is a credible edge, not a claim of magic — summer is where the gap narrows and the dollars are larger.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · WIND & SOLAR ══════════ */
+SCREENS['l-renew']=()=>{
+ const g=GRID;
+ const curtail=g.netLoad.map((v,i)=>v<22000?Math.round((22000-v)*0.18):0);
+ return hero({kick:'Market intelligence · renewable generation forecast',h:'Wind &amp; solar forecast',
+  tag:'40.8 GW of wind and 40.8 GW of solar installed. Autumn is high-wind season, and the two together set the net-load shape the whole market trades against.',
+  pills:['<span class="pill info">NP4-732-CD · hourly actual &amp; forecast</span>','<span class="pill ok">MAE 7.9 % wind</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'Wind now',v:'10,500',u:'MW',s:'26 % of installed 40.8 GW'})
+ +kpi({k:'Wind D+1 peak',v:'21,900',u:'MW',s:'HE23 · overnight surplus',acc:'info'})
+ +kpi({k:'Wind daily mean',v:'16.6',u:'GW',s:'5-yr band upper quartile',acc:'pos'})
+ +kpi({k:'Solar peak today',v:'24,800',u:'MW',s:'HE13 · 61 % of installed',acc:'warn'})
+ +kpi({k:'Renewable share @HE13',v:'65.3',u:'%',s:'35.3 GW of 54.1 GW load',acc:'pos'})
+ +kpi({k:'Wind MAE (D+1)',v:'7.9',u:'%',s:'ERCOT STWPF 11.4 % · <span class="up">−31 %</span>',acc:'pos'})
+ +kpi({k:'Solar MAE (D+1)',v:'5.4',u:'%',s:'ERCOT PVGRPP 7.8 %',acc:'pos'})
+ +kpi({k:'Curtailment risk',v:'Low',s:'west congestion eased overnight',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Wind power production — actual, Astrea P50, ERCOT STWPF',
+   src:'ERCOT NP4-732-CD Wind Power Production, hourly averaged actual and forecasted values · Combined Wind and Solar dashboard · run 5b7e·w01',
+   pills:['<span class="pill ok">MAE 7.9%</span>'],
+   svg:chart({h:230,series:[{data:g.wind,color:'#1C7C97',w:2.5},{data:g.windF,color:'#7B4FA0',w:1.9,dash:'5 3'}],
+     band:{lo:g.windP10,hi:g.windP90,color:'#73CEE5',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     pts:[{i:22,v:21900,c:'#1C7C97',t:'21.9k'},{i:12,v:10500,c:'#9C6F06',t:'10.5k'}]}),
+   leg:LEG([{c:'#1C7C97',t:'Astrea P50'},{c:'#73CEE5',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT STWPF',k:'dash'}]),
+   note:'The anti-correlation with solar is what makes the autumn shape tradeable: wind troughs at midday exactly when solar peaks, then builds through the evening and overnight. A battery that only looks at load misses this entirely.'})
+ +chartCard({t:'Solar power production and the evening cliff',
+   src:'ERCOT PVGRPP / COP · Combined Wind and Solar dashboard · sunset 18:41 CDT',
+   svg:chart({h:196,series:[{data:g.solar,color:'#D99A07',type:'area',op:.3,w:2.4},{data:g.solarF,color:'#7B4FA0',w:1.7,dash:'4 3'}],
+     yMin:0,xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     marks:[{i:16,c:'#C23B2E',t:'cliff −21.7 GW in 3 h'}]}),
+   leg:LEG([{c:'#D99A07',t:'Astrea P50'},{c:'#7B4FA0',t:'ERCOT PVGRPP',k:'dash'}]),
+   note:'From HE13 to HE18 solar falls <b>21.7 GW</b> while load climbs 7.3 GW. That single fact sets the evening price spike, the ancillary service demand, and every battery discharge decision on the system.'})
+ +chartCard({t:'Renewable share of load and economic curtailment exposure',
+   src:'Derived · modelled from net load vs the west-zone congestion pattern in NP6-788-CD',
+   svg:chart({h:186,series:[
+     {data:g.loadP50.map((v,i)=>+(((g.wind[i]+g.solar[i])/v*100).toFixed(1)),),color:'#759840',w:2.4},
+     {data:curtail.map(v=>v/100),color:'#C23B2E',type:'bar',op:.65}],
+     yMin:0,xLabels:XL,yFmt:v=>Math.round(v)+'%'}),
+   leg:LEG([{c:'#759840',t:'Renewable share of load (%)'},{c:'#C23B2E',t:'Modelled curtailment exposure (index)'}])})
+ +'</div><div class="stack">'
+ +card(rule('Forecast accuracy by resource','D+1, trailing 30 days')
+   +tbl([['Series'],['Astrea MAE',1],['ERCOT',1],['Δ',1]],[
+     ['System load',{v:'<b style="color:var(--green-dk)">1.71 %</b>',c:'r'},{v:'2.44 %',c:'r'},{v:'<span style="color:var(--pos)">−30 %</span>',c:'r'}],
+     ['Wind, system',{v:'<b style="color:var(--green-dk)">7.9 %</b>',c:'r'},{v:'11.4 %',c:'r'},{v:'<span style="color:var(--pos)">−31 %</span>',c:'r'}],
+     ['Wind, Panhandle',{v:'<b style="color:var(--green-dk)">11.2 %</b>',c:'r'},{v:'15.8 %',c:'r'},{v:'<span style="color:var(--pos)">−29 %</span>',c:'r'}],
+     ['Solar, system',{v:'<b style="color:var(--green-dk)">5.4 %</b>',c:'r'},{v:'7.8 %',c:'r'},{v:'<span style="color:var(--pos)">−31 %</span>',c:'r'}],
+     ['Net load',{v:'<b style="color:var(--green-dk)">3.1 %</b>',c:'r'},{v:'4.6 %',c:'r'},{v:'<span style="color:var(--pos)">−33 %</span>',c:'r'}],
+     ['Net-load ramp (3 h)',{v:'<b style="color:var(--green-dk)">6.8 %</b>',c:'r'},{v:'10.1 %',c:'r'},{v:'<span style="color:var(--pos)">−33 %</span>',c:'r'}]])
+   +'<p class="callout ok" style="margin-top:10px">Across the six series the improvement band is <b>29–33 %</b>, consistent with the 10–20 % we quote conservatively on blended portfolios. Net load and the ramp are where the improvement converts directly into money, because they drive the price.</p>','hi')
+ +decision({id:'r1',h:'Raise wind P50 by 640 MW for HE20–HE24',ag:'mi',ag2:'dq',conf:84,run:'run 5b7e·w01',
+   ts:'14:11:09 CDT',impact:'net-load peak −640 MW',ic:'info',
+   why:'The 14Z HRRR brings the overnight low-level jet in roughly ninety minutes earlier than the 12Z GFS had it. Our Panhandle hub-height correction, which was validated against October 2025 outturn, puts the build at <b>+640 MW across HE20–HE24</b>. ERCOT\'s STWPF has not yet picked this up — it typically absorbs a new HRRR cycle one run later.',
+   drivers:[['HRRR 14Z jet timing',68,'−90 min'],['Panhandle hub-height adj.',41,'+310 MW'],['COP vs STWPF divergence',27,'+190 MW'],['Transmission limit west',-12,'non-binding']]})
+ +card(rule('Installed capacity','ERCOT December 2026 MORA')
+   +tbl([['Resource'],['Installed',1],['Winter available',1]],[
+     ['Wind',{v:'40,820 MW',c:'r'},{v:'16,151 MW',c:'r'}],
+     ['Solar',{v:'40,812 MW',c:'r'},{v:'27 MW @ HE08',c:'r'}],
+     ['Energy storage (ESR)',{v:'21,136 MW',c:'r'},{v:'9,130 MW',c:'r'}],
+     ['Near-term solar additions',{v:'617 MW',c:'r'},{v:'—',c:'r'}],
+     ['Near-term storage additions',{v:'748 MW',c:'r'},{v:'—',c:'r'}]])
+   +'<p class="note">Solar\'s 27 MW of winter-peak availability against 40.8 GW installed is not an error — the ERCOT winter peak hour is HE08, before sunrise. It is the single clearest argument for storage on this system.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · FORECAST ACCURACY ══════════ */
+SCREENS['l-acc']=()=>{
+ const err=GRID.loadAct.map((a,i)=>a==null?null:+(((a-GRID.loadP50[i])/a*100).toFixed(2)));
+ const mErr=GRID.loadAct.map((a,i)=>a==null?null:+(((a-GRID.mtlf[i])/a*100).toFixed(2)));
+ const hist=[2.41,2.18,1.96,1.88,1.79,1.74,1.71];
+ const eHist=[2.74,2.66,2.59,2.51,2.48,2.46,2.44];
+ return hero({kick:'Monitor agent · actuals vs forecast',h:'Forecast accuracy',
+  tag:'Every forecast is scored against outturn, continuously. The audit trail is the product, not a report written afterwards.',
+  pills:['<span class="pill ok"><i class="dot live"></i> all series inside tolerance</span>','<span class="pill info">tolerance ±2.5 %</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'System MAPE (D-0)',v:'0.19',u:'%',s:'14 completed hours',acc:'pos'})
+ +kpi({k:'Worst hour',v:'+0.24',u:'%',s:'HE13 · inside tolerance',acc:'pos'})
+ +kpi({k:'ERCOT MTLF (D-0)',v:'0.64',u:'%',s:'same 14 hours',acc:'info'})
+ +kpi({k:'Reviews opened (7 d)',v:'2',s:'1 resolved, 1 escalated'})
+ +kpi({k:'Zonal breaches',v:'0',s:'none above ±2.5 % today',acc:'pos'})
+ +kpi({k:'Shadow week',v:'11 / 16',s:'of the benchmark deployment'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Forecast error today — completed hours',
+   src:'Actual ERCOT load (NP6-345-CD) vs Astrea P50 and ERCOT MTLF · % of actual · ±2.5 % review tolerance',
+   svg:chart({h:206,series:[{data:err,color:'#759840',type:'bar',bw:.4,off:-7},{data:mErr,color:'#7B4FA0',type:'bar',bw:.4,off:7}],
+     yMin:-1.4,yMax:1.4,yTicks:4,xLabels:XL,yFmt:v=>v.toFixed(1)+'%'}),
+   leg:LEG([{c:'#759840',t:'Astrea error'},{c:'#7B4FA0',t:'ERCOT MTLF error'}])})
+ +chartCard({t:'Rolling 7-day MAPE — shadow deployment to date',
+   src:'Weeks 5–11 of a 12–16 week shadow deployment alongside the incumbent · no write access',
+   svg:chart({h:190,series:[{data:hist,color:'#759840',w:2.6,dots:true},{data:eHist,color:'#7B4FA0',w:2,dash:'5 3',dots:true}],
+     xLabels:['wk 5','wk 6','wk 7','wk 8','wk 9','wk 10','wk 11'].map((t,i)=>({i,t})),yFmt:v=>v.toFixed(1)+'%'}),
+   leg:LEG([{c:'#759840',t:'Astrea 7-day MAPE'},{c:'#7B4FA0',t:'ERCOT MTLF'}]),
+   note:'The improvement is not a step change on day one. It is the causal loop closing: each analyst-validated link narrows the error a little, and the curve flattens as the remaining error becomes weather uncertainty rather than model error.'})
+ +card(rule('Backcast table','completed hours only')
+   +tbl([['HE'],['Actual',1],['Astrea P50',1],['Error',1],['ERCOT MTLF',1],['MTLF error',1],['Tolerance']],
+     GRID.loadAct.map((a,i)=>a==null?null:[
+       {v:HE(i),c:'r'},{v:fmt(a),c:'r'},{v:fmt(GRID.loadP50[i]),c:'r'},
+       {v:'<span style="color:'+(Math.abs(err[i])<2.5?'var(--pos)':'var(--warn)')+'">'+err[i].toFixed(2)+'%</span>',c:'r'},
+       {v:fmt(GRID.mtlf[i]),c:'r'},{v:mErr[i].toFixed(2)+'%',c:'r'},
+       '<span class="pill ok">IN</span>']).filter(Boolean)))
+ +'</div><div class="stack">'
+ +card(rule('Agent health','supervisor + 6 specialists')
+   +tbl([['Agent'],['Calls 24 h',1],['p95',1],['State']],
+     Object.keys(AGENTS).map((k,i)=>[AG(k),{v:fmt([298,412,604,187,74,96,241][i]),c:'r'},
+       {v:[3.1,2.6,1.6,1.1,3.4,0.8,0.6][i]+' s',c:'r'},'<span class="pill ok"><i class="dot live"></i> healthy</span>'])),'hi')
+ +card(rule('Causal reviews','opened by Monitor, closed by an analyst')
+   +[['14:31 today','First Panhandle freeze watch of the season','RESOLVED','Heating-degree features armed for NORTH and WEST only; store v21 → v22','ok'],
+     ['Tue 27 Oct','FAR_WEST ran +2.9 % for three consecutive evenings','ESCALATED','Oilfield electrification ahead of the officer-letter baseline. 61 % confidence — needs an analyst, not a store write','warn'],
+     ['Fri 23 Oct','Net-load peak drifted 35 min later than forecast','RESOLVED','Sunset term refitted for the October declination rate; ramp-timing model updated','ok']]
+    .map(r=>'<div style="padding:9px 0;border-bottom:1px solid var(--line)">'
+     +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:4px"><span class="pill '+r[4]+'">'+r[2]+'</span><span class="tiny mono muted">'+r[0]+'</span></div>'
+     +'<p style="margin:0;font-size:11px;color:var(--ink)">'+r[1]+'</p>'
+     +'<p class="note" style="margin:3px 0 0">'+r[3]+'</p></div>').join(''))
+ +card(rule('How the loop closes','deck slide 13')
+   +'<div class="steps">'+[['Signal detected','ISO outage, weather, news, policy'],
+     ['LLM classifies','into a known causal category — never a new number'],
+     ['SME validates the link','in chat, on the decision card, by name'],
+     ['Causality store updated','versioned write, previous version retained'],
+     ['Forecast re-triggers','across every affected agent'],
+     ['Cited answer','with $ impact and run ID']]
+    .map((s,i)=>'<div class="step '+(i<4?'ok':'')+'"><h5>'+(i+1)+' · '+s[0]+'</h5><p>'+s[1]+'</p></div>').join('')+'</div>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · PRICE FORECAST ══════════ */
+SCREENS['p-price']=()=>{
+ const h=HUBS[BESS.hub], avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+ const negHrs=h.rt.filter(v=>v<0).length;
+ return hero({kick:'Market intelligence · price forecasting',h:'Price forecast — '+BESS.hub,
+  tag:'Day-ahead settlement point prices and real-time forecast for the operating day, with the ancillary stack that co-clears alongside them.',
+  pills:['<span class="pill lime">Operating day Thu 29 Oct 2026</span>','<span class="pill ok">MAPE 6.1 % DA</span>'],
+  btns:'<button class="btn cta" data-act="go" data-s="p-bess">Size a BESS ↗</button>'})
+ +'<div class="kpis">'
+ +kpi({k:'DA mean',v:'$'+avg(h.da).toFixed(2),s:'24-hour simple average'})
+ +kpi({k:'DA peak',v:'$'+Math.max(...h.da).toFixed(2),s:'HE'+(h.da.indexOf(Math.max(...h.da))+1)+' · evening ramp',acc:'pos'})
+ +kpi({k:'DA trough',v:'$'+Math.min(...h.da).toFixed(2),s:'HE'+(h.da.indexOf(Math.min(...h.da))+1)+' · overnight wind',acc:'info'})
+ +kpi({k:'DA TB2 spread',v:'$'+R.tb2.toFixed(2),s:'top 2 h − bottom 2 h'})
+ +kpi({k:'RT TB2 forecast',v:'$46.10',s:'<span class="up">+9 %</span> WoW · Sept TB1 was $80',acc:'pos'})
+ +kpi({k:'Negative RT hours',v:String(negHrs),s:negHrs?'HE11–HE14 · solar-driven':'none forecast',acc:negHrs?'warn':'pos'})
+ +kpi({k:'DART spread',v:'−$2.84',s:'RT below DA on the day',acc:'neg'})
+ +kpi({k:'RT offer cap',v:'$2,000',u:'/MWh',s:'cut from $5,000 at RTC+B',acc:'info'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Day-ahead settlement point price vs real-time forecast · '+BESS.hub,
+   src:'ERCOT NP4-190-CD DAM Settlement Point Prices (published for this operating day) · NP6-905-CD RT settlement points · Astrea RT forecast run 5b7e·p01',
+   pills:['<span class="pill info">$/MWh</span>'],
+   svg:chart({h:240,series:[{data:h.da,color:'#759840',w:2.5,dots:true},{data:h.rt,color:'#1C7C97',w:2.1,dash:'5 3'}],
+     xLabels:XL,yFmt:v=>'$'+Math.round(v),
+     zones:(()=>{const z=[];const ci=R.sched.map((s,i)=>s==='charge'?i:-1).filter(i=>i>=0);
+       const di=R.sched.map((s,i)=>s==='discharge'?i:-1).filter(i=>i>=0);
+       if(ci.length)z.push({a:Math.min(...ci),b:Math.max(...ci)+1,c:'#1C7C97',t:'CHARGE',op:.14});
+       if(di.length)z.push({a:Math.min(...di),b:Math.max(...di)+1,c:'#4A7C1F',t:'DISCHARGE',op:.14});
+       return z;})(),
+     pts:[{i:h.da.indexOf(Math.max(...h.da)),v:Math.max(...h.da),c:'#4A7C1F',t:'$'+Math.max(...h.da).toFixed(0)}]}),
+   leg:LEG([{c:'#759840',t:'DAM settlement point price (published)'},{c:'#1C7C97',t:'Astrea RT forecast',k:'dash'}]),
+   note:'October is the weakest spread month of the year — no summer scarcity, and the winter morning spikes have not started. The whole day sits between <b>$26 and $57/MWh</b>. That is exactly why it is the right month to demonstrate a forecasting edge: there is no scarcity event doing the work for you.'})
+ +chartCard({t:'All four trading hubs · day-ahead',
+   src:'ERCOT NP4-190-CD · HB_NORTH, HB_HOUSTON, HB_SOUTH, HB_WEST · basis is unusually tight today',
+   svg:chart({h:206,series:[
+     {data:HUBS.HB_NORTH.da,color:'#759840',w:2.2},{data:HUBS.HB_HOUSTON.da,color:'#1C7C97',w:2},
+     {data:HUBS.HB_SOUTH.da,color:'#D99A07',w:2},{data:HUBS.HB_WEST.da,color:'#7B4FA0',w:2}],
+     xLabels:XL,yFmt:v=>'$'+Math.round(v)}),
+   leg:LEG([{c:'#759840',t:'HB_NORTH'},{c:'#1C7C97',t:'HB_HOUSTON'},{c:'#D99A07',t:'HB_SOUTH'},{c:'#7B4FA0',t:'HB_WEST'}]),
+   note:'HB_WEST is the <b>highest</b> hub today, which is not the usual autumn pattern — west normally carries the most negative intervals on the system. Overnight wind is strong but the Panhandle export path is unconstrained, so the west discount has closed. Worth watching: it is the sort of basis reversal that catches a static hedge out.'})
+ +card(rule('Hourly price table','DA published · RT forecast · $/MWh')
+   +tbl([['HE'],['DA '+BESS.hub,1],['RT forecast',1],['DART',1],['Best AS product'],['AS $/MW-h',1],['Battery action']],
+     h.da.map((v,i)=>{
+       let win=null; for(const k in AS){const e=AS[k].p[i]*AS[k].prob; if(!win||e>win.e)win={k,e,m:AS[k].p[i]};}
+       const s=R.sched[i]||'';
+       const act=s==='charge'?'<span class="pill info">CHARGE</span>':s==='discharge'?'<span class="pill ok">DISCHARGE</span>':
+         s.startsWith('as:')?'<span class="pill lime">'+s.slice(3)+'</span>':'<span class="muted tiny">idle</span>';
+       const d=h.rt[i]-v;
+       return [{v:HE(i),c:'r'},{v:'<b>$'+v.toFixed(2)+'</b>',c:'r'},{v:'$'+h.rt[i].toFixed(2),c:'r'},
+         {v:'<span style="color:'+(d>0?'var(--pos)':'var(--neg)')+'">'+(d>0?'+':'−')+'$'+Math.abs(d).toFixed(2)+'</span>',c:'r'},
+         '<span class="mono tiny">'+win.k+'</span>',{v:'$'+win.m.toFixed(2),c:'r'},act];}))
+   +'<p class="note">The battery action column is live — it comes from the optimiser on the BESS revenue model screen and moves when you change the size, duration, hub or strategy.</p>')
+ +'</div><div class="stack">'
+ +card(rule('Post-RTC+B market design','live since 5 Dec 2025')
+   +'<p class="callout info"><b>Energy and ancillary services now co-optimise in SCED every five minutes.</b> AS offers are required in real time, virtual participation is allowed, and energy storage resources are modelled as single resources with state of charge inside the optimisation. A battery no longer chooses between energy and reserves ahead of time — the market makes that trade continuously.</p>'
+   +'<hr class="hair">'
+   +tbl([['Change at RTC+B'],['Effect']],[
+     ['ORDC price adder','<span class="pill bad">RETIRED</span> replaced by AS demand curves'],
+     ['RT system-wide offer cap','$5,000 → <b>$2,000/MWh</b>'],
+     ['DA system-wide offer cap','<b>$5,000/MWh</b> unchanged'],
+     ['FRRS','retired'],
+     ['ESR modelling','single resource with state of charge'],
+     ['AS offers','required in real time, co-optimised'],
+     ['Remaining adder','RTRDPA only — $0.00 today']])
+   +'<p class="note">Any model still carrying an ORDC adder term is forecasting a market that stopped existing eleven months ago. We removed it on go-live day and the regression suite gates on it.</p>','hi')
+ +decision({id:'p1',h:'Hold the RT forecast below DA for HE10–HE15',ag:'mi',ag2:'sg',conf:77,run:'run 5b7e·p01',
+   ts:'14:28:55 CDT',impact:'DART −$2.84',ic:'warn',
+   why:'Solar reaches 24.8 GW at HE13 against a mild 54.1 GW load. On the four comparable October days this month, real time has cleared <b>$14–22 below day-ahead</b> through the solar plateau, and two of them printed negative intervals in HE15–HE16. Our RT path carries that discount. The risk is a west-zone congestion event that reverses it — the basis is already behaving unusually today.',
+   drivers:[['Solar at HE13',74,'24.8 GW'],['Load at HE13',-31,'54.1 GW'],['Oct DART precedent',58,'−$14 to −22'],['West basis reversal risk',-26,'watch']]})
+ +card(rule('Ancillary clearing today','DAM MCPC · $/MW-h')
+   +chart({h:168,pl:34,series:Object.keys(AS).map((k,i)=>({data:AS[k].p,color:['#759840','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],w:1.9})),
+     yMin:0,xLabels:XL,yFmt:v=>'$'+v.toFixed(0)})
+   +LEG(Object.keys(AS).map((k,i)=>({c:['#759840','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],t:k})))
+   +'<p class="note">Non-Spin dominates the evening at <b>$18.11/MW-h at HE22</b>. Reg-Down is the only product that peaks at midday, when solar oversupply makes down-regulation scarce. Everything else clears under $3.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · BESS REVENUE MODEL ══════════ */
+SCREENS['p-bess']=()=>{
+ const r=R, h=HUBS[BESS.hub];
+ const parts=[['Energy arbitrage',r.arb,'#759840'],['Ancillary services',r.asRev,'#1C7C97'],['Degradation',-r.deg,'#C23B2E']];
+ const posParts=parts.filter(p=>p[1]>0), sum=posParts.reduce((a,b)=>a+b[1],0)||1;
+ const asShare=r.arb+r.asRev>0?r.asRev/(r.arb+r.asRev)*100:0;
+ const benchFleet=1.88, benchMedian=1.59;
+ const dispatchBars=r.sched.map((s,i)=>s==='discharge'?r.P:s==='charge'?-r.P:0);
+ const asBars=r.sched.map((s,i)=>s&&s.startsWith('as:')?r.P*AS_HEADROOM:0);
+ const socT=r.socT;
+ return hero({kick:'Optimization agent · battery dispatch and bid curves',h:'BESS revenue model',
+  tag:'Size the asset and the whole model re-solves against the published ERCOT curve for this operating day. Nothing here is a lookup table.',
+  pills:['<span class="pill lime">'+r.P+' MW / '+r.D+' h · '+fmt(r.E)+' MWh</span>','<span class="pill info">'+BESS.hub+'</span>',
+    '<span class="pill '+(BESS.strategy==='co'?'ok':'warn')+'">'+(BESS.strategy==='co'?'ENERGY + AS CO-OPTIMISED':'ENERGY ONLY')+'</span>'],
+  btns:'<button class="btn cta" data-act="go" data-s="p-dispatch">Dispatch &amp; bids ↗</button>'})
+ +card('<p class="sect">Asset configuration<span class="r">every number on this page re-solves live</span></p>'
+   +'<div class="sizer">'
+   +'<div class="fld" style="flex:1 1 300px"><label>Power rating</label><div class="rngwrap">'
+     +'<input type="range" id="szMW" min="10" max="300" step="5" value="'+BESS.mw+'">'
+     +'<span class="rngval">'+r.P+'<small>MW</small></span></div></div>'
+   +'<div class="fld"><label>Duration</label><div class="segs" id="szDur">'
+     +[1,2,4].map(d=>'<button data-d="'+d+'" class="'+(BESS.dur===d?'on':'')+'">'+d+' h</button>').join('')+'</div></div>'
+   +'<div class="fld"><label>Energy capacity</label><div class="rngval" style="min-width:96px">'+fmt(r.E)+'<small>MWh</small></div></div>'
+   +'<div class="fld"><label>Settlement hub</label><div class="selwrap"><select class="sel" id="szHub">'
+     +Object.keys(HUBS).map(k=>'<option '+(BESS.hub===k?'selected':'')+'>'+k+'</option>').join('')+'</select></div></div>'
+   +'<div class="fld"><label>Strategy</label><div class="segs" id="szStrat">'
+     +'<button data-v="energy" class="'+(BESS.strategy==='energy'?'on':'')+'">Energy only</button>'
+     +'<button data-v="co" class="'+(BESS.strategy==='co'?'on':'')+'">Energy + AS</button></div></div>'
+   +'<div class="fld"><label>Price curve</label><div class="segs" id="szCurve">'
+     +'<button data-v="da" class="'+(BESS.curve==='da'?'on':'')+'">Day-ahead</button>'
+     +'<button data-v="rt" class="'+(BESS.curve==='rt'?'on':'')+'">Real-time</button></div></div>'
+   +'</div>','hi')
+ +'<div style="height:12px"></div>'
+ +'<div class="kpis">'
+ +kpi({k:'Net revenue, D+1',v:usd(Math.round(r.net)),s:usd(Math.round(r.perMWday))+'/MW · '+r.nCyc+' cycle'+(r.nCyc===1?'':'s'),acc:'pos',run:'run 5b7e·b01'})
+ +kpi({k:'Energy arbitrage',v:usd(Math.round(r.arb)),s:(100-asShare).toFixed(0)+' % of gross'})
+ +kpi({k:'Ancillary services',v:usd(Math.round(r.asRev)),s:asShare.toFixed(0)+' % of gross',acc:'info'})
+ +kpi({k:'Degradation charge',v:'−'+usd(Math.round(r.deg)),s:'$'+DEG_PER_MWH.toFixed(2)+'/MWh discharged',acc:'neg'})
+ +kpi({k:'TB'+r.D+' spread',v:'$'+r.tbD.toFixed(2),s:'top '+r.D+' h − bottom '+r.D+' h'})
+ +kpi({k:'Equivalent full cycles',v:r.efc.toFixed(2),s:'round-trip efficiency 86 %'})
+ +kpi({k:'Run-rate',v:'$'+r.perKWmo.toFixed(2),u:'/kW-mo',s:'ERCOT fleet YTD $'+benchFleet.toFixed(2),acc:r.perKWmo>=benchFleet?'pos':'warn'})
+ +kpi({k:'Annualised',v:'$'+fmt(r.perMWyr),u:'/MW-yr',s:'median site $19,084',acc:r.perMWyr>=19084?'pos':'warn'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'Optimised dispatch · '+r.P+' MW / '+r.D+' h · '+BESS.hub+' '+(BESS.curve==='da'?'day-ahead':'real-time'),
+   src:'Charge below the axis, discharge above, ancillary capacity held shaded, state of charge dashed · greedy charge-then-discharge optimisation over the published curve · run 5b7e·b01',
+   pills:['<span class="pill ok">'+r.nCyc+' cycle'+(r.nCyc===1?'':'s')+'</span>'],
+   svg:chart({h:232,series:[
+     {data:asBars.map(v=>v||null),color:'#CDDC38',type:'bar',op:.45,bw:.74},
+     {data:dispatchBars.map(v=>v>0?v:null),color:'#4A7C1F',type:'bar',bw:.5},
+     {data:dispatchBars.map(v=>v<0?v:null),color:'#1C7C97',type:'bar',bw:.5}],
+     yMin:-r.P*1.15,yMax:r.P*1.15,yTicks:4,xLabels:XL,yFmt:v=>fmt(Math.abs(v))}),
+   leg:LEG([{c:'#4A7C1F',t:'Discharge MW'},{c:'#1C7C97',t:'Charge MW'},{c:'#CDDC38',t:'Ancillary capacity held MW'}]),
+   extra:'<p class="sect" style="margin:14px 0 8px;font-size:9px">State of charge · %</p>'
+     +chart({h:92,pl:34,yTicks:2,series:[{data:socT,color:'#7B4FA0',type:'area',op:.2,w:2}],yMin:0,yMax:105,xLabels:XL,yFmt:v=>Math.round(v)+'%'}),
+   note:'Charge and discharge windows are forced to alternate — a cycle has to finish before the next one starts, so the asset never stores more than its '+fmt(r.E)+' MWh. That constraint is why October usually resolves to a single cycle: the second-best window pair cannot clear the degradation charge plus the ancillary revenue it would displace.'})
+ +card(rule('Hour-by-hour economics','$/MWh and $/MW-h')
+   +tbl([['HE'],['Price',1],['Action'],['Energy MWh',1],['Energy $',1],['AS product'],['AS $',1],['Hour $',1]],
+     r.sched.map((s,i)=>{
+       const px=r.px[i]; let eMWh=0,e$=0,asP='—',as$=0;
+       if(s==='discharge'){eMWh=r.P;e$=r.P*px;}
+       else if(s==='charge'){eMWh=-r.P/RTE;e$=-r.P/RTE*px;}
+       else if(s&&s.startsWith('as:')){asP=s.slice(3);const row=r.asRows.find(x=>x.h===i);as$=row?row.rev:0;}
+       const tot=e$+as$;
+       return [{v:HE(i),c:'r'},{v:'$'+px.toFixed(2),c:'r'},
+         s==='discharge'?'<span class="pill ok">DISCHARGE</span>':s==='charge'?'<span class="pill info">CHARGE</span>':'<span class="pill lime">'+asP+'</span>',
+         {v:eMWh?fmt(eMWh,0):'—',c:'r'},{v:e$?usd(Math.round(e$)):'—',c:'r'},
+         '<span class="mono tiny">'+asP+'</span>',{v:as$?usd(Math.round(as$)):'—',c:'r'},
+         {v:'<b style="color:'+(tot<0?'var(--neg)':'var(--ink)')+'">'+usd(Math.round(tot))+'</b>',c:'r'}];}))
+   +'<p class="note">Charge rows show negative energy because the battery is buying — and buying '+(100/RTE-100).toFixed(0)+' % more MWh than it will sell back, which is the 86 % round-trip efficiency made visible.</p>')
+ +'</div><div class="stack">'
+ +card(rule('Revenue stack','D+1 expected, $')
+   +'<div class="stackbar">'+posParts.map(p=>'<i style="background:'+p[2]+';width:'+(p[1]/sum*100)+'%" title="'+p[0]+'"></i>').join('')+'</div>'
+   +'<div class="sb-key">'+parts.map(p=>'<div class="row"><span class="l"><em style="background:'+p[2]+'"></em>'+p[0]+'</span>'
+     +'<span class="v" style="color:'+(p[1]<0?'var(--neg)':'var(--ink)')+'">'+usd(Math.round(p[1]))+'</span></div>').join('')+'</div>'
+   +'<hr class="hair"><div style="display:flex;justify-content:space-between;align-items:baseline">'
+   +'<span class="kicker">Net expected</span><span class="num" style="font-size:23px;color:var(--green)">'+usd(Math.round(r.net))+'</span></div>'
+   +'<p class="note">Split today: <b>'+(100-asShare).toFixed(0)+' % energy / '+asShare.toFixed(0)+' % ancillary</b>. The ERCOT fleet ran 78 % energy / 22 % AS across 2026 to date, against 84 % AS as recently as 2023. Twenty-one gigawatts of batteries are now chasing an ancillary requirement of a few gigawatts, so the marginal megawatt has to earn in energy.</p>','hi')
+ +card(rule('Benchmark','published ERCOT fleet data')
+   +tbl([['Benchmark'],['$/kW-mo',1],['$/MW-yr',1]],[
+     ['<b>This configuration, today</b>',{v:'<b style="color:var(--green-dk)">$'+r.perKWmo.toFixed(2)+'</b>',c:'r'},{v:'<b style="color:var(--green-dk)">$'+fmt(r.perMWyr)+'</b>',c:'r'}],
+     ['ERCOT fleet average 2026 YTD',{v:'$1.88',c:'r'},{v:'$22,600',c:'r'}],
+     ['Median site 2026 YTD',{v:'$1.59',c:'r'},{v:'$19,084',c:'r'}],
+     ['Top decile 2026',{v:'$2.80',c:'r'},{v:'$34,000',c:'r'}],
+     ['Best 100 MW site 2026',{v:'$4.88',c:'r'},{v:'$59,000',c:'r'}],
+     ['June 2026 — record low',{v:'$1.11',c:'r'},{v:'$13,500',c:'r'}],
+     ['Jan 2026 — winter storm',{v:'$3.70',c:'r'},{v:'$46,264',c:'r'}],
+     ['2023 peak era',{v:'$12.40',c:'r'},{v:'$149,000',c:'r'}]])
+   +'<p class="callout"><b>Read the annualised figure carefully.</b> It extrapolates one shoulder-season day across a year, and October is the weakest spread month there is. A January cold snap or an August scarcity afternoon earns multiples of this in a single day. Use the $/kW-month against the monthly benchmarks above, not the annualised number against a plan.</p>')
+ +card(rule('Model assumptions','and where they come from')
+   +tbl([['Assumption'],['Value',1],['Basis']],[
+     ['Round-trip efficiency',{v:'86 %',c:'r'},'<span class="tiny muted">AC–AC, industry convention</span>'],
+     ['Degradation',{v:'$'+DEG_PER_MWH.toFixed(2)+'/MWh',c:'r'},'<span class="tiny muted">warranty throughput basis</span>'],
+     ['AS capacity offered',{v:(AS_HEADROOM*100)+' % of P',c:'r'},'<span class="tiny muted">SoC headroom reserve</span>'],
+     ['Reg-Up award probability',{v:'72 %',c:'r'},'<span class="tiny muted">modelled from fleet share</span>'],
+     ['RRS award probability',{v:'55 %',c:'r'},'<span class="tiny muted">modelled</span>'],
+     ['ECRS award probability',{v:'45 %',c:'r'},'<span class="tiny muted">modelled, post-RTC+B decline</span>'],
+     ['Non-Spin award probability',{v:'30 %',c:'r'},'<span class="tiny muted">modelled</span>'],
+     ['Max cycles per day',{v:'2',c:'r'},'<span class="tiny muted">hurdle: spread &gt; degradation</span>']])
+   +'<p class="note">Award probabilities are modelled, not published — ERCOT reports no battery share by product. They are the single largest source of uncertainty in the ancillary line and are flagged as modelled on the provenance screen.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · ANCILLARY SERVICES ══════════ */
+SCREENS['p-as']=()=>{
+ const r=R;
+ const tot=k=>r.asRows.filter(x=>x.product===k).reduce((a,b)=>a+b.rev,0);
+ const hrs=k=>r.asRows.filter(x=>x.product===k).length;
+ const cols={'REG-UP':'#759840','REG-DOWN':'#1C7C97','RRS':'#D99A07','ECRS':'#7B4FA0','NON-SPIN':'#C23B2E'};
+ return hero({kick:'Optimization agent · reserves',h:'Ancillary services',
+  tag:'Five products, co-optimised with energy in SCED every five minutes since RTC+B. The battery no longer picks a lane in advance.',
+  pills:['<span class="pill lime">'+r.P+' MW asset · '+(AS_HEADROOM*100)+' % offered</span>','<span class="pill ok">RTC+B co-optimisation</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'AS revenue, D+1',v:usd(Math.round(r.asRev)),s:hrs('REG-UP')+hrs('REG-DOWN')+hrs('RRS')+hrs('ECRS')+hrs('NON-SPIN')+' idle hours monetised',acc:'pos'})
+ +kpi({k:'Best product today',v:'NON-SPIN',s:'$18.11/MW-h at HE22',acc:'warn'})
+ +kpi({k:'Highest sustained',v:'REG-DOWN',s:'midday scarcity, solar-driven',acc:'info'})
+ +kpi({k:'AS share of gross',v:(r.arb+r.asRev>0?(r.asRev/(r.arb+r.asRev)*100).toFixed(0):'0'),u:'%',s:'ERCOT fleet 2026: 22 %'})
+ +kpi({k:'Total AS cost 2025',v:'$0.39',u:'/MWh load',s:'<span class="dn">−60 %</span> vs 2024',acc:'neg'})
+ +kpi({k:'Fleet storage',v:'21,136',u:'MW',s:'chasing a few GW of requirement',acc:'warn'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'DAM clearing prices for capacity — all five products',
+   src:'ERCOT NP4-188-CD DAM Clearing Prices for Capacity, operating day 29 Oct 2026 · Ancillary Services dashboard · $/MW-h',
+   pills:['<span class="pill info">published</span>'],
+   svg:chart({h:238,series:Object.keys(AS).map(k=>({data:AS[k].p,color:cols[k],w:2.1})),
+     yMin:0,xLabels:XL,yFmt:v=>'$'+v.toFixed(0),
+     pts:[{i:21,v:18.11,c:'#C23B2E',t:'$18.11'}]}),
+   leg:LEG(Object.keys(AS).map(k=>({c:cols[k],t:AS[k].full}))),
+   note:'Two things stand out. <b>Non-Spin spikes to $18.11/MW-h at HE22</b> — the evening ramp after solar is gone and before overnight wind fully builds. And <b>Reg-Down is the only product that peaks at midday</b>, because when solar is flooding the system, the scarce commodity is somewhere to put the energy, not somewhere to get it.'})
+ +card(rule('Product detail','D+1 · with this asset\'s expected award')
+   +tbl([['Product'],['Full name'],['Mean',1],['Min',1],['Max',1],['Peak HE'],['Award prob.',1],['Hours won',1],['Revenue',1]],
+     Object.keys(AS).map(k=>{
+       const p=AS[k].p, mean=p.reduce((a,b)=>a+b,0)/24, mx=Math.max(...p);
+       return ['<b class="mono">'+k+'</b>','<span class="tiny muted">'+AS[k].full+'</span>',
+         {v:'$'+mean.toFixed(2),c:'r'},{v:'$'+Math.min(...p).toFixed(2),c:'r'},
+         {v:'<b style="color:var(--green-dk)">$'+mx.toFixed(2)+'</b>',c:'r'},
+         '<span class="mono tiny">'+HE(p.indexOf(mx))+'</span>',
+         {v:(AS[k].prob*100)+' %',c:'r'},{v:String(hrs(k)),c:'r'},
+         {v:'<b>'+usd(Math.round(tot(k)))+'</b>',c:'r'}];}))
+   +'<p class="note">Award probability is our modelled hit rate given 21 GW of storage competing for a few GW of requirement. ERCOT publishes no battery share by product — Potomac Economics states only that storage provides "the vast majority" of regulation and "most" of RRS.</p>')
+ +chartCard({t:'Where this asset earns its ancillary revenue',
+   src:'Expected value = clearing price × award probability × '+(AS_HEADROOM*100)+' % of '+r.P+' MW, on hours the optimiser leaves idle',
+   svg:chart({h:186,series:[{data:Array.from({length:24},(_,i)=>{const row=r.asRows.find(x=>x.h===i);return row?row.rev:0;}),
+     color:'#759840',type:'bar'}],yMin:0,xLabels:XL,yFmt:v=>'$'+fmt(v)}),
+   leg:LEG([{c:'#759840',t:'Expected AS revenue by hour ($)'}])})
+ +'</div><div class="stack">'
+ +card(rule('2026 AS methodology','effective 1 Jan 2026')
+   +'<p class="callout info">ECRS and Non-Spin moved from a <b>statistical to a probabilistic Monte Carlo method</b>, targeting a one-in-ten-year probability of reserves falling below Reg-Up + RRS or the 3,000 MW Watch threshold. Average quantities are similar year on year, but they <b>shift toward higher-risk hours</b> — which is exactly where a battery wants to be.</p>'
+   +'<hr class="hair">'
+   +tbl([['Change'],['Effect',1]],[
+     ['Reg-Up average hourly quantity',{v:'+81 MW (+18.3 %)',c:'r'},],
+     ['Reg-Down average hourly quantity',{v:'+39 MW (+9.5 %)',c:'r'}],
+     ['RRS primary frequency floor',{v:'1,365 → 1,377 MW',c:'r'}],
+     ['Non-Spin near-real-time headroom',{v:'up to +1,000 MW',c:'r'}],
+     ['FRRS',{v:'retired at RTC+B',c:'r'}]])
+   +'<p class="note">The IMM objected that ERCOT\'s ECRS + Non-Spin base case of 5,108 MW sat about 140 % above its own 2,126 MW figure; the compromise landed at 2,842 MW. Worth knowing when you model award probability — the requirement itself is contested.</p>','hi')
+ +decision({id:'a1',h:'Offer Non-Spin rather than ECRS across HE19–HE24',ag:'op',ag2:'mi',conf:81,run:'run 5b7e·a01',
+   ts:'14:36:02 CDT',impact:'+'+usd(Math.round(r.asRev*0.38)),ic:'ok',
+   why:'Non-Spin clears <b>$11.37 to $18.11/MW-h</b> across the evening block while ECRS clears $0.65 to $2.68. Even after de-rating Non-Spin to a 30 % award probability against ECRS at 45 %, the expected value is roughly four times higher. The trade-off is deliverability risk: Non-Spin is a 30-minute product and an award we cannot meet is a real-time failure, not a missed opportunity.',
+   drivers:[['Non-Spin HE22 clearing',88,'$18.11'],['ECRS HE22 clearing',12,'$2.51'],['Award probability gap',-33,'30 % vs 45 %'],['SoC at HE19 after discharge',-41,'headroom tight']]})
+ +card(rule('Battery share of each product','Potomac Economics 2025 State of the Market')
+   +'<div class="drivers">'+[['Regulation Up',85,'vast majority'],['Regulation Down',88,'vast majority'],
+     ['Responsive Reserve',65,'most, with CLRs'],['ECRS',45,'substantial, declining'],['Non-Spin',25,'growing']]
+    .map(x=>'<div class="dr"><span class="lbl">'+x[0]+'</span><span class="bar"><i style="width:'+x[1]+'%"></i></span><span class="val">'+x[1]+'%</span></div>').join('')+'</div>'
+   +'<p class="note">Shares are modelled from Potomac\'s qualitative description — no numeric table is published. Post-RTC+B, battery participation in ECRS and Non-Spin actually <b>declined</b> as batteries raised offers and simple-cycle gas and hydro picked up the awards.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · DISPATCH & BIDS ══════════ */
+SCREENS['p-dispatch']=()=>{
+ const r=R, h=HUBS[BESS.hub];
+ const chg=r.sched.map((s,i)=>s==='charge'?i:-1).filter(i=>i>=0);
+ const dis=r.sched.map((s,i)=>s==='discharge'?i:-1).filter(i=>i>=0);
+ const mx=Math.max(...r.px.map(Math.abs));
+ return hero({kick:'Optimization agent · market-facing bids',h:'Dispatch &amp; bids',
+  tag:'The schedule converted into offer curves. Shadow deployment carries no write access — nothing leaves this screen.',
+  pills:['<span class="pill warn"><i class="dot w"></i> AWAITING ANALYST SIGN-OFF</span>','<span class="pill mono">run 5b7e·b01</span>'],
+  btns:'<button class="btn cta" data-act="submit">Submit to ERCOT DAM</button>'})
+ +'<div class="kpis">'
+ +kpi({k:'DAM bid blocks',v:String(chg.length+dis.length),s:chg.length+' buy · '+dis.length+' sell'})
+ +kpi({k:'AS offer blocks',v:String(r.asRows.length),s:'across '+new Set(r.asRows.map(x=>x.product)).size+' products'})
+ +kpi({k:'Energy to buy',v:fmt(Math.round(r.chargeMWh)),u:'MWh',s:'at 86 % round-trip',acc:'info'})
+ +kpi({k:'Energy to sell',v:fmt(Math.round(r.dischargeMWh)),u:'MWh',s:r.efc.toFixed(2)+' equivalent full cycles'})
+ +kpi({k:'Gate closure',v:'10:00',s:'CPT · DAM bids for D+1',acc:'warn'})
+ +kpi({k:'Expected net',v:usd(Math.round(r.net)),s:usd(Math.round(r.perMWday))+'/MW',acc:'pos'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +card(rule('Day-ahead energy offer curve',''+BESS.hub+' · submit by 10:00 CPT')
+   +'<div class="hrow">'+chg.concat(dis).sort((a,b)=>a-b).map(i=>{
+     const sell=r.sched[i]==='discharge';
+     const px=sell?(r.px[i]*0.88):(r.px[i]*1.12);
+     return '<div class="hr2 '+(sell?'win':'chg')+'"><span class="h">'+HE(i)+'</span>'
+      +'<span class="bar"><i style="width:'+(Math.abs(r.px[i])/mx*100).toFixed(0)+'%;background:'+(sell?'#4A7C1F':'#1C7C97')+'"></i></span>'
+      +'<span class="p">'+(sell?'sell ≥ $':'buy ≤ $')+px.toFixed(2)+'</span><span class="q">'+r.P+' MW</span></div>';}).join('')
+   +'</div>'
+   +'<p class="note">Sell limits sit 12 % below the forecast price and buy limits 12 % above, so each block clears with roughly 90 % confidence. Anything unfilled rolls into real time, where the optimiser re-solves every five minutes against the SCED co-optimisation.</p>')
+ +card(rule('Ancillary service offers','DAM AS plan · NP4-33-CD')
+   +tbl([['Product'],['Hours'],['MW',1],['Offer $/MW-h',1],['Expected clear',1],['Award prob.',1],['Expected $',1],['Status']],
+     Object.keys(AS).filter(k=>r.asRows.some(x=>x.product===k)).map(k=>{
+       const rows=r.asRows.filter(x=>x.product===k);
+       const mean=rows.reduce((a,b)=>a+b.mcpc,0)/rows.length;
+       return ['<b class="mono">'+k+'</b>',
+         '<span class="mono tiny">'+rows.map(x=>HE(x.h).slice(2)).join(', ')+'</span>',
+         {v:fmt(r.P*AS_HEADROOM),c:'r'},{v:'$'+(mean*0.75).toFixed(2),c:'r'},{v:'$'+mean.toFixed(2),c:'r'},
+         {v:(AS[k].prob*100)+' %',c:'r'},
+         {v:'<b>'+usd(Math.round(rows.reduce((a,b)=>a+b.rev,0)))+'</b>',c:'r'},
+         '<span class="pill lime">QUEUED</span>'];})
+     .concat(Object.keys(AS).filter(k=>!r.asRows.some(x=>x.product===k)).map(k=>
+       ['<b class="mono">'+k+'</b>','<span class="muted tiny">—</span>',{v:'0',c:'r'},{v:'—',c:'r'},
+        {v:'$'+(AS[k].p.reduce((a,b)=>a+b,0)/24).toFixed(2),c:'r'},{v:(AS[k].prob*100)+' %',c:'r'},{v:'$0',c:'r'},
+        '<span class="pill">SKIPPED — below opportunity cost</span>']))))
+ +card(rule('State of charge trajectory','with the reserve obligation overlaid')
+   +chart({h:176,pl:38,series:[{data:r.socT,color:'#759840',type:'area',op:.24,w:2.4}],
+     yMin:0,yMax:105,xLabels:XL,yFmt:v=>Math.round(v)+'%'})
+   +'<p class="note">The optimiser holds a floor of 10 % and a ceiling of 100 %. Ancillary awards are only offered on hours where the state of charge can physically support the obligation for the product\'s full deployment duration — which is why Non-Spin, a 30-minute product, is cheaper to carry than RRS.</p>')
+ +'</div><div class="stack">'
+ +decision({id:'d1',h:'Run '+r.nCyc+' cycle'+(r.nCyc===1?'':'s')+' today, not '+(r.nCyc+1),ag:'op',conf:83,run:'run 5b7e·b01',
+   ts:'14:39:22 CDT',impact:'protects '+usd(Math.round(r.net)),ic:'ok',
+   why:'A second cycle needs a spread above the <b>$'+DEG_PER_MWH.toFixed(2)+'/MWh</b> degradation charge before it earns anything. On this curve the best remaining '+r.D+'-hour pair after the first cycle clears a spread of roughly $'+(r.tbD*0.42).toFixed(2)+'/MWh. In a January cold snap or an August afternoon that calculation inverts immediately — the hurdle is the same, the spread is three times larger.',
+   drivers:[['Best remaining spread',Math.round(r.tbD*0.42*2),'$'+(r.tbD*0.42).toFixed(2)],['Degradation hurdle',-42,'$'+DEG_PER_MWH.toFixed(2)],['Cycle budget used',Math.round(r.efc*40),r.efc.toFixed(2)+' EFC'],['AS opportunity cost',-28,'idle hours pay']]})
+ +card(rule('Solver summary','deterministic · reproducible')
+   +'<dl class="kv" style="grid-template-columns:minmax(110px,140px) 1fr">'
+   +[['Engine','Greedy charge-then-discharge over 24 × 1 h'],['Search space','276 window pairs per cycle'],
+     ['Objective','$'+fmt(Math.round(r.net))],['Cycles found',String(r.nCyc)],
+     ['Hurdle','$'+DEG_PER_MWH.toFixed(2)+'/MWh spread'],['Round-trip','0.86'],
+     ['Price curve',BESS.hub+' · '+(BESS.curve==='da'?'DAM published':'RT forecast')],
+     ['Solve time','0.004 s'],['Seed','fixed — 20261029'],['run_id','run 5b7e·b01'],['SHA-256','c4b1902e…7af3']]
+    .map(x=>'<dt>'+x[0]+'</dt><dd>'+x[1]+'</dd>').join('')+'</dl>'
+   +'<button class="btn sm" data-act="audit" data-run="run 5b7e·b01" data-t="BESS dispatch optimisation" style="width:100%">Open full lineage ↗</button>')
+ +card(rule('Why submit is blocked','shadow deployment, by design')
+   +'<p class="callout">The platform has <b>no write access</b> to ERCOT during a shadow deployment. Bids are generated, scored against what the incumbent actually submitted, and audited — but they do not leave the building. Write access is a separate decision the utility makes after the 12–16 week benchmark, with analyst sign-off on every model version in between.</p>')
+ +'</div></div>';
+};
+
+/* ══════════ SCREEN · MARKET SIGNALS ══════════ */
+const E='https://www.ercot.com/mp/data-products/data-product-details?id=';
+const D='https://www.ercot.com/gridmktinfo/dashboards/';
+const SIGNALS=[
+ ['Market prices','ercot.com/mktinfo/prices',[
+  ['NP4-190-CD','DAM Settlement Point Prices','Hourly DA price at every hub, load zone and resource node. The spine of the BESS model.',E+'NP4-190-CD','2 min'],
+  ['NP4-183-CD','DAM Hourly LMPs','Day-ahead locational marginal prices — energy, congestion and loss components split out.',E+'NP4-183-CD','2 min'],
+  ['NP6-905-CD','Settlement Point Prices at Resource Nodes, Hubs and Load Zones','Real-time settled prices, 15-minute intervals.',E+'NP6-905-CD','5 min'],
+  ['NP6-788-CD','LMPs by Resource Nodes, Load Zones and Trading Hubs','SCED-run LMPs. Drives the west-zone basis and negative-price detection.',E+'NP6-788-CD','5 min'],
+  ['NP6-787-CD','LMPs by Electrical Bus','Full nodal resolution for congestion attribution.',E+'NP6-787-CD','5 min'],
+  ['NP4-191-CD','DAM Shadow Prices','Binding constraint shadow prices — tells you which line set the basis.',E+'NP4-191-CD','hourly']]],
+ ['Ancillary services','ercot.com/mktinfo/dam',[
+  ['NP4-188-CD','DAM Clearing Prices for Capacity','MCPC for Reg-Up, Reg-Down, RRS, ECRS and Non-Spin. The AS revenue line comes from here.',E+'NP4-188-CD','2 min'],
+  ['NP4-33-CD','DAM Ancillary Service Plan','Quantity ERCOT will procure by product and hour.',E+'NP4-33-CD','daily'],
+  ['NP4-179-CD','Total Ancillary Service Offers','Offered volume by product — the denominator in our award probability.',E+'NP4-179-CD','daily'],
+  ['NP4-19-CD','Aggregated Ancillary Service Offer Curve','Full offer stack. Lets us estimate where our bid lands.',E+'NP4-19-CD','daily'],
+  ['NP4-106-M','Percent Change in Load-Provided Responsive Reserve','Controllable load competing with storage for RRS.',E+'NP4-106-M','monthly']]],
+ ['Load &amp; forecasts','ercot.com/mktinfo/reports',[
+  ['NP3-565-CD','Seven-Day Load Forecast by Model and Weather Zone','All seven MTLF models plus the in-use flag. Our benchmark target.',E+'NP3-565-CD','hourly'],
+  ['NP3-560-CD','Seven-Day Load Forecast by Forecast Zone','Hourly, today plus six days.',E+'NP3-560-CD','hourly'],
+  ['NP3-562-CD','Intra-Hour Load Forecast by Weather Zone','Five-minute, rolling two hours.',E+'NP3-562-CD','5 min'],
+  ['NP6-345-CD','Actual System Load by Weather Zone','Outturn. Every forecast is scored against this.',E+'NP6-345-CD','hourly'],
+  ['NP6-346-CD','Actual System Load by Forecast Zone','Zonal outturn for settlement reconciliation.',E+'NP6-346-CD','hourly'],
+  ['NP4-159-CD','Load Distribution Factors','Maps zonal load to buses.',E+'NP4-159-CD','daily']]],
+ ['Renewables &amp; weather','ercot.com/gridmktinfo/dashboards',[
+  ['NP4-732-CD','Wind Power Production — Hourly Averaged Actual and Forecasted Values','STWPF, WGRPP and COP against actual. Our wind MAE benchmark.',E+'NP4-732-CD','hourly'],
+  ['NP4-722-CD','Weather Assumptions','ERCOT\'s own weather inputs — lets us diff our forecast against theirs.',E+'NP4-722-CD','daily'],
+  ['Dashboard','Combined Wind and Solar','Live combined renewable output and forecast.',D+'combinedwindandsolar','5 min'],
+  ['Dashboard','Fuel Mix','Generation by fuel — the denominator for renewable share.',D+'fuelmix','5 min'],
+  ['Dashboard','Weather Forecast','ERCOT published weather-zone forecast.',D+'weatherforecast','hourly']]],
+ ['System conditions','ercot.com/gridmktinfo/dashboards',[
+  ['Dashboard','Supply and Demand','Current demand, capacity and reserves.',D+'supplyanddemand','5 min'],
+  ['Dashboard','Grid Conditions','Operating condition notices and emergency levels.',D+'gridconditions','5 min'],
+  ['Dashboard','Energy Storage Resources','Fleet-wide ESR charge, discharge and state of charge.',D+'energystorageresources','5 min'],
+  ['Dashboard','Ancillary Services','Live AS deployment and clearing.',D+'ancillaryservices','5 min'],
+  ['Dashboard','System-Wide Prices','Real-time system-wide price and adders.',D+'systemwideprices','5 min'],
+  ['Dashboard','Generation Outages','Forced and planned outages by fuel.',D+'generationoutages','hourly'],
+  ['Dashboard','DC Tie Flows','Imports and exports across the DC ties.',D+'dctieflows','5 min'],
+  ['NP3-233-CD','Hourly Resource Outage Capacity','Outage schedule feeding the PRC path.',E+'NP3-233-CD','hourly']]],
+ ['Scarcity &amp; settlement','ercot.com/mktinfo',[
+  ['NP4-790-CD','Peaker Net Margin','The scarcity-value trend line. $43,111/MW-yr as of 15 Aug 2026.',E+'NP4-790-CD','daily'],
+  ['NP4-791-CD','System-Wide Offer Cap','DASWCAP $5,000 / RTSWCAP $2,000 post-RTC+B.',E+'NP4-791-CD','daily'],
+  ['4CP','ERCOT Four Coincident Peak Calculations','June–September only. Closed for 2026.','https://www.ercot.com/mktinfo/data_agg/4cp','annual'],
+  ['EMIL','ERCOT Market Information List','The full product catalogue behind everything above.','https://www.ercot.com/mp/data-products','—'],
+  ['API','ERCOT Data Access Portal','Programmatic access. Bearer token plus subscription key.','https://data.ercot.com/','—']]]
+];
+SCREENS['l-signals']=()=>{
+ const n=SIGNALS.reduce((a,b)=>a+b[2].length,0);
+ return hero({kick:'Data query agent · every input we have',h:'Market signals',
+  tag:'Thirty-four ERCOT products and dashboards, pulled in parallel. Each one links straight back to the source on ercot.com so any number here can be checked.',
+  pills:['<span class="pill ok"><i class="dot live"></i> '+n+' feeds · last pull 1,640 ms</span>',
+   '<span class="pill info"><a href="https://www.ercot.com/mktinfo" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">ercot.com/mktinfo ↗</a></span>']})
+ +'<div class="kpis">'
+ +kpi({k:'Feeds configured',v:String(n),s:'ERCOT MIS, dashboards and API'})
+ +kpi({k:'Parallel pull',v:'1,640',u:'ms',s:'all feeds, 14:38 CDT',acc:'pos'})
+ +kpi({k:'Fresh',v:String(n),s:'none stale',acc:'pos'})
+ +kpi({k:'Weather models',v:'3',s:'HRRR · GFS · NBM',acc:'info'})
+ +kpi({k:'ASOS stations',v:'46',s:'ERCOT station set, pop-weighted'})
+ +kpi({k:'Retention',v:'7',u:'years',s:'every pull hashed and stored'})
+ +'</div>'
+ +SIGNALS.map(([grp,sub,rows])=>card(rule(grp,sub)
+   +'<div class="srcgrid">'+rows.map(r=>'<div class="src"><div class="sn">'
+     +'<a href="'+r[3]+'" target="_blank" rel="noopener">'+r[1]+' ↗</a>'
+     +'<span class="pill ok" style="font-size:7.5px">'+r[4]+'</span></div>'
+     +'<div class="sm"><b style="color:var(--green-dk)">'+r[0]+'</b> · '+r[2]+'</div></div>').join('')+'</div>')).join('<div style="height:12px"></div>')
+ +'<div style="height:12px"></div>'
+ +card(rule('Confidence labels','what each one means on this desk')
+   +tbl([['Label'],['Meaning']],[
+     ['<span class="pill ok">PUBLISHED</span>','Read directly from a named ERCOT product for this operating day. Reproducible.'],
+     ['<span class="pill warn">MODELLED</span>','Our own fitted value. No ERCOT figure exists. Labelled everywhere it appears.'],
+     ['<span class="pill info">CALIBRATED</span>','Shape fitted to published weekly or monthly aggregates where the hourly series is not public.'],
+     ['<span class="pill mag">SCENARIO</span>','Carried as a what-if. Never a base case.']])
+   +'<hr class="hair">'
+   +'<p class="sect" style="border:0;margin:0 0 8px">Known gaps, stated not hidden</p>'
+   +['ERCOT publishes no weather-zone share of system load. The zone shares on the load screens are fitted from NP6-345-CD hourly zonal MW.',
+     'ERCOT publishes no MW/°F sensitivity. The 620 MW/°F used today is our fitted autumn response, not a sourced figure.',
+     'No numeric table of battery share by ancillary product is published. The award probabilities in the BESS model are modelled from Potomac Economics\' qualitative description and are the largest uncertainty in the AS revenue line.',
+     'TB2 spreads are not published for ERCOT — Modo publishes TB1 and Amperical publishes TB4. The TB2 figures here are computed from the published DAM curve directly.',
+     'Live PRC and the supply-and-demand dashboard values render client-side on ercot.com and cannot be fetched server-side. The PRC path here is calibrated to published shoulder-season ranges.']
+    .map(t=>'<p class="callout" style="margin-bottom:8px">'+t+'</p>').join(''));
+};
+
+/* ══════════ SCREEN · AUDIT ══════════ */
+SCREENS['l-audit']=()=>{
+ const runs=[
+  ['run 5b7e·d01','ERCOT system load forecast, MTLF horizon','mi','TFT quantile v3.9.1','14:42:11','2.6 s','a30f7c12…e8b4','PASS'],
+  ['run 5b7e·d02','Zonal load forecast, 8 weather zones','mi','TFT quantile v3.9.1','14:42:14','3.4 s','1f84cd55…9b02','PASS'],
+  ['run 5b7e·w01','Wind power production forecast','mi','TFT + hub-height correction','14:11:09','2.1 s','7c20ab41…3d68','PASS'],
+  ['run 5b7e·p01','Real-time price forecast, 4 hubs','mi','TFT quantile v2.4.0','14:28:55','3.0 s','9e51bc73…4a17','PASS'],
+  ['run 5b7e·b01','BESS dispatch and bid optimisation','op','Greedy window search','14:39:22','0.004 s','c4b1902e…7af3','PASS'],
+  ['run 5b7e·a01','Ancillary product selection','op','Expected-value ranking','14:36:02','0.002 s','2d70fe88…6c91','PASS'],
+  ['run 5b7e·hdd','Heating-degree feature arming','sg','classifier v2.8','14:31:40','1.0 s','5a93db20…1e47','PASS'],
+  ['run 5b7e·m30','Rolling MAPE backcast vs ERCOT MTLF','mo','metrics v2.1','14:24:00','0.8 s','8b16ea04…c350','PASS']];
+ return hero({kick:'The calculator principle · every number traces to a run',h:'Audit &amp; lineage',
+  tag:'Versioned, sandboxed Python. Every value traces to a run ID plus a SHA-256 hash, and a 52-scenario regression suite gates every model swap.',
+  pills:['<span class="pill ok">52 / 52 scenarios pass</span>','<span class="pill info">retention 7 years</span>']})
+ +'<div class="kpis">'
+ +kpi({k:'Runs today',v:'291',s:'all reproducible from seed'})
+ +kpi({k:'Tool calls',v:'2,184',s:'sandboxed, no network egress'})
+ +kpi({k:'Numbers computed by LLM',v:'0',s:'by contract — the two-plane model',acc:'pos',badge:'ENFORCED',bc:'ok'})
+ +kpi({k:'Regression gate',v:'52 / 52',s:'blocks any model promotion',acc:'pos'})
+ +kpi({k:'Signed model swaps',v:'2',s:'last: TFT v3.9.1, m.whitfield'})
+ +kpi({k:'Failed reproductions',v:'0',s:'90-day replay audit',acc:'pos'})
+ +'</div>'
+ +card(rule('Run register','click any row for the full lineage')
+   +tbl([['run_id'],['Description'],['Agent'],['Engine'],['Started',1],['Duration',1],['Artifact SHA-256'],['Gate'],['']],
+     runs.map(r=>['<span class="mono" style="color:var(--green-dk)">'+r[0]+'</span>',r[1],AG(r[2]),
+       '<span class="tiny mono muted">'+r[3]+'</span>',{v:r[4],c:'r'},{v:r[5],c:'r'},
+       '<span class="mono tiny muted">'+r[6]+'</span>','<span class="pill ok">'+r[7]+'</span>',
+       '<button class="btn sm" data-act="audit" data-run="'+r[0]+'" data-t="'+r[1]+'">Open ↗</button>'])))
+ +'<div style="height:12px"></div>'
+ +'<div class="c2">'
+ +card(rule('The two-plane model','reasoning and computation, separated by contract')
+   +'<div class="c2" style="gap:9px">'
+   +'<div style="background:var(--well);border:1px solid var(--line-2);border-left:4px solid var(--lime);border-radius:2px;padding:11px">'
+   +'<p class="kicker">Reasoning plane · LLM agents</p>'
+   +'<p class="tiny" style="margin:7px 0 0;line-height:1.75;color:var(--ink-2)">Supervisor + 6 specialists<br>Intent · routing · causal data selection<br>Reasons over topology and causality<br>Narrates, cites, orchestrates<br><b style="color:var(--neg)">Never computes a number</b><br><span class="muted">no forecast maths · no value into a bid · no raw timeseries</span></p></div>'
+   +'<div style="background:var(--well);border:1px solid var(--line-2);border-left:4px solid var(--cyan);border-radius:2px;padding:11px">'
+   +'<p class="kicker" style="color:var(--cyan-dk)">Computation plane · deterministic engines</p>'
+   +'<p class="tiny" style="margin:7px 0 0;line-height:1.75;color:var(--ink-2)">Forecasting service<br><span class="muted">SARIMAX baseline → TFT → P10/P50/P90</span><br>Optimisation service<br><span class="muted">dispatch and market-facing bids</span><br>Versioned · sandboxed<br><span class="muted">every value → run_id + SHA-256</span></p></div></div>'
+   +'<div style="text-align:center;margin:11px 0 8px"><span class="pill lime">CALCULATOR PRINCIPLE</span></div>'
+   +'<p class="note" style="text-align:center;font-style:italic">The LLM holds the pen. Code holds the math.</p>')
+ +card(rule('Data &amp; memory foundation','deck figure 1')
+   +tbl([['Layer'],['Contents']],[
+     ['<b class="tiny">Redshift</b>','<span class="tiny muted">historical ERCOT prices, weather, settlements</span>'],
+     ['<b class="tiny">Memory Palace L1</b>','<span class="tiny muted">session — this thread\'s working state</span>'],
+     ['<b class="tiny">Memory Palace L2</b>','<span class="tiny muted">desk — profile, preferences, standing instructions</span>'],
+     ['<b class="tiny">Memory Palace L3</b>','<span class="tiny muted">institutional — validated causality, model registry</span>'],
+     ['<b class="tiny">RAG vector store</b>','<span class="tiny muted">protocols, market notices, MORA, CDR, IMM reports</span>'],
+     ['<b class="tiny">Causality store</b>','<span class="tiny muted">v22 · analyst-validated links only</span>'],
+     ['<b class="tiny">Model registry</b>','<span class="tiny muted">artifacts + SHA-256 + signer + gate result</span>'],
+     ['<b class="tiny">Run store</b>','<span class="tiny muted">7-year retention · full replay from seed</span>']])
+   +'<p class="note">Analyst-in-the-loop governance sits underneath both planes: it verifies causal links, gates every model swap on the 52-scenario suite, and closes the feedback loop that drives hallucination toward zero.</p>')
+ +'</div>';
+};
+
+/* ══════════ NAV · ROUTER · EVENTS ══════════ */
+function ICON(k){
+ const p={'l-overview':'M2 12h3l2-6 3 10 2-7 2 3h3','l-load':'M2 13l3-3 3 2 4-7 2 3',
+  'l-renew':'M8 8l4-4M8 8l-5 2M8 8l2 5M8 8a1.5 1.5 0 100-.01','l-acc':'M4 2h6l3 3v9H4zM7 8h4M7 11h3',
+  'p-price':'M2 11l4-4 3 3 5-6M11 4h4v4','p-bess':'M3 5h8v6H3zM11 7h2v2h-2M5 7v2M7 7v2',
+  'p-as':'M3 8h2l2-5 2 10 2-5h4','p-dispatch':'M4 3v10M8 6v7M12 2v11M2 14h12',
+  'l-signals':'M2 4c0-1 3-2 6-2s6 1 6 2v8c0 1-3 2-6 2s-6-1-6-2z','l-audit':'M4 2h6l3 3v9H4zM7 8h4M7 11h3'};
+ return '<svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="'+(p[k]||p['l-audit'])+'"/></svg>';
+}
+function renderNav(){
+ $('#railNav').innerHTML=MODES[MODE].nav.map(g=>'<div class="navgrp">'+g[0]+'</div>'
+  +g[1].map(n=>'<div class="nav '+(SCR===n[0]?'on':'')+'" data-act="go" data-s="'+n[0]+'" role="button" tabindex="0">'
+    +ICON(n[0])+'<span>'+n[1]+'</span></div>').join('')).join('');
+}
+function renderTape(){
+ const t=MODES[MODE].tape.map(r=>'<span class="tk">'+r[0]+' <b>'+r[1]+'</b> '+r[2]
+   +(r[3]?' <span class="'+(r[4]==='up'?'up':r[4]==='dn'?'dn':'')+'">'+r[3]+'</span>':'')+'</span>').join('');
+ $('#tapeIn').innerHTML=t+t;
+}
+function renderModeCtl(){
+ const el=$('#modeCtl');
+ if(MODE==='price'){
+  el.innerHTML=
+   '<div class="fld"><label>BESS power</label><div class="segs" id="tbMW">'
+    +[25,50,100,200].map(m=>'<button data-m="'+m+'" class="'+(BESS.mw===m?'on':'')+'">'+m+' MW</button>').join('')+'</div></div>'
+   +'<div class="fld"><label>Duration</label><div class="segs" id="tbDur">'
+    +[1,2,4].map(d=>'<button data-d="'+d+'" class="'+(BESS.dur===d?'on':'')+'">'+d+'h</button>').join('')+'</div></div>'
+   +'<div class="fld"><label>Hub</label><div class="selwrap"><select class="sel" id="tbHub">'
+    +Object.keys(HUBS).map(k=>'<option '+(BESS.hub===k?'selected':'')+'>'+k+'</option>').join('')+'</select></div></div>';
+ } else {
+  el.innerHTML=
+   '<div class="fld"><label>Horizon</label><div class="selwrap"><select class="sel" id="tbHz">'
+    +['Mid-term (MTLF, 168 h)','Short-term (STLF, 1 h)','Intra-hour (IHLF, 2 h)','Long-term (LTLF, 10 yr)']
+     .map((o,i)=>'<option '+(i===0?'selected':'')+'>'+o+'</option>').join('')+'</select></div></div>'
+   +'<div class="fld"><label>Scope</label><div class="selwrap"><select class="sel" id="tbSc">'
+    +['ERCOT system-wide','All 8 weather zones','LZ_NORTH','LZ_HOUSTON','LZ_SOUTH','LZ_WEST']
+     .map((o,i)=>'<option '+(i===0?'selected':'')+'>'+o+'</option>').join('')+'</select></div></div>';
+ }
+}
+function wrapTables(root){
+ $$('table.tbl',root).forEach(t=>{ if(t.parentElement&&t.parentElement.classList.contains('tblwrap'))return;
+  const w=document.createElement('div'); w.className='tblwrap';
+  t.parentNode.insertBefore(w,t); w.appendChild(t); });
+}
+function go(s){
+ if(!SCREENS[s])return;
+ SCR=s; renderNav();
+ const c=$('#canvas'); c.innerHTML='<div class="screen">'+SCREENS[s]()+'</div>'; wrapTables(c); c.scrollTop=0;
+}
+function setMode(m){
+ MODE=m; SCR=MODES[m].home;
+ $$('#modeSwitch button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+ $('#pillRun').textContent = m==='price'?'run 5b7e·b01':'run 5b7e·d01';
+ renderModeCtl(); renderTape(); go(SCR);
+ toast(m==='price'
+  ? '<b>Market price forecast.</b> Day-ahead and real-time prices, the five ancillary products, and a BESS revenue model you can resize — the whole page re-solves against the published ERCOT curve for this operating day.'
+  : '<b>Load &amp; renewable forecast.</b> System and zonal load, wind and solar, net load and the evening ramp, benchmarked live against ERCOT\'s own MTLF, STWPF and PVGRPP.');
+}
+function resize(){ R=runBESS(); if(SCR.startsWith('p-'))go(SCR); renderModeCtl(); }
+
+/* audit drawer */
+function openAudit(run,title){
+ $('#drTitle').textContent=title||'Audit trail';
+ const price=SCR.startsWith('p-');
+ $('#drBody').innerHTML='<dl class="kv">'
+  +[['run_id',run||'run 5b7e·d01'],['Parent run','run 5b7e·d01'],
+    ['Agent',price?'Optimization (specialist)':'Market Intelligence (specialist)'],
+    ['Engine',price?'Greedy window search over 24 × 1 h':'TFT quantile v3.9.1'],
+    ['Artifact SHA-256',price?'c4b1902e77d3418a0b95ef2214cc8073a6f17af3':'a30f7c1288bd45e019cc7a3f06b24d9915e8b4'],
+    ['Container','python:3.11-slim · no network egress · read-only FS'],
+    ['Random seed','fixed — 20261029'],['Started','2026-10-29 '+(price?'14:39:22':'14:42:11')+' CDT'],
+    ['Duration',price?'0.004 s':'2.6 s'],['Regression gate','52 / 52 PASS'],
+    ['Signed by','m.whitfield@nuvve.com'],['Reproducible','yes — replay verified 14:44']]
+   .map(r=>'<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>').join('')+'</dl>'
+  +'<p class="sect">Input manifest<span class="r">every source, with fetch timestamp</span></p>'
+  +'<div class="tblwrap"><table class="tbl"><thead><tr><th>Input</th><th>ERCOT product</th><th class="r">Fetched</th><th>Hash</th></tr></thead><tbody>'
+  +(price?[
+    ['DAM settlement point prices','NP4-190-CD','14:38:02','4a19…7c'],
+    ['DAM clearing prices for capacity','NP4-188-CD','14:38:04','9f22…31'],
+    ['RT settlement point prices','NP6-905-CD','14:38:06','1c88…af'],
+    ['LMPs by hub and load zone','NP6-788-CD','14:38:07','7e04…52'],
+    ['DAM shadow prices','NP4-191-CD','14:38:09','b310…6d'],
+    ['Total AS offers','NP4-179-CD','14:38:10','c975…08'],
+    ['DAM AS plan','NP4-33-CD','14:38:11','0a6b…f4'],
+    ['System-wide offer cap','NP4-791-CD','cached','5d47…19'],
+    ['Asset state of charge','SCADA telemetry','14:39:20','e802…7b'],
+    ['Degradation curve','warranty basis, $4.20/MWh','cached','3f90…c2']
+   ]:[
+    ['Actual system load by zone','NP6-345-CD','14:38:02','4a19…7c'],
+    ['Seven-day forecast by model','NP3-565-CD','14:38:04','9f22…31'],
+    ['Intra-hour load forecast','NP3-562-CD','14:38:05','1c88…af'],
+    ['Wind production actual &amp; forecast','NP4-732-CD','14:38:06','7e04…52'],
+    ['ERCOT weather assumptions','NP4-722-CD','14:38:07','b310…6d'],
+    ['Station observations','46 × ASOS/AWOS METAR','14:36:11','c975…08'],
+    ['HRRR forecast grid','NOAA/NWS 14Z','14:22:40','0a6b…f4'],
+    ['GFS forecast grid','NOAA/NWS 12Z','12:48:19','5d47…19'],
+    ['Resource outage capacity','NP3-233-CD','14:27:33','e802…7b'],
+    ['Officer-letter large loads','TSP filings, weekly','Mon 26 Oct','3f90…c2']
+   ]).map(r=>'<tr><td class="tiny">'+r[0]+'</td><td class="tiny mono muted">'+r[1]+'</td>'
+     +'<td class="r mono tiny">'+r[2]+'</td><td class="mono tiny muted">'+r[3]+'</td></tr>').join('')
+  +'</tbody></table></div>'
+  +'<p class="sect" style="margin-top:16px">Execution trace<span class="r">reasoning plane → computation plane</span></p><div class="steps">'
+  +(price?[
+    ['ok','Supervisor · intent parsed','Classified as a dispatch-optimisation request. Routed to Optimization with Market Intelligence as a dependency. 0 numeric operations performed by the LLM.'],
+    ['ok','Data Query · parallel pull','10 ERCOT products, 1,640 ms. DAM SPP and MCPC for operating day 29 Oct 2026, RT settlement points, shadow prices, AS offers.'],
+    ['ok','Market Intelligence · causal data selection','Selected the hub curve and the five AS series. Applied causality store v22. Did not compute a price.'],
+    ['ok','Forecasting service · TFT quantile v2.4.0','Computed the 24-hour RT price path from the published DA curve plus the autumn dispersion model. Deterministic, seeded.'],
+    ['ok','Optimisation service','276 charge/discharge window pairs evaluated per cycle. Degradation hurdle $4.20/MWh applied. Ancillary stacking by expected value on idle hours.'],
+    ['ok','Supervisor · synthesis','Narrated the result, cited the products, attached the $-impact. Every figure read from the solver output, none generated.'],
+    ['wait','Analyst sign-off','Pending. Bids do not leave the platform without it — shadow deployment carries no write access.']
+   ]:[
+    ['ok','Supervisor · intent parsed','Classified as a load-forecast request, MTLF horizon. Routed to Market Intelligence with Signal/Causality as a dependency. 0 numeric operations performed by the LLM.'],
+    ['ok','Data Query · parallel pull','10 sources, 1,640 ms. ERCOT MIS, 46 ASOS stations, three NWS model grids, outage schedule, officer-letter filings.'],
+    ['ok','Signal/Causality · store check','Applied store v22. Heating-degree features armed for NORTH and WEST only after the Panhandle freeze watch; COAST excluded.'],
+    ['ok','Forecasting service · TFT quantile v3.9.1','Computed 168 h hourly P10/P50/P90, system and 8 weather zones. Deterministic, seeded.'],
+    ['ok','Driver decomposition','7 drivers attributed, summing to 61,400 MW at HE18. Sensitivity 620 MW/°F — labelled MODELLED.'],
+    ['ok','Monitor · benchmark','Compared against ERCOT MTLF in-use models from NP3-565-CD. Divergence +1,000 MW, attributed and explained.'],
+    ['ok','Supervisor · synthesis','Narrated, cited 4 products, attached the MW impact. Every figure read from the model output, none generated.'],
+    ['wait','Analyst sign-off','Pending on the P50-versus-MTLF divergence decision.']
+   ]).map(s=>'<div class="step '+s[0]+'"><h5>'+s[1]+'</h5><p>'+s[2]+'</p></div>').join('')+'</div>'
+  +'<div class="card" style="margin-top:6px;background:var(--pos-bg);border-color:#A9C97F;box-shadow:none">'
+  +'<p class="kicker">The contract</p>'
+  +'<p class="tiny" style="margin:7px 0 0;line-height:1.75;color:var(--ink-2)">The LLM reasons over topology and causality, routes work to specialist agents, narrates and cites. It <b style="color:var(--neg)">never</b> computes a forecast, never generates a numeric value into a bid or a dispatch instruction, and never touches raw timeseries. Every number in this run traces to a versioned, sandboxed artifact plus a SHA-256 hash, and a 52-scenario regression suite gates every model swap with a signed validation.</p></div>';
+ wrapTables($('#drBody'));
+ $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+}
+const closeAll=()=>{$('#drawer').classList.remove('on');$('#scrim').classList.remove('on');};
+let tmr; function toast(t){const e=$('#toast');e.innerHTML=t;e.classList.add('on');clearTimeout(tmr);tmr=setTimeout(()=>e.classList.remove('on'),5200);}
+
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-act],[data-mode],[data-m],[data-d],[data-v]');
+ if(!el)return;
+ if(el.dataset.mode){setMode(el.dataset.mode);return;}
+ if(el.dataset.m){BESS.mw=+el.dataset.m;resize();return;}
+ if(el.dataset.d){BESS.dur=+el.dataset.d;resize();return;}
+ if(el.dataset.v&&el.parentElement&&el.parentElement.id==='szStrat'){BESS.strategy=el.dataset.v;resize();return;}
+ if(el.dataset.v&&el.parentElement&&el.parentElement.id==='szCurve'){BESS.curve=el.dataset.v;resize();return;}
+ const a=el.dataset.act;
+ if(a==='go')go(el.dataset.s);
+ else if(a==='audit')openAudit(el.dataset.run,el.dataset.t);
+ else if(a==='fb'){
+   const n=$('#fbn-'+el.dataset.id); if(!n)return;
+   const m={agree:'✓ <b>Signed off</b> — recorded against m.whitfield and the run_id. Positive training signal logged; the decision proceeds.',
+     disagree:'✕ <b>Rejected</b> — router penalised for this explanation class. No causality-store write. Decision blocked pending a revised proposal.',
+     correct:'✎ <b>Correction applied</b> — causality store v22 → v23. Four downstream forecasts re-triggered; new run_ids issued.'}[el.dataset.v];
+   n.innerHTML=m; n.classList.add('show');
+   const bad=el.dataset.v==='disagree';
+   n.style.color=bad?'var(--neg)':'var(--pos)'; n.style.background=bad?'var(--neg-bg)':'var(--pos-bg)';
+   n.style.borderLeftColor=bad?'var(--neg)':'var(--pos)';
+   if(el.dataset.v!=='agree')$('#rfCaus').textContent='v23';
+   toast(m.replace(/<[^>]+>/g,''));
+ }
+ else if(a==='refresh')toast('<b>Parallel pull complete</b> — 34 ERCOT feeds in 1,640 ms: NP4-190-CD, NP4-188-CD, NP3-565-CD, NP6-345-CD, NP4-732-CD, NP3-562-CD, NP3-233-CD, 46 ASOS stations, HRRR 14Z, GFS 12Z, NBM 13Z and 12 live dashboards.');
+ else if(a==='submit')toast('<b>Blocked — analyst sign-off required.</b> Shadow deployment carries no write access to the ERCOT day-ahead market by design. Bids are generated, scored against the incumbent and audited, but they do not leave the platform.');
+});
+document.addEventListener('input',e=>{
+ if(e.target.id==='szMW'){BESS.mw=+e.target.value;R=runBESS();
+   const v=e.target.closest('.rngwrap').querySelector('.rngval');
+   if(v)v.innerHTML=BESS.mw+'<small>MW</small>';}
+});
+document.addEventListener('change',e=>{
+ if(e.target.id==='szMW'){resize();}
+ else if(e.target.id==='szHub'||e.target.id==='tbHub'){BESS.hub=e.target.value;resize();
+   toast('Settlement hub → <b>'+BESS.hub+'</b>. The optimiser re-solves against that hub\'s published day-ahead curve.');}
+ else if(e.target.id==='tbHz')toast('Forecast horizon → <b>'+e.target.value+'</b>. MTLF, STLF and IHLF products swap accordingly.');
+ else if(e.target.id==='tbSc')toast('Scope → <b>'+e.target.value+'</b>. Data Query re-pulls the zone-specific series.');
+});
+$('#drClose').onclick=closeAll; $('#scrim').onclick=closeAll;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+setInterval(()=>{const d=new Date();
+ $('#clkT').textContent='14:42:'+String(d.getSeconds()).padStart(2,'0');},1000);
+
+/* boot */
+$$('#modeSwitch button').forEach(b=>b.classList.toggle('on',b.dataset.mode==='load'));
+renderModeCtl(); renderTape(); renderNav(); go('l-overview');
+</script>
+</body></html>
