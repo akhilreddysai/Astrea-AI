@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Astrea ERCOT Desk - agentic load, renewable and market price forecasting for the Texas interconnection, with a live BESS revenue model.">
+<meta name="description" content="Astrea ERCOT Desk">
+<meta name="robots" content="noindex,nofollow">
 <meta name="color-scheme" content="light"><title>Astrea ERCOT Desk</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
@@ -639,22 +640,24 @@ const heatC=v=>['#E8F0D4','#CDDC38','#ABCA47','#759840','#C9A227','#D98324','#C2
 const MODES={
  load:{label:'Load & renewable forecast',home:'l-overview',
   nav:[['Forecast desk',[['l-overview','System overview'],['l-load','Load forecast'],['l-renew','Wind & solar forecast']]],
-       ['Assess',[['l-acc','Forecast accuracy'],['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
+       ['Assess',[['l-acc','Forecast accuracy'],['w-winter','Winter 2026–27 outlook'],['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
   tape:[['ERCOT LOAD','52,840','MW','+2.2% YoY','up'],['PEAK FCST HE18','61,400','MW','','f'],
    ['ERCOT MTLF','60,400','MW','−1,000','dn'],['NET-LOAD PEAK','42,320','MW @HE19','','f'],
    ['WIND','10,500','MW now','−44% vs 03:00','dn'],['SOLAR','24,800','MW HE13','','f'],
    ['NET-LOAD MIN','18,800','MW HE13','','f'],['MAPE 7D','1.71','% Astrea','−0.73pp','up'],
    ['ERCOT MTLF MAPE','2.44','%','','f'],['PRC','15,600','MW','comfortable','up'],
-   ['WIND MAE','7.9','% Astrea','vs 11.4% STWPF','up'],['SYSTEM TEMP','79','°F','+3','up']]},
+   ['WIND MAE','7.9','% Astrea','vs 11.4% STWPF','up'],['SYSTEM TEMP','79','°F','+3','up'],
+   ['WINTER P50','64.2','GW late Jan','El Niño','f'],['WINTER P95','79.4','GW','P(record) 1.4%','dn']]},
  price:{label:'Market price forecast · BESS',home:'p-price',
   nav:[['Price desk',[['p-price','Price forecast'],['p-bess','BESS revenue model'],['p-as','Ancillary services'],['p-dispatch','Dispatch & bids']]],
-       ['Assess',[['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
+       ['Assess',[['w-winter','Winter 2026–27 outlook'],['l-signals','Market signals'],['l-audit','Audit & lineage']]]],
   tape:[['HB_NORTH DA','$36.42','avg','D+1','f'],['HB_NORTH PEAK','$52.84','HE18','','f'],
    ['HB_WEST DA','$39.63','avg','highest hub','up'],['HB_HOUSTON DA','$38.21','avg','','f'],
    ['RT TB2','$46.10','MWh','+9% WoW','up'],['DA TB2','$24.96','MWh','','f'],
    ['NON-SPIN','$18.11','MW-h HE22','peak AS','up'],['REG-DOWN','$5.21','MW-h HE22','','f'],
    ['ECRS','$2.68','MW-h HE23','','f'],['RRS','$2.43','MW-h HE23','','f'],
-   ['RTSWCAP','$2,000','MWh','post-RTC+B','f'],['RTRDPA','$0.00','adder','','f']]}
+   ['RTSWCAP','$2,000','MWh','post-RTC+B','f'],['RTRDPA','$0.00','adder','','f'],
+   ['WINTER P95','79.4','GW','mid-Jan AM','dn'],['12CP','pending','rules due 31 Dec','SB 6','f']]}
 };
 let MODE='load', SCR='l-overview';
 const SCREENS={};
@@ -664,7 +667,7 @@ SCREENS['l-overview']=()=>{
  const g=GRID;
  return hero({kick:'Planning & forecasting · ERCOT interconnection',h:'System overview',
   tag:'Autumn shoulder season. Load is two-thirds of the July peak, wind is near its seasonal high, and the duck curve is at its deepest of the year.',
-  pills:['<span class="pill ok"><i class="dot live"></i> 18 ERCOT feeds fresh</span>','<span class="pill info">4CP season closed · Jun–Sep</span>'],
+  pills:['<span class="pill ok"><i class="dot live"></i> 18 ERCOT feeds fresh</span>','<span class="pill info">4CP season closed · Jun–Sep</span>','<span class="pill warn">Winter P95 79.4 GW</span>'],
   btns:'<button class="btn cta" data-act="go" data-s="l-load">Load detail ↗</button><button class="btn" data-act="refresh">⟲ Refresh</button>'})
  +'<div class="kpis">'
  +kpi({k:'System load now',v:'52,840',u:'MW',s:'14:42 CDT · <span class="up">+2.2%</span> weather-adj YoY'})
@@ -717,7 +720,9 @@ SCREENS['l-overview']=()=>{
      ['DA system-wide offer cap',{v:'$5,000/MWh',c:'r'}],
      ['RT reliability deployment adder',{v:'$0.00',c:'r'}],
      ['Comanche Peak 1',{v:'refuelling outage',c:'r'}],
-     ['Winter inspection cycle',{v:'in progress',c:'r'}]])
+     ['Winter inspection cycle',{v:'in progress',c:'r'}],
+     ['Winter P50 / P95',{v:'<b style="color:var(--green-dk)">64.2 / 79.4 GW</b>',c:'r'}],
+     ['12CP rulemaking',{v:'<span class="pill warn">DUE 31 DEC 2026</span>',c:'r'}]])
    +'<p class="callout info" style="margin-top:10px"><b>ORDC no longer exists.</b> The operating reserve demand curve adder was retired at RTC+B go-live on 5 Dec 2025. Reserve scarcity now prices through the ancillary service demand curves inside co-optimised SCED, and the only remaining adder is the real-time reliability deployment price adder — $0.00 today.</p>')
  +card(rule('Agent activity','last 25 min')
    +'<div class="feed">'+[
@@ -726,7 +731,8 @@ SCREENS['l-overview']=()=>{
     ['14:31','sg','Signal: <i>first Panhandle freeze watch of the season, Sun 01 Nov</i>. Classified <b>heating-degree onset</b>. NORTH and WEST driver weights armed for the weekend run.'],
     ['14:24','mo','Backcast HE14 +0.22 %. ERCOT MTLF −0.21 %. Fourteen of fourteen completed hours inside the ±2.5 % tolerance.'],
     ['14:11','mi','Wind forecast revised +640 MW for HE20–HE24 on the 14Z HRRR. Evening net-load peak lowered 42,960 → 42,320 MW.'],
-    ['13:58','sg','Comanche Peak 1 refuelling confirmed in NP3-233-CD. Supply-side only — no load-forecast effect; PRC path lowered 980 MW.']
+    ['13:58','sg','Comanche Peak 1 refuelling confirmed in NP3-233-CD. Supply-side only — no load-forecast effect; PRC path lowered 980 MW.'],
+    ['24 Oct','sc','Third-party winter outlook ingested and benchmarked. Our P50 sits <b>1.2 GW above</b> the published figure on the large-load term. <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">Open the winter outlook ↗</a>']
    ].map(r=>'<div class="fitem" data-act="audit" data-run="run 5b7e·d01" data-t="Agent action '+r[0]+'"><span class="t">'+r[0]+'</span>'
      +'<div class="bd"><div class="hdr">'+AG(r[1])+'</div><p>'+r[2]+'</p></div></div>').join('')+'</div>')
  +'</div></div>';
@@ -759,7 +765,7 @@ SCREENS['l-load']=()=>{
    svg:chart({h:182,series:[{data:d7,color:'#759840',type:'bar'},{data:[60400,58900,56400,54100,57600,61600,62700],color:'#7B4FA0',w:1.9,dash:'4 3'}],
      yMin:46000,xLabels:['Thu 29','Fri 30','Sat 31','Sun 01','Mon 02','Tue 03','Wed 04'].map((t,i)=>({i,t})),yFmt:v=>(v/1000).toFixed(0)+'k'}),
    leg:LEG([{c:'#759840',t:'Astrea daily peak P50'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}]),
-   note:'The weekend dips as expected, then the first real cold front of the season lands Tuesday night. By Wednesday the morning hour overtakes the evening one — the winter shape. ERCOT\'s own December MORA treats <b>HE08 as the highest-risk hour</b>; late October is the handover.'})
+   note:'The weekend dips as expected, then the first real cold front of the season lands Tuesday night. By Wednesday the morning hour overtakes the evening one — the winter shape. ERCOT\'s own December MORA treats <b>HE08 as the highest-risk hour</b>; late October is the handover. The seasonal picture beyond this window sits on the <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">winter outlook</a>: a P50 of 64.2 GW in late January against a P95 of 79.4 GW on a mid-January morning.'})
  +card(rule('Zonal forecast · HE18','8 official ERCOT weather zones')
    +tbl([['Zone'],['Anchor stations'],['P50 MW',1],['Share',1],['Dry bulb',1],['Dew pt',1],['MAE',1],['YoY',1]],
      g.zones.map(z=>['<b class="mono">'+z.c+'</b><br><span class="tiny muted">'+z.n+'</span>',
@@ -798,7 +804,7 @@ SCREENS['l-renew']=()=>{
  const curtail=g.netLoad.map((v,i)=>v<22000?Math.round((22000-v)*0.18):0);
  return hero({kick:'Market intelligence · renewable generation forecast',h:'Wind &amp; solar forecast',
   tag:'40.8 GW of wind and 40.8 GW of solar installed. Autumn is high-wind season, and the two together set the net-load shape the whole market trades against.',
-  pills:['<span class="pill info">NP4-732-CD · hourly actual &amp; forecast</span>','<span class="pill ok">MAE 7.9 % wind</span>']})
+  pills:['<span class="pill info">NP4-732-CD · hourly actual &amp; forecast</span>','<span class="pill ok">MAE 7.9 % wind</span>','<span class="pill warn">El Niño: wind up, solar down</span>']})
  +'<div class="kpis">'
  +kpi({k:'Wind now',v:'10,500',u:'MW',s:'26 % of installed 40.8 GW'})
  +kpi({k:'Wind D+1 peak',v:'21,900',u:'MW',s:'HE23 · overnight surplus',acc:'info'})
@@ -817,7 +823,7 @@ SCREENS['l-renew']=()=>{
      band:{lo:g.windP10,hi:g.windP90,color:'#73CEE5',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
      pts:[{i:22,v:21900,c:'#1C7C97',t:'21.9k'},{i:12,v:10500,c:'#9C6F06',t:'10.5k'}]}),
    leg:LEG([{c:'#1C7C97',t:'Astrea P50'},{c:'#73CEE5',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT STWPF',k:'dash'}]),
-   note:'The anti-correlation with solar is what makes the autumn shape tradeable: wind troughs at midday exactly when solar peaks, then builds through the evening and overnight. A battery that only looks at load misses this entirely.'})
+   note:'The anti-correlation with solar is what makes the autumn shape tradeable: wind troughs at midday exactly when solar peaks, then builds through the evening and overnight. A battery that only looks at load misses this entirely.<br><br><b>Into the winter</b>, the El Niño storm track cuts both ways. More frequent frontal passages should support <b>stronger wind</b>, especially ahead of and behind each front — and they bring major congestion patterns with them. Extended cloud and rain will <b>weaken solar</b> over the same stretches. See the <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">winter outlook</a>.'})
  +chartCard({t:'Solar power production and the evening cliff',
    src:'ERCOT PVGRPP / COP · Combined Wind and Solar dashboard · sunset 18:41 CDT',
    svg:chart({h:196,series:[{data:g.solar,color:'#D99A07',type:'area',op:.3,w:2.4},{data:g.solarF,color:'#7B4FA0',w:1.7,dash:'4 3'}],
@@ -853,7 +859,8 @@ SCREENS['l-renew']=()=>{
      ['Energy storage (ESR)',{v:'21,136 MW',c:'r'},{v:'9,130 MW',c:'r'}],
      ['Near-term solar additions',{v:'617 MW',c:'r'},{v:'—',c:'r'}],
      ['Near-term storage additions',{v:'748 MW',c:'r'},{v:'—',c:'r'}]])
-   +'<p class="note">Solar\'s 27 MW of winter-peak availability against 40.8 GW installed is not an error — the ERCOT winter peak hour is HE08, before sunrise. It is the single clearest argument for storage on this system.</p>')
+   +'<p class="note">Solar\'s 27 MW of winter-peak availability against 40.8 GW installed is not an error — the ERCOT winter peak hour is HE08, before sunrise. It is the single clearest argument for storage on this system.</p>'
+   +'<p class="callout" style="margin-top:10px">Watch the days that pair <b>low solar with a wind lull</b>. That is where scarcity can appear even when load itself is unremarkable — and it is invisible to anyone forecasting load alone.</p>')
  +'</div></div>';
 };
 
@@ -948,7 +955,7 @@ SCREENS['p-price']=()=>{
        return z;})(),
      pts:[{i:h.da.indexOf(Math.max(...h.da)),v:Math.max(...h.da),c:'#4A7C1F',t:'$'+Math.max(...h.da).toFixed(0)}]}),
    leg:LEG([{c:'#759840',t:'DAM settlement point price (published)'},{c:'#1C7C97',t:'Astrea RT forecast',k:'dash'}]),
-   note:'October is the weakest spread month of the year — no summer scarcity, and the winter morning spikes have not started. The whole day sits between <b>$26 and $57/MWh</b>. That is exactly why it is the right month to demonstrate a forecasting edge: there is no scarcity event doing the work for you.'})
+   note:'<b>Looking ahead:</b> on grey winter days the net-demand curve stops looking like this deep midday duck and reverts to a traditional winter shape, with midday prices firmer than the market has grown used to. Our <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">winter outlook</a> carries that as the base case under a Super El Niño.<br><br>October is the weakest spread month of the year — no summer scarcity, and the winter morning spikes have not started. The whole day sits between <b>$26 and $57/MWh</b>. That is exactly why it is the right month to demonstrate a forecasting edge: there is no scarcity event doing the work for you.'})
  +chartCard({t:'All four trading hubs · day-ahead',
    src:'ERCOT NP4-190-CD · HB_NORTH, HB_HOUSTON, HB_SOUTH, HB_WEST · basis is unusually tight today',
    svg:chart({h:206,series:[
@@ -1082,6 +1089,7 @@ SCREENS['p-bess']=()=>{
      ['June 2026 — record low',{v:'$1.11',c:'r'},{v:'$13,500',c:'r'}],
      ['Jan 2026 — winter storm',{v:'$3.70',c:'r'},{v:'$46,264',c:'r'}],
      ['2023 peak era',{v:'$12.40',c:'r'},{v:'$149,000',c:'r'}]])
+   +'<p class="callout warn" style="margin-bottom:10px"><b>The winter risk is charging, not discharging.</b> On cloudy El Niño days with weak solar there is less cheap midday energy to store for the evening peak. That widens evening spreads but worsens the charge leg, and it makes state of charge a far more important input to real-time prices under RTC+B. Run this asset on a grey-day curve and the optimiser will often drop to a single cycle.</p>'
    +'<p class="callout"><b>Read the annualised figure carefully.</b> It extrapolates one shoulder-season day across a year, and October is the weakest spread month there is. A January cold snap or an August scarcity afternoon earns multiples of this in a single day. Use the $/kW-month against the monthly benchmarks above, not the annualised number against a plan.</p>')
  +card(rule('Model assumptions','and where they come from')
    +tbl([['Assumption'],['Value',1],['Basis']],[
@@ -1267,6 +1275,14 @@ const SIGNALS=[
   ['Dashboard','Generation Outages','Forced and planned outages by fuel.',D+'generationoutages','hourly'],
   ['Dashboard','DC Tie Flows','Imports and exports across the DC ties.',D+'dctieflows','5 min'],
   ['NP3-233-CD','Hourly Resource Outage Capacity','Outage schedule feeding the PRC path.',E+'NP3-233-CD','hourly']]],
+ ['Seasonal &amp; third-party outlooks','ingested as signals, benchmarked not adopted',[
+  ['Amperon','2026–2027 U.S. Winter Grid Outlook','Competitor outlook, Oct 2026. Ensemble percentiles benchmarked against ours on the winter screen.','https://www.amperon.co','24 Oct'],
+  ['NOAA CPC','ENSO Diagnostic Discussion','Super El Niño; SST anomaly above +4.0 °C. 83 % chance Oct–Dec exceeds every event since 1950.','https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/','8 Oct'],
+  ['NOAA','Seasonal Temperature &amp; Precipitation Outlook','Dec–Jan–Feb 2026-27. Texas near-normal temperature, above-normal precipitation.','https://www.cpc.ncep.noaa.gov/products/predictions/long_range/','15 Oct'],
+  ['EIA 860M','Preliminary Monthly Electric Generator Inventory','Capacity additions and retirements. 19.2 GW ERCOT batteries operating as of Sep 2026.','https://www.eia.gov/electricity/data/eia860m/','Sep 26'],
+  ['ERCOT','Capacity, Demand and Reserves (CDR)','Winter 2026/27 firm peak 78,124 MW, reserve margin 22.1 %.','https://www.ercot.com/gridinfo/resource','Dec 25'],
+  ['ERCOT','Monthly Outlook for Resource Adequacy (MORA)','December 2026. Highest-risk hour HE08.','https://www.ercot.com/gridinfo/resource','2 Oct'],
+  ['PUCT','SB 6 · 12CP rulemaking docket','Four summer coincident peaks become twelve monthly 30-minute peaks. Rules due 31 Dec 2026.','https://www.puc.texas.gov/','tracked']]],
  ['Scarcity &amp; settlement','ercot.com/mktinfo',[
   ['NP4-790-CD','Peaker Net Margin','The scarcity-value trend line. $43,111/MW-yr as of 15 Aug 2026.',E+'NP4-790-CD','daily'],
   ['NP4-791-CD','System-Wide Offer Cap','DASWCAP $5,000 / RTSWCAP $2,000 post-RTC+B.',E+'NP4-791-CD','daily'],
@@ -1306,7 +1322,8 @@ SCREENS['l-signals']=()=>{
      'ERCOT publishes no MW/°F sensitivity. The 620 MW/°F used today is our fitted autumn response, not a sourced figure.',
      'No numeric table of battery share by ancillary product is published. The award probabilities in the BESS model are modelled from Potomac Economics\' qualitative description and are the largest uncertainty in the AS revenue line.',
      'TB2 spreads are not published for ERCOT — Modo publishes TB1 and Amperical publishes TB4. The TB2 figures here are computed from the published DAM curve directly.',
-     'Live PRC and the supply-and-demand dashboard values render client-side on ercot.com and cannot be fetched server-side. The PRC path here is calibrated to published shoulder-season ranges.']
+     'Live PRC and the supply-and-demand dashboard values render client-side on ercot.com and cannot be fetched server-side. The PRC path here is calibrated to published shoulder-season ranges.',
+     'The winter outlook screen draws its seasonal narrative and published ensemble percentiles from Amperon\'s 2026–2027 U.S. Winter Grid Outlook. Amperon is a forecasting vendor and a direct competitor. We benchmark against their figures rather than adopting them, and the divergence is stated on the decision card rather than quietly absorbed.']
     .map(t=>'<p class="callout" style="margin-bottom:8px">'+t+'</p>').join(''));
 };
 
@@ -1364,13 +1381,157 @@ SCREENS['l-audit']=()=>{
  +'</div>';
 };
 
+/* ══════════ WINTER 2026-27 OUTLOOK ══════════
+   Third-party outlook ingested as a signal and benchmarked against, not adopted.
+   Source: Amperon, "2026-2027 U.S. Winter Grid Outlook", October 2026. */
+const WINTER={
+ /* ERCOT winter peak probability distribution, GW. Astrea ensemble vs the
+    published Amperon mid-term ensemble (run of 23 Oct 2026). */
+ bins:[50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88],
+ astrea: [0.25,0.51,0.89,1.39,2.0,2.66,3.33,3.97,4.52,4.97,5.29,5.47,5.53,5.48,5.33,5.1,4.82,4.49,4.14,3.79,3.43,3.08,2.75,2.44,2.15,1.89,1.65,1.44,1.25,1.08,0.93,0.8,0.69,0.59,0.5,0.43,0.37,0.31,0.27],
+ amperon:[0.42,0.8,1.31,1.95,2.67,3.41,4.11,4.71,5.19,5.53,5.71,5.76,5.68,5.49,5.22,4.89,4.53,4.14,3.75,3.37,3.0,2.66,2.34,2.05,1.78,1.54,1.33,1.15,0.98,0.84,0.72,0.61,0.52,0.44,0.37,0.32,0.27,0.23,0.19],
+ marks:{astreaP50:64.2,astreaP95:79.4,ampP50:63.0,ampP95:78.0,fern:75.9,record:80.56,cdr:78.12},
+ monthly:[['December',59.8,73.1,'Mild open; first real cold risk late in the month'],
+          ['January',64.2,79.4,'Peak month. Tail clusters on early-morning heating ramps'],
+          ['February',61.5,76.8,'Fern anniversary. Record 80.56 GW was set 20 Feb 2025']],
+ /* ERCOT July hourly average solar generation by year, MW — the buildout that
+    makes a cloudy winter a different market than two years ago. */
+ solarYears:[['2023',12120],['2024',16383],['2025',23781],['2026',30367]],
+ pipeline:[
+  ['Batteries','5.1 GW','Quantum &amp; Quantum II BESS (~422 MW each) construction complete, awaiting commercial operation'],
+  ['Solar','6.1 GW','Swenson Solar 600 MW (Nov) · Clear Fork Creek 600 MW solar + 600 MW storage (Mar)'],
+  ['Wind','1.5 GW','Spread across the Panhandle and South Texas']],
+ retire:[['O.W. Sommers gas steam','420 MW','near San Antonio','March 2027']],
+ signals:[
+  ['ENSO state','Super El Niño','SST anomaly above +4.0 °C in the eastern equatorial Pacific; second strongest on record through August','bad'],
+  ['CPC confidence','83 %','probability that Oct–Dec exceeds every El Niño since 1950','warn'],
+  ['Persistence','through Mar 2027','strong-to-very-strong favoured at &gt;83 % into Jan–Mar','warn'],
+  ['Texas temperature','Near normal','Southeast and Texas sit in the near-normal band, not the warm band','ok'],
+  ['Texas precipitation','Above normal','southern tier wet; Southern Great Plains drought improves or ends','info'],
+  ['Storm track','Active, southern','more frontal passages — stronger wind, weaker solar','info']]
+};
+
+SCREENS['w-winter']=()=>{
+ const W=WINTER, m=W.marks;
+ const cum=(arr,x)=>{let s=0;for(let i=0;i<W.bins.length;i++){if(W.bins[i]>=x)s+=arr[i];}return s;};
+ const pFern=cum(W.astrea,m.fern).toFixed(1), pRec=cum(W.astrea,m.record).toFixed(1);
+ const solarMax=Math.max(...W.solarYears.map(y=>y[1]));
+ return hero({kick:'Scenario agent · seasonal outlook ingested 24 Oct 2026',h:'Winter 2026–27 outlook',
+  tag:'A historically strong El Niño gives this winter the clearest seasonal signal in decades. A clear signal does not remove the risk — it moves it.',
+  pills:['<span class="pill warn"><i class="dot w"></i> SUPER EL NIÑO</span>',
+   '<span class="pill info">third-party outlook · benchmarked, not adopted</span>'],
+  btns:'<button class="btn" data-act="go" data-s="l-load">Load forecast ↗</button>'})
+ +'<div class="kpis">'
+ +kpi({k:'Astrea P50 winter peak',v:'64.2',u:'GW',s:'late January · Amperon P50 63.0',acc:'pos'})
+ +kpi({k:'Astrea P95',v:'79.4',u:'GW',s:'mid-Jan morning · Amperon P95 78.0',acc:'warn'})
+ +kpi({k:'P(exceeds Storm Fern)',v:pFern,u:'%',s:'Fern peaked at 75.9 GW, 26 Jan 2026',acc:'warn'})
+ +kpi({k:'P(new winter record)',v:pRec,u:'%',s:'record 80,560 MW · 20 Feb 2025',acc:'neg'})
+ +kpi({k:'ERCOT CDR firm peak',v:'78.1',u:'GW',s:'planning basis, not a median',acc:'info'})
+ +kpi({k:'Reserve margin',v:'22.1',u:'%',s:'winter 2026/27 · CDR Dec 2025',acc:'pos'})
+ +kpi({k:'Battery fleet',v:'19.2',u:'GW',s:'EIA 860M Sep 26 · 13.9 GW end-2025',acc:'pos'})
+ +kpi({k:'Highest-risk hour',v:'HE08',s:'morning heating ramp · Dec MORA',acc:'warn'})
+ +'</div>'
+ +'<div class="c-23"><div class="stack">'
+ +chartCard({t:'ERCOT winter peak — probability distribution',
+   src:'Astrea mid-term ensemble vs the Amperon mid-term ensemble published 23 Oct 2026 · ERCOT CDR December 2025 firm peak forecast shown for contrast',
+   pills:['<span class="pill ok">Astrea P50 64.2 GW</span>','<span class="pill mag">Amperon P50 63.0 GW</span>'],
+   svg:chart({h:238,pl:40,series:[
+     {data:W.amperon,color:'#7B4FA0',type:'bar',op:.42,bw:.86},
+     {data:W.astrea,color:'#759840',w:2.6}],
+     yMin:0,xLabels:[0,6,12,18,24,30,36].map(i=>({i,t:W.bins[i]+' GW'})),yFmt:v=>v.toFixed(0)+'%',
+     marks:[{i:25.9,c:'#C23B2E',t:'Fern 75.9'},{i:30.56,c:'#111111',t:'record 80.6'}],
+     pts:[{i:12,v:5.53,c:'#4A7C1F',t:'P50 64.2'}]}),
+   leg:LEG([{c:'#759840',t:'Astrea ensemble'},{c:'#7B4FA0',t:'Amperon ensemble (published)'},{c:'#C23B2E',t:'Winter Storm Fern actual',k:'dash'}]),
+   note:'The two ensembles agree on the centre and differ in the tail. We carry <b>1.2 GW more</b> at the median and a visibly fatter right shoulder above 78 GW, because our large-load term tracks the officer-letter filings month by month rather than holding an annual baseline. In a mild season that difference is worth almost nothing. On the one morning it matters it is worth everything, which is the whole argument for forecasting the distribution rather than the average.'})
+ +card(rule('Why three "winter peak" numbers disagree','and which one to plan against')
+   +tbl([['Figure'],['Value',1],['What it actually is']],[
+     ['Astrea / Amperon P50',{v:'63 – 64 GW',c:'r'},'<span class="tiny muted">The median outcome. What you should expect to actually happen.</span>'],
+     ['Astrea / Amperon P95',{v:'78 – 79 GW',c:'r'},'<span class="tiny muted">The 1-in-20 morning. What a trading book or a reserve plan should survive.</span>'],
+     ['ERCOT CDR firm peak',{v:'78.1 GW',c:'r'},'<span class="tiny muted">A planning basis built on extreme weather assumptions. Not a forecast of the median and never was.</span>'],
+     ['Winter Storm Fern actual',{v:'75.9 GW',c:'r'},'<span class="tiny muted">26 Jan 2026. Not a record, partly because large flexible customers curtailed.</span>'],
+     ['All-time winter record',{v:'80.56 GW',c:'r'},'<span class="tiny muted">20 Feb 2025, Winter Storm Kingston.</span>']])
+   +'<p class="callout info">The CDR number sitting almost exactly on the P95 is a coincidence of this particular winter, not a rule. Reading the CDR firm peak as a forecast is one of the most common mistakes made with ERCOT planning documents — it is a resource-adequacy construct, and comparing it against a median forecast will make any vendor look wrong.</p>')
+ +chartCard({t:'Why a cloudy winter is a different market than two years ago',
+   src:'ERCOT July hourly average solar generation by year, MW · Amperon analysis · ERCOT solar topped 35 GW in July 2026',
+   svg:chart({h:186,pl:46,series:[{data:W.solarYears.map(y=>y[1]),color:'#D99A07',type:'bar',bw:.5}],
+     yMin:0,xLabels:W.solarYears.map((y,i)=>({i,t:y[0]})),yFmt:v=>(v/1000).toFixed(0)+' GW'}),
+   leg:LEG([{c:'#D99A07',t:'July hourly average solar, MW'}]),
+   note:'Solar has grown <b>2.5× in three years</b>. That is what makes an El Niño winter a genuinely new problem rather than a repeat: extended cloud and rain now subtract far more generation than they used to, and they do it on exactly the days when a shallow cold intrusion raises load.'})
+ +card(rule('Monthly outlook','GW · Astrea ensemble')
+   +tbl([['Month'],['P50',1],['P95',1],['Note']],
+     W.monthly.map(r=>[r[0],{v:'<b style="color:var(--green-dk)">'+r[1].toFixed(1)+'</b>',c:'r'},
+       {v:r[2].toFixed(1),c:'r'},'<span class="tiny muted">'+r[3]+'</span>'])))
+ +'</div><div class="stack">'
+ +card(rule('The seasonal signal','NOAA CPC · October 2026')
+   +tbl([['Driver'],['State',1]],
+     W.signals.map(s=>['<b class="tiny">'+s[0]+'</b><br><span class="tiny muted">'+s[2]+'</span>',
+       {v:'<span class="pill '+s[3]+'">'+s[1]+'</span>',c:'r'}]))
+   +'<p class="callout">Texas sits in the <b>near-normal</b> temperature band, not the warm band that covers the northern tier. Milder than last winter is the base case, but an active southern storm track can pair moisture with a shallow cold intrusion — and that combination is how Texas gets ice. A short, sharp freeze stays on the table in a moderate season.</p>','hi')
+ +decision({id:'w1',h:'Carry 1.2 GW above the published third-party P50',ag:'sc',ag2:'mi',conf:73,run:'run 5b7e·wtr',
+   ts:'24 Oct 2026 09:14 CDT',impact:'+1.2 GW at P50',ic:'info',
+   why:'Amperon\'s published ensemble puts the ERCOT median winter peak near <b>63 GW</b> in late January. We carry <b>64.2 GW</b>. The difference is almost entirely the large-load term: we track officer-letter filings and observed FAR_WEST and WEST ramp month by month, while a seasonal outlook published in October necessarily holds a baseline fixed. Load growth has not paused for winter — data-centre and industrial demand is round-the-clock. Confidence is deliberately moderate: 73 % reflects genuine uncertainty about how much of the queue actually energises by January.',
+   drivers:[['Large-load ramp since Oct',58,'+0.9 GW'],['Officer-letter revisions',34,'+0.3 GW'],['El Niño mild signal',-41,'−0.6 GW'],['Curtailment behaviour (Fern precedent)',-27,'unresolved']]})
+ +card(rule('Capacity changes this winter','EIA 860M · Nov 2026 – Mar 2027')
+   +tbl([['Resource'],['Planned',1],['Notable']],
+     W.pipeline.map(p=>['<b>'+p[0]+'</b>',{v:'<b style="color:var(--green-dk)">'+p[1]+'</b>',c:'r'},'<span class="tiny muted">'+p[2]+'</span>']))
+   +'<hr class="hair">'
+   +tbl([['Retiring'],['MW',1],['Where'],['When',1]],
+     W.retire.map(r=>['<b>'+r[0]+'</b>',{v:r[1],c:'r'},'<span class="tiny muted">'+r[2]+'</span>',{v:r[3],c:'r'}]))
+   +'<p class="callout warn" style="margin-top:10px">The <b>O.W. Sommers</b> retirement is a CPS Energy unit. 420 MW of dispatchable gas steam leaving the San Antonio pocket in March 2027 changes the local winter-morning picture, and it lands the same season the 12CP rules take effect.</p>')
+ +'</div></div>'
+ +'<div style="height:12px"></div>'
+ +card(rule('12CP — the structural change behind this winter','PUCT must finalise rules by 31 December 2026')
+  +'<div class="c2"><div>'
+  +'<p class="callout warn"><b>Four summer coincident peaks become twelve monthly ones.</b> Senate Bill 6 directs the PUCT to replace 4CP with twelve 30-minute coincident peaks, one per month. The effective date is still unknown and nothing in the statute requires a grace period.</p>'
+  +'<p class="note">Under 4CP, December through February could safely be ignored by large commercial and industrial users. Under 12CP every month counts — and winter peaks are lower, flatter and considerably harder to time than a 100 °F August afternoon. This is the first season where a large Texas load has a real reason to watch winter mornings.</p>'
+  +'<p class="note">For a utility, the operational consequence is a forecasting problem, not a tariff problem: a flat winter morning peak is much harder to call within a 30-minute window than a sharp summer afternoon one. Facilities that start building winter operating history and curtailment playbooks now will be better positioned than those waiting for an effective date.</p>'
+  +'</div><div>'
+  +tbl([['Dimension'],['4CP (today)'],['12CP (pending)']],[
+    ['Intervals','4 per year','<b>12 per year</b>'],
+    ['Months','June – September','<b>All twelve</b>'],
+    ['Interval length','15 minutes','<b>30 minutes</b>'],
+    ['Winter relevance','None','<b>Every month counts</b>'],
+    ['Peak shape','Sharp summer afternoon','<b>Flat winter morning</b>'],
+    ['Timing difficulty','Moderate','<b>Materially harder</b>'],
+    ['Status','In force','<b>Rules due 31 Dec 2026</b>']])
+  +'<p class="note" style="margin-top:10px">The desk tracks the PUCT docket and will switch the peak-probability model from a four-interval to a twelve-interval basis on the effective date, not on the rule date.</p>'
+  +'</div></div>')
+ +'<div style="height:12px"></div>'
+ +card(rule('What this means for the two desks','how the outlook propagates into the models')
+  +'<div class="c2">'
+  +'<div class="box"><p class="kicker">Load &amp; renewable forecast</p>'
+  +'<p class="note" style="margin-top:7px">Wind runs <b>stronger</b> — more frontal passages, with the usual surge ahead of and behind each front. Solar runs <b>weaker</b> on extended cloudy stretches. On grey winter days the net-demand curve stops looking like the deep midday duck of recent seasons and reverts to a traditional winter shape. The forecasting problem shifts from load toward <b>net load, renewable output and ramp timing</b>.</p>'
+  +'<p class="note">The days that deserve the most attention are the ones pairing <b>low solar with a wind lull</b>. That is where scarcity can appear even when load itself is unremarkable — and it is invisible to anyone forecasting load alone.</p></div>'
+  +'<div class="box"><p class="kicker">Market price forecast · BESS</p>'
+  +'<p class="note" style="margin-top:7px">The catch this winter is <b>charging</b>, not discharging. On cloudy days with weak solar there is less cheap midday energy to store for the evening peak. That widens evening spreads and makes <b>battery state of charge a far more important input to real-time prices</b> under RTC+B, where ESRs are modelled as single resources with state of charge inside the co-optimisation.</p>'
+  +'<p class="note">Firmer midday prices cut both ways: better revenue on the charge leg is worse economics for the cycle. The BESS model already prices this — run the same asset on a grey-day curve and the optimiser will often drop to a single cycle.</p></div>'
+  +'</div>'
+  +'<p class="callout ok" style="margin-top:12px">The outlook\'s own conclusion is the one we would underwrite: in a season like this the value of forecasting is not in predicting the average. It is in identifying which days break from it, how far, and at what probability. That is the entire design premise of this desk.</p>')
+ +'<div style="height:12px"></div>'
+ +card(rule('Attribution','third-party research, used as a signal')
+  +'<p class="note" style="margin-top:0">Seasonal narrative, the published ensemble percentiles, the EIA 860M capacity figures and the ERCOT July solar series on this screen are drawn from <b>Amperon\'s 2026–2027 U.S. Winter Grid Outlook</b>, published October 2026, and from the NOAA, EIA and ERCOT sources it cites. Amperon is a forecasting vendor and a direct competitor.</p>'
+  +'<p class="note">We ingest competitor and third-party outlooks the same way we ingest an ISO notice: as a signal, routed through Signal/Causality, validated by an analyst, and versioned into the causality store. We benchmark against them rather than adopting them — the divergence is the interesting part, and it is stated on the decision card above rather than quietly absorbed.</p>'
+  +'<div class="srcgrid" style="margin-top:10px">'
+  +[['Amperon','2026–2027 U.S. Winter Grid Outlook, October 2026','https://www.amperon.co'],
+    ['NOAA CPC','ENSO Diagnostic Discussion, 8 Oct 2026','https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/'],
+    ['NOAA','Winter Outlook, issued 15 Oct 2026','https://www.noaa.gov/news-release/noaa-predicts-warmer-winter'],
+    ['EIA','Preliminary Monthly Electric Generator Inventory (860M), Sep 2026','https://www.eia.gov/electricity/data/eia860m/'],
+    ['ERCOT','Capacity, Demand and Reserves Report, Dec 2025','https://www.ercot.com/gridinfo/resource'],
+    ['ERCOT','Monthly Outlook for Resource Adequacy, Dec 2026','https://www.ercot.com/gridinfo/resource'],
+    ['PUCT / SB 6','12CP rulemaking, due 31 Dec 2026','https://www.puc.texas.gov/'],
+    ['ERCOT','System Operations Update — Winter Storm Fern','https://www.ercot.com/committees/board']]
+   .map(s=>'<div class="src"><div class="sn"><a href="'+s[2]+'" target="_blank" rel="noopener">'+s[0]+' ↗</a></div>'
+    +'<div class="sm">'+s[1]+'</div></div>').join('')+'</div>');
+};
+
 /* ══════════ NAV · ROUTER · EVENTS ══════════ */
 function ICON(k){
  const p={'l-overview':'M2 12h3l2-6 3 10 2-7 2 3h3','l-load':'M2 13l3-3 3 2 4-7 2 3',
   'l-renew':'M8 8l4-4M8 8l-5 2M8 8l2 5M8 8a1.5 1.5 0 100-.01','l-acc':'M4 2h6l3 3v9H4zM7 8h4M7 11h3',
   'p-price':'M2 11l4-4 3 3 5-6M11 4h4v4','p-bess':'M3 5h8v6H3zM11 7h2v2h-2M5 7v2M7 7v2',
   'p-as':'M3 8h2l2-5 2 10 2-5h4','p-dispatch':'M4 3v10M8 6v7M12 2v11M2 14h12',
-  'l-signals':'M2 4c0-1 3-2 6-2s6 1 6 2v8c0 1-3 2-6 2s-6-1-6-2z','l-audit':'M4 2h6l3 3v9H4zM7 8h4M7 11h3'};
+  'l-signals':'M2 4c0-1 3-2 6-2s6 1 6 2v8c0 1-3 2-6 2s-6-1-6-2z','l-audit':'M4 2h6l3 3v9H4zM7 8h4M7 11h3',
+  'w-winter':'M8 2v12M3 5l10 6M13 5L3 11M8 2l-2 2M8 2l2 2M8 14l-2-2M8 14l2-2'};
  return '<svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="'+(p[k]||p['l-audit'])+'"/></svg>';
 }
 function renderNav(){
