@@ -1,21 +1,38 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Astrea ERCOT Desk">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Astrea AI · ERCOT Desk</title>
+<meta name="description" content="Astrea AI ERCOT desk - load and renewable forecasting, market price forecasting for a BESS, and the 2026-27 winter outlook.">
+<meta name="theme-color" content="#0A436A">
 <meta name="robots" content="noindex,nofollow">
-<meta name="color-scheme" content="light"><title>Astrea ERCOT Desk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cg fill='%230A436A'%3E%3Crect x='20' y='6' width='113' height='1012' rx='56.5' opacity='.45'/%3E%3Crect x='302' y='153' width='113' height='718' rx='56.5' opacity='.72'/%3E%3Crect x='583' y='307' width='113' height='410' rx='56.5'/%3E%3C/g%3E%3Ccircle cx='900' cy='512' r='102' fill='%2355732D'/%3E%3C/svg%3E">
+<link rel="canonical" href="/">
+<meta property="og:title" content="Astrea AI · ERCOT Desk">
+<meta property="og:description" content="Astrea AI ERCOT desk - load and renewable forecasting, market price forecasting for a BESS, and the 2026-27 winter outlook.">
+<meta property="og:type" content="website">
+<style>html,body{margin:0;padding:0}:root{color-scheme:light}</style>
+</head>
+<body>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 /* ============================================================
-   ASTREA · ERCOT DESK — light theme
-   Palette lifted verbatim from the Nuvve POC (energy-poc.camereye.ai)
+   ASTREA AI · light theme
+   Palette derived from the Astrea AI mark: navy #0A436A carried at three
+   weights, with the mark's olive #55732D reserved for positive states.
    ============================================================ */
 :root{
-  --green:#759840; --green-dk:#5F7D33; --green-lt:#ABCA47;
-  --lime:#CDDC38;  --lime-soft:#E8F0C4; --cyan:#73CEE5; --cyan-dk:#1C7C97;
-  --bg:#F2F1EF; --bg-tint:#E8F0D4; --card:#FFFFFF; --well:#F8F9F4; --well-2:#EFF3E6;
-  --ink:#111111; --ink-2:#333333; --ink-3:#555555; --ink-4:#767676; --ink-5:#9AA394;
-  --line:#D8DFCB; --line-2:rgba(117,152,64,.30); --rule:#CDDC38;
-  --pos:#4A7C1F; --pos-bg:#EDF5DF;
+  /* Primary = the logo's navy, carried at three weights like the three bars. */
+  --green:#0A436A; --green-dk:#07304C; --green-lt:#4E7B9B;
+  --lime:#9BB4C9;  --lime-soft:#E3EBF2; --cyan:#73CEE5; --cyan-dk:#1C7C97;
+  --steel:#4E7B9B; --slate:#9BB4C9; --olive:#55732D;
+  --bg:#F2F3F5; --bg-tint:#E4EDF4; --card:#FFFFFF; --well:#F7F9FB; --well-2:#EDF2F7;
+  --ink:#111111; --ink-2:#333333; --ink-3:#555555; --ink-4:#767676; --ink-5:#97A3AD;
+  --line:#D3DDE6; --line-2:rgba(10,67,106,.26); --rule:#9BB4C9;
+  /* The logo's green circle does one job here: it means "good". */
+  --pos:#55732D; --pos-bg:#EDF2E2;
   --neg:#C23B2E; --neg-bg:#FBEBE9;
   --warn:#9C6F06; --warn-bg:#FBF2DC;
   --info:#1C7C97; --info-bg:#E4F2F7;
@@ -24,15 +41,15 @@
   --ff-u:'Montserrat',system-ui,sans-serif;
   --ff-m:'JetBrains Mono',ui-monospace,Menlo,monospace;
   --r:4px;
-  --sh:3px 3px 0 rgba(171,202,71,.40);
+  --sh:3px 3px 0 rgba(155,180,201,.40);
   --sh-lime:6px 6px 0 var(--lime);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
   background:
-    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(117,152,64,.03) 10px,rgba(117,152,64,.03) 11px),
-    linear-gradient(165deg,#ffffff 0%,#F2F1EF 55%,#E8F0D4 100%);
+    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(10,67,106,.03) 10px,rgba(10,67,106,.03) 11px),
+    linear-gradient(165deg,#ffffff 0%,#F2F3F5 55%,#E4EDF4 100%);
   background-attachment:fixed;
   color:var(--ink); font-family:var(--ff-u); font-size:13px; line-height:1.45;
   -webkit-font-smoothing:antialiased; overflow:hidden;
@@ -40,7 +57,7 @@ body{
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(117,152,64,.35);border-radius:10px}
+::-webkit-scrollbar-thumb{background:rgba(10,67,106,.35);border-radius:10px}
 ::-webkit-scrollbar-thumb:hover{background:var(--green)}
 :focus-visible{outline:2px solid var(--green);outline-offset:2px}
 
@@ -69,7 +86,7 @@ hr.hair{height:1px;background:var(--line);border:0;margin:12px 0}
   text-transform:uppercase;padding:3px 7px;border-radius:2px;border:1px solid var(--line-2);
   color:var(--ink-2);background:#fff;white-space:nowrap}
 .pill.lime{background:var(--lime);color:#111;border-color:var(--lime)}
-.pill.ok{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.pill.ok{background:var(--pos-bg);border-color:#A6BE84;color:var(--pos)}
 .pill.bad{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
 .pill.warn{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
 .pill.info{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
@@ -111,13 +128,18 @@ table.tbl th.r{font-family:var(--ff-u)}
 .app{display:grid;grid-template-columns:218px 1fr;grid-template-rows:100%;
   height:100vh;height:100dvh;width:100vw;overflow:hidden}
 
-.rail{background:linear-gradient(180deg,#5F7D33 0%,#759840 45%,#6A8A36 100%);
+.rail{background:linear-gradient(180deg,#07304C 0%,#0A436A 52%,#0E5078 100%);
   border-right:4px solid var(--lime);display:flex;flex-direction:column;overflow:hidden;min-height:0}
-.rail-brand{padding:14px;border-bottom:1px solid rgba(205,220,56,.35)}
-.logobox{background:#fff;border:2px solid var(--lime);border-radius:var(--r);padding:8px 10px;
-  box-shadow:2px 2px 0 rgba(0,0,0,.12)}
-.logobox .lg{font-family:var(--ff-d);font-weight:900;font-size:17px;letter-spacing:.15em;color:var(--green);margin:0}
-.logobox .sb{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin:2px 0 0;font-weight:700}
+.rail-brand{padding:14px;border-bottom:1px solid rgba(155,180,201,.35)}
+.logobox{background:#fff;border:1px solid rgba(155,180,201,.9);border-radius:var(--r);padding:9px 10px;
+  box-shadow:2px 2px 0 rgba(0,0,0,.10);display:flex;align-items:center;gap:9px}
+.logobox .mark{flex:none;width:28px;height:28px;display:block}
+.logobox .wd{min-width:0}
+.logobox .lg{font-family:var(--ff-d);font-weight:900;font-size:15px;letter-spacing:.13em;color:var(--green);
+  margin:0;display:flex;align-items:baseline;gap:5px;line-height:1}
+.logobox .lg i{font-family:var(--ff-u);font-style:normal;font-weight:700;font-size:8.5px;letter-spacing:.14em;
+  color:#fff;background:var(--olive);border-radius:2px;padding:2px 4px;line-height:1}
+.logobox .sb{font-size:8px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-4);margin:4px 0 0;font-weight:700}
 .rail-brand .iso{margin:9px 0 0;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#fff;font-weight:700;opacity:.9}
 .rail-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;padding:11px 10px 8px}
 .navgrp{font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--lime);font-weight:700;margin:14px 4px 6px;opacity:.95}
@@ -128,7 +150,7 @@ table.tbl th.r{font-family:var(--ff-u)}
 .nav:hover{background:rgba(0,0,0,.32);border-color:var(--lime)}
 .nav.on{background:var(--lime);color:#111;font-weight:700;border-color:var(--lime);box-shadow:2px 2px 0 rgba(0,0,0,.15)}
 .nav .ic{width:15px;height:15px;flex:none}
-.rail-foot{border-top:1px solid rgba(205,220,56,.35);padding:10px 12px;font-size:9.5px;color:#fff;line-height:1.7}
+.rail-foot{border-top:1px solid rgba(155,180,201,.35);padding:10px 12px;font-size:9.5px;color:#fff;line-height:1.7}
 .rail-foot .row{display:flex;justify-content:space-between;gap:6px}
 .rail-foot b{color:var(--lime);font-weight:700}
 
@@ -137,7 +159,7 @@ table.tbl th.r{font-family:var(--ff-u)}
   padding:9px 14px;backdrop-filter:blur(6px);z-index:30;display:flex;flex-direction:column;gap:8px}
 .tb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .modeswitch{display:inline-flex;background:var(--well-2);border:2px solid var(--green);border-radius:var(--r);
-  padding:2px;gap:2px;box-shadow:2px 2px 0 rgba(171,202,71,.45)}
+  padding:2px;gap:2px;box-shadow:2px 2px 0 rgba(155,180,201,.45)}
 .modeswitch button{border:0;background:transparent;cursor:pointer;padding:6px 13px;border-radius:2px;
   font-size:11px;font-weight:700;color:var(--green-dk);letter-spacing:.02em;transition:.12s;white-space:nowrap}
 .modeswitch button:hover{background:#fff}
@@ -161,7 +183,7 @@ table.tbl th.r{font-family:var(--ff-u)}
 .clock{font-family:var(--ff-m);font-size:11px;color:var(--ink-3);text-align:right;line-height:1.3}
 .clock b{color:var(--green-dk);font-weight:700}
 .avatar{width:28px;height:28px;border-radius:2px;background:var(--green);color:#fff;display:grid;place-items:center;
-  font-weight:700;font-size:10.5px;border:2px solid var(--lime);flex:none}
+  font-weight:700;font-size:10px;letter-spacing:.04em;border:2px solid var(--slate);flex:none}
 
 .tape{height:26px;flex:none;background:var(--green-dk);overflow:hidden;display:flex;align-items:center;border-bottom:2px solid var(--lime)}
 .tape-in{display:flex;gap:24px;white-space:nowrap;animation:tick 52s linear infinite;padding-left:14px}
@@ -279,12 +301,12 @@ svg{display:block;overflow:visible}
 .fb-note.show{display:block}
 
 .agent-chip{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.04em;
-  padding:2px 7px;border-radius:2px;background:var(--pos-bg);border:1px solid #A9C97F;color:var(--pos);white-space:nowrap}
-.agent-chip.mi{background:#F7FAE3;border-color:#C9D86E;color:#6B7A12}
+  padding:2px 7px;border-radius:2px;background:var(--pos-bg);border:1px solid #A6BE84;color:var(--pos);white-space:nowrap}
+.agent-chip.mi{background:#F2F6F9;border-color:#A9C0D2;color:#2C5C80}
 .agent-chip.dq{background:var(--info-bg);border-color:#97CBDC;color:var(--info)}
 .agent-chip.sg{background:var(--warn-bg);border-color:#DEC082;color:var(--warn)}
 .agent-chip.sc{background:var(--mag-bg);border-color:#C2A8DA;color:var(--mag)}
-.agent-chip.op{background:var(--pos-bg);border-color:#A9C97F;color:var(--pos)}
+.agent-chip.op{background:var(--pos-bg);border-color:#A6BE84;color:var(--pos)}
 .agent-chip.mo{background:var(--neg-bg);border-color:#E3A9A2;color:var(--neg)}
 
 .feed{max-height:330px;overflow-y:auto;margin:0 -4px}
@@ -306,7 +328,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .rngval{font-family:var(--ff-d);font-weight:700;font-size:16px;min-width:76px;text-align:right;color:var(--ink)}
 .rngval small{font-family:var(--ff-u);font-size:10px;font-weight:600;color:var(--ink-4);margin-left:3px}
 
-.scrim{position:fixed;inset:0;background:rgba(30,40,22,.45);opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.scrim{position:fixed;inset:0;background:rgba(8,28,45,.45);opacity:0;pointer-events:none;transition:.2s;z-index:90}
 .scrim.on{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:640px;max-width:95vw;background:var(--bg);
   border-left:4px solid var(--lime);transform:translateX(100%);transition:transform .24s cubic-bezier(.2,.8,.2,1);
@@ -341,15 +363,18 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .callout{border-left:3px solid var(--warn);background:var(--warn-bg);padding:8px 10px;border-radius:2px;
   font-size:10.5px;color:#6E4F04;line-height:1.6;margin:0}
 .callout.info{border-left-color:var(--cyan-dk);background:var(--info-bg);color:#115A6E}
-.callout.ok{border-left-color:var(--pos);background:var(--pos-bg);color:#33590F}
-</style></head><body>
+.callout.ok{border-left-color:var(--pos);background:var(--pos-bg);color:#3C521F}
+</style>
 
 <div class="app">
   <aside class="rail">
     <div class="rail-brand">
       <div class="logobox">
-        <p class="lg">ASTREA</p>
-        <p class="sb">a Nuvve company</p>
+        <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false"><g fill="#0A436A"><rect x="20" y="6" width="113" height="1012" rx="56.5" opacity=".45"/><rect x="302" y="153" width="113" height="718" rx="56.5" opacity=".72"/><rect x="583" y="307" width="113" height="410" rx="56.5"/></g><circle cx="900" cy="512" r="102" fill="#55732D"/></svg>
+        <div class="wd">
+          <p class="lg">ASTREA<i>AI</i></p>
+          <p class="sb">Agentic forecasting</p>
+        </div>
       </div>
       <p class="iso">ERCOT · Texas interconnection</p>
     </div>
@@ -375,9 +400,10 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
         <span class="pill ok"><i class="dot live"></i> ERCOT MIS LIVE</span>
         <span class="pill mono" id="pillRun">run 5b7e·d01</span>
         <div class="tb-div"></div>
+        <a class="btn sm" href="/co-op">Co-op desk &#8599;</a>
         <div class="clock"><b id="clkT">14:42:08</b><br><span>CDT · Thu 29 Oct 2026</span></div>
-        <div class="avatar" title="Marcus Whitfield">MW</div>
-        <a class="btn sm" href="/api/logout" title="End this session" style="text-decoration:none">Sign out</a>
+        <div class="avatar">MW</div>
+        <a class="btn sm" href="/api/logout">Sign out</a>
       </div>
     </header>
 
@@ -582,15 +608,15 @@ function chart(o){
   let s='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" role="img">';
   const tk=o.yTicks||5;
   for(let t=0;t<=tk;t++){const v=mn+(mx-mn)*t/tk,y=Y(v);
-    s+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+y.toFixed(1)+'" stroke="#D8DFCB" stroke-width="1"/>';
+    s+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+y.toFixed(1)+'" stroke="#D3DDE6" stroke-width="1"/>';
     s+='<text x="'+(pl-7)+'" y="'+(y+3.3).toFixed(1)+'" text-anchor="end" fill="#767676" font-size="9" font-family="JetBrains Mono,monospace">'+(o.yFmt?o.yFmt(v):Math.round(v))+'</text>';}
-  if(mn<0&&mx>0){const z=Y(0);s+='<line x1="'+pl+'" y1="'+z.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+z.toFixed(1)+'" stroke="#9AA394" stroke-width="1.2"/>';}
+  if(mn<0&&mx>0){const z=Y(0);s+='<line x1="'+pl+'" y1="'+z.toFixed(1)+'" x2="'+(w-pr)+'" y2="'+z.toFixed(1)+'" stroke="#97A3AD" stroke-width="1.2"/>';}
   (o.xLabels||[]).forEach(l=>{s+='<text x="'+X(l.i).toFixed(1)+'" y="'+(h-6)+'" text-anchor="middle" fill="#767676" font-size="9" font-family="JetBrains Mono,monospace">'+l.t+'</text>';});
   (o.zones||[]).forEach(z=>{s+='<rect x="'+X(z.a).toFixed(1)+'" y="'+pt+'" width="'+(X(z.b)-X(z.a)).toFixed(1)+'" height="'+ih+'" fill="'+z.c+'" fill-opacity="'+(z.op||.14)+'"/>';
     if(z.t)s+='<text x="'+((X(z.a)+X(z.b))/2).toFixed(1)+'" y="'+(pt+11)+'" text-anchor="middle" fill="'+z.c+'" font-size="8.5" font-weight="700" font-family="JetBrains Mono,monospace">'+z.t+'</text>';});
   if(o.band){let p='';o.band.hi.forEach((v,i)=>p+=(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1));
     for(let i=o.band.lo.length-1;i>=0;i--)p+='L'+X(i).toFixed(1)+','+Y(o.band.lo[i]).toFixed(1);
-    s+='<path d="'+p+'Z" fill="'+(o.band.color||'#ABCA47')+'" fill-opacity="'+(o.band.op||.30)+'"/>';}
+    s+='<path d="'+p+'Z" fill="'+(o.band.color||'#7FA3BF')+'" fill-opacity="'+(o.band.op||.30)+'"/>';}
   o.series.forEach(se=>{
     if(se.type==='bar'){const bw=Math.max(2,iw/n*(se.bw||.62));
       se.data.forEach((v,i)=>{if(v==null||v===0)return;const y0=Y(Math.max(0,mn)),y1=Y(v);
@@ -645,7 +671,7 @@ function decision(d){
   +'<span style="flex:1"></span><button class="btn sm" data-act="audit" data-run="'+d.run+'" data-t="'+d.h.slice(0,46)+'">Lineage ↗</button></div>'
   +'<p class="fb-note" id="fbn-'+d.id+'"></p></div>';
 }
-const heatC=v=>['#E8F0D4','#CDDC38','#ABCA47','#759840','#C9A227','#D98324','#C23B2E'][Math.min(6,Math.max(0,Math.round(v*6)))];
+const heatC=v=>['#E4EDF4','#9BB4C9','#7FA3BF','#0A436A','#C9A227','#D98324','#C23B2E'][Math.min(6,Math.max(0,Math.round(v*6)))];
 
 /* ══════════ MODES & NAV ══════════ */
 const MODES={
@@ -694,18 +720,18 @@ SCREENS['l-overview']=()=>{
  +chartCard({t:'System load — actual vs Astrea P50 vs ERCOT MTLF',
    src:'ERCOT NP6-345-CD actual by weather zone · NP3-565-CD seven-day forecast by model and weather zone · Astrea run 5b7e·d01 · Thu 29 Oct 2026 CDT',
    pills:['<span class="pill ok">MAPE 1.71%</span>','<button class="btn sm" data-act="go" data-s="l-load">Detail ↗</button>'],
-   svg:chart({h:238,series:[{data:g.loadP50,color:'#759840',w:2.4},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'},{data:g.loadAct,color:'#111111',w:2.2}],
-     band:{lo:g.loadP10,hi:g.loadP90,color:'#ABCA47',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
-     pts:[{i:17,v:61400,c:'#4A7C1F',t:'61.4k'}]}),
-   leg:LEG([{c:'#759840',t:'Astrea P50'},{c:'#ABCA47',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'},{c:'#111111',t:'Actual to 14:42'}])})
+   svg:chart({h:238,series:[{data:g.loadP50,color:'#0A436A',w:2.4},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'},{data:g.loadAct,color:'#111111',w:2.2}],
+     band:{lo:g.loadP10,hi:g.loadP90,color:'#7FA3BF',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     pts:[{i:17,v:61400,c:'#55732D',t:'61.4k'}]}),
+   leg:LEG([{c:'#0A436A',t:'Astrea P50'},{c:'#7FA3BF',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'},{c:'#111111',t:'Actual to 14:42'}])})
  +chartCard({t:'Net load — the autumn duck curve',
    src:'Load − utility-scale wind − utility-scale solar · ERCOT NP4-732-CD wind actual &amp; forecast · Combined Wind and Solar dashboard',
    pills:['<span class="pill warn">23.5 GW ramp</span>'],
-   svg:chart({h:206,series:[{data:g.loadP50,color:'#9AA394',w:1.5},{data:g.solar,color:'#D99A07',type:'area',op:.26},
-     {data:g.wind,color:'#1C7C97',type:'area',op:.22},{data:g.netLoad,color:'#759840',w:2.6}],
+   svg:chart({h:206,series:[{data:g.loadP50,color:'#97A3AD',w:1.5},{data:g.solar,color:'#D99A07',type:'area',op:.26},
+     {data:g.wind,color:'#1C7C97',type:'area',op:.22},{data:g.netLoad,color:'#0A436A',w:2.6}],
      yMin:0,xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
-     pts:[{i:18,v:42320,c:'#4A7C1F',t:'net pk 42.3k'},{i:12,v:18800,c:'#1C7C97',t:'18.8k'}]}),
-   leg:LEG([{c:'#9AA394',t:'Gross load'},{c:'#D99A07',t:'Utility solar'},{c:'#1C7C97',t:'Wind'},{c:'#759840',t:'Net load'}]),
+     pts:[{i:18,v:42320,c:'#55732D',t:'net pk 42.3k'},{i:12,v:18800,c:'#1C7C97',t:'18.8k'}]}),
+   leg:LEG([{c:'#97A3AD',t:'Gross load'},{c:'#D99A07',t:'Utility solar'},{c:'#1C7C97',t:'Wind'},{c:'#0A436A',t:'Net load'}]),
    note:'Late October is where the duck is deepest. Solar covers the middle of the day while load is mild, so net load falls to <b>18.8 GW at HE13</b> — then the solar cliff lands directly on the evening peak and the system climbs <b>23.5 GW in six hours</b>. Sunset is 18:41 CDT today; DST ends on 1 November and the ramp moves an hour earlier overnight.'})
  +card(rule('Weather zone load &amp; forecast quality','at today\'s peak, HE18')
    +'<div class="zgrid">'+g.zones.map(z=>'<div class="zone" data-act="go" data-s="l-load">'
@@ -767,15 +793,15 @@ SCREENS['l-load']=()=>{
  +chartCard({t:'Probabilistic load forecast · D+1 · ERCOT system',
    src:'TFT quantile v3.9.1 · 46-station population-weighted weather · run 5b7e·d02 · SHA-256 a30f7c12…e8b4',
    pills:['<span class="pill info">hourly · MTLF horizon</span>'],
-   svg:chart({h:244,series:[{data:g.loadP50,color:'#759840',w:2.4,dots:true},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'}],
-     band:{lo:g.loadP10,hi:g.loadP90,color:'#ABCA47',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
-     marks:[{i:17,c:'#4A7C1F',t:'peak HE18'},{i:18,c:'#9C6F06',t:'net-load peak'}]}),
-   leg:LEG([{c:'#759840',t:'Astrea P50'},{c:'#ABCA47',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}])})
+   svg:chart({h:244,series:[{data:g.loadP50,color:'#0A436A',w:2.4,dots:true},{data:g.mtlf,color:'#7B4FA0',w:1.9,dash:'5 3'}],
+     band:{lo:g.loadP10,hi:g.loadP90,color:'#7FA3BF',op:.3},xLabels:XL,yFmt:v=>(v/1000).toFixed(0)+'k',
+     marks:[{i:17,c:'#55732D',t:'peak HE18'},{i:18,c:'#9C6F06',t:'net-load peak'}]}),
+   leg:LEG([{c:'#0A436A',t:'Astrea P50'},{c:'#7FA3BF',t:'P10–P90',k:'band'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}])})
  +chartCard({t:'Seven-day outlook · daily peak',
    src:'MTLF 168 h · Thu 29 Oct → Wed 04 Nov 2026 · a cold front arrives Tue evening',
-   svg:chart({h:182,series:[{data:d7,color:'#759840',type:'bar'},{data:[60400,58900,56400,54100,57600,61600,62700],color:'#7B4FA0',w:1.9,dash:'4 3'}],
+   svg:chart({h:182,series:[{data:d7,color:'#0A436A',type:'bar'},{data:[60400,58900,56400,54100,57600,61600,62700],color:'#7B4FA0',w:1.9,dash:'4 3'}],
      yMin:46000,xLabels:['Thu 29','Fri 30','Sat 31','Sun 01','Mon 02','Tue 03','Wed 04'].map((t,i)=>({i,t})),yFmt:v=>(v/1000).toFixed(0)+'k'}),
-   leg:LEG([{c:'#759840',t:'Astrea daily peak P50'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}]),
+   leg:LEG([{c:'#0A436A',t:'Astrea daily peak P50'},{c:'#7B4FA0',t:'ERCOT MTLF',k:'dash'}]),
    note:'The weekend dips as expected, then the first real cold front of the season lands Tuesday night. By Wednesday the morning hour overtakes the evening one — the winter shape. ERCOT\'s own December MORA treats <b>HE08 as the highest-risk hour</b>; late October is the handover. The seasonal picture beyond this window sits on the <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">winter outlook</a>: a P50 of 64.2 GW in late January against a P95 of 79.4 GW on a mid-January morning.'})
  +card(rule('Zonal forecast · HE18','8 official ERCOT weather zones')
    +tbl([['Zone'],['Anchor stations'],['P50 MW',1],['Share',1],['Dry bulb',1],['Dew pt',1],['MAE',1],['YoY',1]],
@@ -845,10 +871,10 @@ SCREENS['l-renew']=()=>{
  +chartCard({t:'Renewable share of load and economic curtailment exposure',
    src:'Derived · modelled from net load vs the west-zone congestion pattern in NP6-788-CD',
    svg:chart({h:186,series:[
-     {data:g.loadP50.map((v,i)=>+(((g.wind[i]+g.solar[i])/v*100).toFixed(1)),),color:'#759840',w:2.4},
+     {data:g.loadP50.map((v,i)=>+(((g.wind[i]+g.solar[i])/v*100).toFixed(1)),),color:'#0A436A',w:2.4},
      {data:curtail.map(v=>v/100),color:'#C23B2E',type:'bar',op:.65}],
      yMin:0,xLabels:XL,yFmt:v=>Math.round(v)+'%'}),
-   leg:LEG([{c:'#759840',t:'Renewable share of load (%)'},{c:'#C23B2E',t:'Modelled curtailment exposure (index)'}])})
+   leg:LEG([{c:'#0A436A',t:'Renewable share of load (%)'},{c:'#C23B2E',t:'Modelled curtailment exposure (index)'}])})
  +'</div><div class="stack">'
  +card(rule('Forecast accuracy by resource','D+1, trailing 30 days')
    +tbl([['Series'],['Astrea MAE',1],['ERCOT',1],['Δ',1]],[
@@ -895,14 +921,14 @@ SCREENS['l-acc']=()=>{
  +'<div class="c-23"><div class="stack">'
  +chartCard({t:'Forecast error today — completed hours',
    src:'Actual ERCOT load (NP6-345-CD) vs Astrea P50 and ERCOT MTLF · % of actual · ±2.5 % review tolerance',
-   svg:chart({h:206,series:[{data:err,color:'#759840',type:'bar',bw:.4,off:-7},{data:mErr,color:'#7B4FA0',type:'bar',bw:.4,off:7}],
+   svg:chart({h:206,series:[{data:err,color:'#0A436A',type:'bar',bw:.4,off:-7},{data:mErr,color:'#7B4FA0',type:'bar',bw:.4,off:7}],
      yMin:-1.4,yMax:1.4,yTicks:4,xLabels:XL,yFmt:v=>v.toFixed(1)+'%'}),
-   leg:LEG([{c:'#759840',t:'Astrea error'},{c:'#7B4FA0',t:'ERCOT MTLF error'}])})
+   leg:LEG([{c:'#0A436A',t:'Astrea error'},{c:'#7B4FA0',t:'ERCOT MTLF error'}])})
  +chartCard({t:'Rolling 7-day MAPE — shadow deployment to date',
    src:'Weeks 5–11 of a 12–16 week shadow deployment alongside the incumbent · no write access',
-   svg:chart({h:190,series:[{data:hist,color:'#759840',w:2.6,dots:true},{data:eHist,color:'#7B4FA0',w:2,dash:'5 3',dots:true}],
+   svg:chart({h:190,series:[{data:hist,color:'#0A436A',w:2.6,dots:true},{data:eHist,color:'#7B4FA0',w:2,dash:'5 3',dots:true}],
      xLabels:['wk 5','wk 6','wk 7','wk 8','wk 9','wk 10','wk 11'].map((t,i)=>({i,t})),yFmt:v=>v.toFixed(1)+'%'}),
-   leg:LEG([{c:'#759840',t:'Astrea 7-day MAPE'},{c:'#7B4FA0',t:'ERCOT MTLF'}]),
+   leg:LEG([{c:'#0A436A',t:'Astrea 7-day MAPE'},{c:'#7B4FA0',t:'ERCOT MTLF'}]),
    note:'The improvement is not a step change on day one. It is the causal loop closing: each analyst-validated link narrows the error a little, and the curve flattens as the remaining error becomes weather uncertainty rather than model error.'})
  +card(rule('Backcast table','completed hours only')
    +tbl([['HE'],['Actual',1],['Astrea P50',1],['Error',1],['ERCOT MTLF',1],['MTLF error',1],['Tolerance']],
@@ -957,23 +983,23 @@ SCREENS['p-price']=()=>{
  +chartCard({t:'Day-ahead settlement point price vs real-time forecast · '+BESS.hub,
    src:'ERCOT NP4-190-CD DAM Settlement Point Prices (published for this operating day) · NP6-905-CD RT settlement points · Astrea RT forecast run 5b7e·p01',
    pills:['<span class="pill info">$/MWh</span>'],
-   svg:chart({h:240,series:[{data:h.da,color:'#759840',w:2.5,dots:true},{data:h.rt,color:'#1C7C97',w:2.1,dash:'5 3'}],
+   svg:chart({h:240,series:[{data:h.da,color:'#0A436A',w:2.5,dots:true},{data:h.rt,color:'#1C7C97',w:2.1,dash:'5 3'}],
      xLabels:XL,yFmt:v=>'$'+Math.round(v),
      zones:(()=>{const z=[];const ci=R.sched.map((s,i)=>s==='charge'?i:-1).filter(i=>i>=0);
        const di=R.sched.map((s,i)=>s==='discharge'?i:-1).filter(i=>i>=0);
        if(ci.length)z.push({a:Math.min(...ci),b:Math.max(...ci)+1,c:'#1C7C97',t:'CHARGE',op:.14});
-       if(di.length)z.push({a:Math.min(...di),b:Math.max(...di)+1,c:'#4A7C1F',t:'DISCHARGE',op:.14});
+       if(di.length)z.push({a:Math.min(...di),b:Math.max(...di)+1,c:'#55732D',t:'DISCHARGE',op:.14});
        return z;})(),
-     pts:[{i:h.da.indexOf(Math.max(...h.da)),v:Math.max(...h.da),c:'#4A7C1F',t:'$'+Math.max(...h.da).toFixed(0)}]}),
-   leg:LEG([{c:'#759840',t:'DAM settlement point price (published)'},{c:'#1C7C97',t:'Astrea RT forecast',k:'dash'}]),
+     pts:[{i:h.da.indexOf(Math.max(...h.da)),v:Math.max(...h.da),c:'#55732D',t:'$'+Math.max(...h.da).toFixed(0)}]}),
+   leg:LEG([{c:'#0A436A',t:'DAM settlement point price (published)'},{c:'#1C7C97',t:'Astrea RT forecast',k:'dash'}]),
    note:'<b>Looking ahead:</b> on grey winter days the net-demand curve stops looking like this deep midday duck and reverts to a traditional winter shape, with midday prices firmer than the market has grown used to. Our <a href="#" data-act="go" data-s="w-winter" style="color:var(--cyan-dk)">winter outlook</a> carries that as the base case under a Super El Niño.<br><br>October is the weakest spread month of the year — no summer scarcity, and the winter morning spikes have not started. The whole day sits between <b>$26 and $57/MWh</b>. That is exactly why it is the right month to demonstrate a forecasting edge: there is no scarcity event doing the work for you.'})
  +chartCard({t:'All four trading hubs · day-ahead',
    src:'ERCOT NP4-190-CD · HB_NORTH, HB_HOUSTON, HB_SOUTH, HB_WEST · basis is unusually tight today',
    svg:chart({h:206,series:[
-     {data:HUBS.HB_NORTH.da,color:'#759840',w:2.2},{data:HUBS.HB_HOUSTON.da,color:'#1C7C97',w:2},
+     {data:HUBS.HB_NORTH.da,color:'#0A436A',w:2.2},{data:HUBS.HB_HOUSTON.da,color:'#1C7C97',w:2},
      {data:HUBS.HB_SOUTH.da,color:'#D99A07',w:2},{data:HUBS.HB_WEST.da,color:'#7B4FA0',w:2}],
      xLabels:XL,yFmt:v=>'$'+Math.round(v)}),
-   leg:LEG([{c:'#759840',t:'HB_NORTH'},{c:'#1C7C97',t:'HB_HOUSTON'},{c:'#D99A07',t:'HB_SOUTH'},{c:'#7B4FA0',t:'HB_WEST'}]),
+   leg:LEG([{c:'#0A436A',t:'HB_NORTH'},{c:'#1C7C97',t:'HB_HOUSTON'},{c:'#D99A07',t:'HB_SOUTH'},{c:'#7B4FA0',t:'HB_WEST'}]),
    note:'HB_WEST is the <b>highest</b> hub today, which is not the usual autumn pattern — west normally carries the most negative intervals on the system. Overnight wind is strong but the Panhandle export path is unconstrained, so the west discount has closed. Worth watching: it is the sort of basis reversal that catches a static hedge out.'})
  +card(rule('Hourly price table','DA published · RT forecast · $/MWh')
    +tbl([['HE'],['DA '+BESS.hub,1],['RT forecast',1],['DART',1],['Best AS product'],['AS $/MW-h',1],['Battery action']],
@@ -1005,9 +1031,9 @@ SCREENS['p-price']=()=>{
    why:'Solar reaches 24.8 GW at HE13 against a mild 54.1 GW load. On the four comparable October days this month, real time has cleared <b>$14–22 below day-ahead</b> through the solar plateau, and two of them printed negative intervals in HE15–HE16. Our RT path carries that discount. The risk is a west-zone congestion event that reverses it — the basis is already behaving unusually today.',
    drivers:[['Solar at HE13',74,'24.8 GW'],['Load at HE13',-31,'54.1 GW'],['Oct DART precedent',58,'−$14 to −22'],['West basis reversal risk',-26,'watch']]})
  +card(rule('Ancillary clearing today','DAM MCPC · $/MW-h')
-   +chart({h:168,pl:34,series:Object.keys(AS).map((k,i)=>({data:AS[k].p,color:['#759840','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],w:1.9})),
+   +chart({h:168,pl:34,series:Object.keys(AS).map((k,i)=>({data:AS[k].p,color:['#0A436A','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],w:1.9})),
      yMin:0,xLabels:XL,yFmt:v=>'$'+v.toFixed(0)})
-   +LEG(Object.keys(AS).map((k,i)=>({c:['#759840','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],t:k})))
+   +LEG(Object.keys(AS).map((k,i)=>({c:['#0A436A','#1C7C97','#D99A07','#7B4FA0','#C23B2E'][i],t:k})))
    +'<p class="note">Non-Spin dominates the evening at <b>$18.11/MW-h at HE22</b>. Reg-Down is the only product that peaks at midday, when solar oversupply makes down-regulation scarce. Everything else clears under $3.</p>')
  +'</div></div>';
 };
@@ -1015,7 +1041,7 @@ SCREENS['p-price']=()=>{
 /* ══════════ SCREEN · BESS REVENUE MODEL ══════════ */
 SCREENS['p-bess']=()=>{
  const r=R, h=HUBS[BESS.hub];
- const parts=[['Energy arbitrage',r.arb,'#759840'],['Ancillary services',r.asRev,'#1C7C97'],['Degradation',-r.deg,'#C23B2E']];
+ const parts=[['Energy arbitrage',r.arb,'#0A436A'],['Ancillary services',r.asRev,'#1C7C97'],['Degradation',-r.deg,'#C23B2E']];
  const posParts=parts.filter(p=>p[1]>0), sum=posParts.reduce((a,b)=>a+b[1],0)||1;
  const asShare=r.arb+r.asRev>0?r.asRev/(r.arb+r.asRev)*100:0;
  const benchFleet=1.88, benchMedian=1.59;
@@ -1060,11 +1086,11 @@ SCREENS['p-bess']=()=>{
    src:'Charge below the axis, discharge above, ancillary capacity held shaded, state of charge dashed · greedy charge-then-discharge optimisation over the published curve · run 5b7e·b01',
    pills:['<span class="pill ok">'+r.nCyc+' cycle'+(r.nCyc===1?'':'s')+'</span>'],
    svg:chart({h:232,series:[
-     {data:asBars.map(v=>v||null),color:'#CDDC38',type:'bar',op:.45,bw:.74},
-     {data:dispatchBars.map(v=>v>0?v:null),color:'#4A7C1F',type:'bar',bw:.5},
+     {data:asBars.map(v=>v||null),color:'#9BB4C9',type:'bar',op:.45,bw:.74},
+     {data:dispatchBars.map(v=>v>0?v:null),color:'#55732D',type:'bar',bw:.5},
      {data:dispatchBars.map(v=>v<0?v:null),color:'#1C7C97',type:'bar',bw:.5}],
      yMin:-r.P*1.15,yMax:r.P*1.15,yTicks:4,xLabels:XL,yFmt:v=>fmt(Math.abs(v))}),
-   leg:LEG([{c:'#4A7C1F',t:'Discharge MW'},{c:'#1C7C97',t:'Charge MW'},{c:'#CDDC38',t:'Ancillary capacity held MW'}]),
+   leg:LEG([{c:'#55732D',t:'Discharge MW'},{c:'#1C7C97',t:'Charge MW'},{c:'#9BB4C9',t:'Ancillary capacity held MW'}]),
    extra:'<p class="sect" style="margin:14px 0 8px;font-size:9px">State of charge · %</p>'
      +chart({h:92,pl:34,yTicks:2,series:[{data:socT,color:'#7B4FA0',type:'area',op:.2,w:2}],yMin:0,yMax:105,xLabels:XL,yFmt:v=>Math.round(v)+'%'}),
    note:'Charge and discharge windows are forced to alternate — a cycle has to finish before the next one starts, so the asset never stores more than its '+fmt(r.E)+' MWh. That constraint is why October usually resolves to a single cycle: the second-best window pair cannot clear the degradation charge plus the ancillary revenue it would displace.'})
@@ -1121,7 +1147,7 @@ SCREENS['p-as']=()=>{
  const r=R;
  const tot=k=>r.asRows.filter(x=>x.product===k).reduce((a,b)=>a+b.rev,0);
  const hrs=k=>r.asRows.filter(x=>x.product===k).length;
- const cols={'REG-UP':'#759840','REG-DOWN':'#1C7C97','RRS':'#D99A07','ECRS':'#7B4FA0','NON-SPIN':'#C23B2E'};
+ const cols={'REG-UP':'#0A436A','REG-DOWN':'#1C7C97','RRS':'#D99A07','ECRS':'#7B4FA0','NON-SPIN':'#C23B2E'};
  return hero({kick:'Optimization agent · reserves',h:'Ancillary services',
   tag:'Five products, co-optimised with energy in SCED every five minutes since RTC+B. The battery no longer picks a lane in advance.',
   pills:['<span class="pill lime">'+r.P+' MW asset · '+(AS_HEADROOM*100)+' % offered</span>','<span class="pill ok">RTC+B co-optimisation</span>']})
@@ -1156,8 +1182,8 @@ SCREENS['p-as']=()=>{
  +chartCard({t:'Where this asset earns its ancillary revenue',
    src:'Expected value = clearing price × award probability × '+(AS_HEADROOM*100)+' % of '+r.P+' MW, on hours the optimiser leaves idle',
    svg:chart({h:186,series:[{data:Array.from({length:24},(_,i)=>{const row=r.asRows.find(x=>x.h===i);return row?row.rev:0;}),
-     color:'#759840',type:'bar'}],yMin:0,xLabels:XL,yFmt:v=>'$'+fmt(v)}),
-   leg:LEG([{c:'#759840',t:'Expected AS revenue by hour ($)'}])})
+     color:'#0A436A',type:'bar'}],yMin:0,xLabels:XL,yFmt:v=>'$'+fmt(v)}),
+   leg:LEG([{c:'#0A436A',t:'Expected AS revenue by hour ($)'}])})
  +'</div><div class="stack">'
  +card(rule('2026 AS methodology','effective 1 Jan 2026')
    +'<p class="callout info">ECRS and Non-Spin moved from a <b>statistical to a probabilistic Monte Carlo method</b>, targeting a one-in-ten-year probability of reserves falling below Reg-Up + RRS or the 3,000 MW Watch threshold. Average quantities are similar year on year, but they <b>shift toward higher-risk hours</b> — which is exactly where a battery wants to be.</p>'
@@ -1205,7 +1231,7 @@ SCREENS['p-dispatch']=()=>{
      const sell=r.sched[i]==='discharge';
      const px=sell?(r.px[i]*0.88):(r.px[i]*1.12);
      return '<div class="hr2 '+(sell?'win':'chg')+'"><span class="h">'+HE(i)+'</span>'
-      +'<span class="bar"><i style="width:'+(Math.abs(r.px[i])/mx*100).toFixed(0)+'%;background:'+(sell?'#4A7C1F':'#1C7C97')+'"></i></span>'
+      +'<span class="bar"><i style="width:'+(Math.abs(r.px[i])/mx*100).toFixed(0)+'%;background:'+(sell?'#55732D':'#1C7C97')+'"></i></span>'
       +'<span class="p">'+(sell?'sell ≥ $':'buy ≤ $')+px.toFixed(2)+'</span><span class="q">'+r.P+' MW</span></div>';}).join('')
    +'</div>'
    +'<p class="note">Sell limits sit 12 % below the forecast price and buy limits 12 % above, so each block clears with roughly 90 % confidence. Anything unfilled rolls into real time, where the optimiser re-solves every five minutes against the SCED co-optimisation.</p>')
@@ -1225,7 +1251,7 @@ SCREENS['p-dispatch']=()=>{
         {v:'$'+(AS[k].p.reduce((a,b)=>a+b,0)/24).toFixed(2),c:'r'},{v:(AS[k].prob*100)+' %',c:'r'},{v:'$0',c:'r'},
         '<span class="pill">SKIPPED — below opportunity cost</span>']))))
  +card(rule('State of charge trajectory','with the reserve obligation overlaid')
-   +chart({h:176,pl:38,series:[{data:r.socT,color:'#759840',type:'area',op:.24,w:2.4}],
+   +chart({h:176,pl:38,series:[{data:r.socT,color:'#0A436A',type:'area',op:.24,w:2.4}],
      yMin:0,yMax:105,xLabels:XL,yFmt:v=>Math.round(v)+'%'})
    +'<p class="note">The optimiser holds a floor of 10 % and a ceiling of 100 %. Ancillary awards are only offered on hours where the state of charge can physically support the obligation for the product\'s full deployment duration — which is why Non-Spin, a 30-minute product, is cheaper to carry than RRS.</p>')
  +'</div><div class="stack">'
@@ -1448,11 +1474,11 @@ SCREENS['w-winter']=()=>{
    pills:['<span class="pill ok">Astrea P50 64.2 GW</span>','<span class="pill mag">Amperon P50 63.0 GW</span>'],
    svg:chart({h:238,pl:40,series:[
      {data:W.amperon,color:'#7B4FA0',type:'bar',op:.42,bw:.86},
-     {data:W.astrea,color:'#759840',w:2.6}],
+     {data:W.astrea,color:'#0A436A',w:2.6}],
      yMin:0,xLabels:[0,6,12,18,24,30,36].map(i=>({i,t:W.bins[i]+' GW'})),yFmt:v=>v.toFixed(0)+'%',
      marks:[{i:25.9,c:'#C23B2E',t:'Fern 75.9'},{i:30.56,c:'#111111',t:'record 80.6'}],
-     pts:[{i:12,v:5.53,c:'#4A7C1F',t:'P50 64.2'}]}),
-   leg:LEG([{c:'#759840',t:'Astrea ensemble'},{c:'#7B4FA0',t:'Amperon ensemble (published)'},{c:'#C23B2E',t:'Winter Storm Fern actual',k:'dash'}]),
+     pts:[{i:12,v:5.53,c:'#55732D',t:'P50 64.2'}]}),
+   leg:LEG([{c:'#0A436A',t:'Astrea ensemble'},{c:'#7B4FA0',t:'Amperon ensemble (published)'},{c:'#C23B2E',t:'Winter Storm Fern actual',k:'dash'}]),
    note:'The two ensembles agree on the centre and differ in the tail. We carry <b>1.2 GW more</b> at the median and a visibly fatter right shoulder above 78 GW, because our large-load term tracks the officer-letter filings month by month rather than holding an annual baseline. In a mild season that difference is worth almost nothing. On the one morning it matters it is worth everything, which is the whole argument for forecasting the distribution rather than the average.'})
  +card(rule('Why three "winter peak" numbers disagree','and which one to plan against')
    +tbl([['Figure'],['Value',1],['What it actually is']],[
@@ -1608,7 +1634,7 @@ function openAudit(run,title){
     ['Container','python:3.11-slim · no network egress · read-only FS'],
     ['Random seed','fixed — 20261029'],['Started','2026-10-29 '+(price?'14:39:22':'14:42:11')+' CDT'],
     ['Duration',price?'0.004 s':'2.6 s'],['Regression gate','52 / 52 PASS'],
-    ['Signed by','m.whitfield@nuvve.com'],['Reproducible','yes — replay verified 14:44']]
+    ['Signed by','m.whitfield@astrea.ai'],['Reproducible','yes — replay verified 14:44']]
    .map(r=>'<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>').join('')+'</dl>'
   +'<p class="sect">Input manifest<span class="r">every source, with fetch timestamp</span></p>'
   +'<div class="tblwrap"><table class="tbl"><thead><tr><th>Input</th><th>ERCOT product</th><th class="r">Fetched</th><th>Hash</th></tr></thead><tbody>'
@@ -1656,7 +1682,7 @@ function openAudit(run,title){
     ['ok','Supervisor · synthesis','Narrated, cited 4 products, attached the MW impact. Every figure read from the model output, none generated.'],
     ['wait','Analyst sign-off','Pending on the P50-versus-MTLF divergence decision.']
    ]).map(s=>'<div class="step '+s[0]+'"><h5>'+s[1]+'</h5><p>'+s[2]+'</p></div>').join('')+'</div>'
-  +'<div class="card" style="margin-top:6px;background:var(--pos-bg);border-color:#A9C97F;box-shadow:none">'
+  +'<div class="card" style="margin-top:6px;background:var(--pos-bg);border-color:#A6BE84;box-shadow:none">'
   +'<p class="kicker">The contract</p>'
   +'<p class="tiny" style="margin:7px 0 0;line-height:1.75;color:var(--ink-2)">The LLM reasons over topology and causality, routes work to specialist agents, narrates and cites. It <b style="color:var(--neg)">never</b> computes a forecast, never generates a numeric value into a bid or a dispatch instruction, and never touches raw timeseries. Every number in this run traces to a versioned, sandboxed artifact plus a SHA-256 hash, and a 52-scenario regression suite gates every model swap with a signed validation.</p></div>';
  wrapTables($('#drBody'));
@@ -1712,4 +1738,7 @@ setInterval(()=>{const d=new Date();
 $$('#modeSwitch button').forEach(b=>b.classList.toggle('on',b.dataset.mode==='load'));
 renderModeCtl(); renderTape(); renderNav(); go('l-overview');
 </script>
+
 </body></html>
+</body>
+</html>
